@@ -1,14 +1,18 @@
 -- Set leader
 vim.g.mapleader = " "
-vim.g.maplocalleader = ' '
+vim.g.maplocalleader = " "
 -- Easy open netrw
 vim.keymap.set("n", "<leader>e", vim.cmd.Ex)
 -- Easy exit
 vim.keymap.set("n", "Q", "ZQ")
 -- Don't highlight search
-vim.keymap.set("n", "<Esc>", function() vim.cmd [[ nohlsearch ]] end)
+vim.keymap.set("n", "<Esc>", function()
+	vim.cmd([[ nohlsearch ]])
+end)
 -- Save like in vsc**e
-vim.keymap.set("n", "<C-S>", function() vim.cmd [[write]] end)
+vim.keymap.set("n", "<C-S>", function()
+	vim.cmd([[write]])
+end)
 -- Replace the work you were on
 -- TODO: to lua
 vim.keymap.set("n", "g%", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
@@ -27,10 +31,16 @@ vim.keymap.set("t", "<C-l>", [[<C-\><C-n><C-w>l]])
 vim.keymap.set("n", "{", ":keepjumps normal! {<CR>")
 vim.keymap.set("n", "}", ":keepjumps normal! }<CR>")
 -- Easy to relod current file
-vim.keymap.set("n", "<leader>%", function() vim.cmd [[so]] end)
+vim.keymap.set("n", "<leader>%", function()
+	vim.cmd([[so]])
+end)
 -- tweak the way new lines are added a bit
 vim.keymap.set("n", "]<Space>", "o<esc>")
 vim.keymap.set("n", "[<Space>", "O<esc>")
+-- Search the selected test
+vim.keymap.set("v", "//", [[y/\V<C-R>=escape(@",'/\')<CR><CR>]])
+-- Print full path to current root
+vim.keymap.set("n", "y!", "<cmd>lua print(vim.loop.cwd())<cr>")
 
 -- Select in/outside the line
 vim.keymap.set("v", "al", ":<C-U>normal 0v$h<CR>")
