@@ -28,6 +28,9 @@ vim.keymap.set("n", "{", ":keepjumps normal! {<CR>")
 vim.keymap.set("n", "}", ":keepjumps normal! }<CR>")
 -- Easy to relod current file
 vim.keymap.set("n", "<leader>%", function() vim.cmd [[so]] end)
+-- tweak the way new lines are added a bit
+vim.keymap.set("n", "]<Space>", "o<esc>")
+vim.keymap.set("n", "[<Space>", "O<esc>")
 
 -- Move things in visual mode
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
