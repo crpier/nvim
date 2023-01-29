@@ -4,13 +4,13 @@ require("neodev").setup()
 
 -- Actual LSP setup
 require("mason").setup()
-require("mason-lspconfig").setup({
+require("mason-lspconfig").setup {
   ensure_installed = {
     "sumneko_lua",
     "pyright",
     "gopls",
   },
-})
+}
 local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
 local lsp_attach = function(_, bufnr)
   local opts = { buffer = bufnr }
@@ -24,20 +24,23 @@ local lsp_attach = function(_, bufnr)
   vim.keymap.set("n", "d;", vim.diagnostic.open_float, opts)
   vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
 end
-local lspconfig = require("lspconfig")
-require("mason-lspconfig").setup_handlers({
+local lspconfig = require "lspconfig"
+require("mason-lspconfig").setup_handlers {
   function(server_name)
-    lspconfig[server_name].setup({
+    lspconfig[server_name].setup {
       on_attach = lsp_attach,
       capabilities = lsp_capabilities,
-    })
+    }
   end,
-})
+}
+-- some lsp maps
+vim.keymap.set("n", "<leader>li", "<cmd>LspInfo<CR>")
+vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<CR>")
 
 -- illuminate
-require("illuminate").configure({
+require("illuminate").configure {
   min_count_to_highlight = 2,
-})
+}
 vim.keymap.set("n", "<C-n>", function()
   require("illuminate").goto_next_reference(false)
 end)
@@ -46,10 +49,10 @@ vim.keymap.set("n", "<C-p>", function()
 end)
 
 -- null-ls
-local null_ls = require("null-ls")
-null_ls.setup({
+local null_ls = require "null-ls"
+null_ls.setup {
   sources = {
     null_ls.builtins.formatting.stylua,
     null_ls.builtins.formatting.black,
   },
-})
+}

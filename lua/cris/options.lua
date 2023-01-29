@@ -19,14 +19,13 @@ vim.o.scrolloff = 8
 vim.o.updatetime = 250
 -- Always show the sign column
 vim.wo.signcolumn = "yes"
--- Set completeopt to have a better completion experience
 vim.o.completeopt = "menuone,noselect"
 -- No wrapping of text
 vim.o.wrap = false
 -- Set indent to 4 spaces by default
-vim.opt.tabstop = 4
-vim.opt.softtabstop = 4
-vim.opt.shiftwidth = 4
+vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
+vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
 vim.opt.smartindent = true
 -- Only one statuline
@@ -34,6 +33,7 @@ vim.opt.laststatus = 3
 -- Show filename at the top
 -- TODO: if SSH_CLIENT use `%F` instead
 vim.opt.winbar = "   %f %m %r"
+vim.o.termguicolors = true
 
 ---- Autocommands ----
 -- highlight on yank
@@ -54,10 +54,36 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 -- 	group = formatoptions_group,
 -- 	pattern = '*',
 -- })
+-- misc autocommands
 local misc_group = vim.api.nvim_create_augroup("Misc", { clear = true })
-vim.api.nvim_create_autocmd("BufReadPost", {
-  command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g`\"" | endif]],
+-- Return to last cursor location
+vim.api.nvim_create_autocmd(
+  "BufReadPost",
+  { command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g`\"" | endif]], group = misc_group }
+)
+-- Easy quit with q on certain buffers
+vim.api.nvim_create_autocmd({ "FileType" }, {
+  pattern = { "qf", "help", "man", "lspinfo" },
+  callback = function()
+    vim.cmd [[ nnoremap <silent> <buffer> q :close<CR> ]]
+  end,
   group = misc_group,
 })
-
+-- Make vim know Jenkinsfiles are groovy code
+vim.api.nvim_create_autocmd({ "FileType" }, {
+  pattern = { "Jenkinsfile" },
+  callback = function()
+    vim.opt_local.ft = "groovy"
+  end,
+  group = misc_group,
+})
+-- Enable wrapping and spelling on some files
+vim.api.nvim_create_autocmd({ "FileType" }, {
+  pattern = { "gitcommit", "markdown" },
+  callback = function()
+    vim.opt_local.wrap = true
+    vim.opt_local.spell = true
+  end,
+})
+-- Don't insert comment leader when pressing o/O on comment line
 vim.api.nvim_create_autocmd("BufEnter", { command = [[set formatoptions-=o]], group = misc_group })

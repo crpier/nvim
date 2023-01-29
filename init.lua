@@ -1,1 +1,1 @@
-require("cris")
+require "cris"

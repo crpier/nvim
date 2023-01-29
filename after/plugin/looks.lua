@@ -1,10 +1,10 @@
-vim.cmd.colorscheme("kanagawa")
+vim.cmd.colorscheme "kanagawa"
 vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 vim.api.nvim_set_hl(0, "WinSeparator", { bg = "none" })
 
 -- Lualine
-require("lualine").setup({
+require("lualine").setup {
   options = {
     icons_enabled = false,
     component_separators = "|",
@@ -20,4 +20,4 @@ require("lualine").setup({
     lualine_y = { "filetype" },
     lualine_z = { "location" },
   },
-})
+}

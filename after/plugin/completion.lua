@@ -1,21 +1,21 @@
-local cmp = require("cmp")
+local cmp = require "cmp"
 
-cmp.setup({
+cmp.setup {
   snippet = {
     -- REQUIRED - you must specify a snippet engine
     expand = function(args)
       require("luasnip").lsp_expand(args.body) -- For `luasnip` users.
     end,
   },
-  mapping = cmp.mapping.preset.insert({
+  mapping = cmp.mapping.preset.insert {
     ["<C-b>"] = cmp.mapping.scroll_docs(-4),
     ["<C-f>"] = cmp.mapping.scroll_docs(4),
     ---@diagnostic disable-next-line: missing-parameter
     ["<C-Space>"] = cmp.mapping.complete(),
     ["<C-e>"] = cmp.mapping.abort(),
     -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-    ["<Tab>"] = cmp.mapping.confirm({ select = true }),
-  }),
+    ["<Tab>"] = cmp.mapping.confirm { select = true },
+  },
   sources = cmp.config.sources({
     { name = "nvim_lsp" },
     { name = "luasnip" }, -- For luasnip users.
@@ -24,7 +24,7 @@ cmp.setup({
     { name = "path" },
     { name = "emoji" },
   }),
-})
+}
 
 -- Set configuration for specific filetype.
 -- TODO: play around with this a bit
@@ -47,7 +47,7 @@ cmp.setup.cmdline(":", {
 })
 
 -- Snippets
-local ls = require("luasnip")
+local ls = require "luasnip"
 -- <c-k> is my expansion key
 -- this will expand the current item or jump to the next item within the snippet.
 vim.keymap.set({ "i", "s" }, "<c-k>", function()

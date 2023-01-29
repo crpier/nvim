@@ -1,9 +1,9 @@
 ------ TreeSitter ------
-require("nvim-treesitter.configs").setup({
+require("nvim-treesitter.configs").setup {
   ensure_installed = { "python", "go", "lua", "help", "bash" },
   highlight = { enable = true },
   indent = {
-    enable = true,
+    enable = false,
     --disable = { 'python' },
   },
   incremental_selection = {
@@ -59,4 +59,4 @@ require("nvim-treesitter.configs").setup({
       },
     },
   },
-})
+}

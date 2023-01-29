@@ -1,7 +1,7 @@
 -- harpoon
-local mark = require("harpoon.mark")
-local ui = require("harpoon.ui")
-local term = require("harpoon.term")
+local mark = require "harpoon.mark"
+local ui = require "harpoon.ui"
+local term = require "harpoon.term"
 
 vim.keymap.set("n", "mm", mark.add_file)
 vim.keymap.set("n", "m<enter>", ui.toggle_quick_menu)
