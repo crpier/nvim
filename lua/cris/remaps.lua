@@ -7,11 +7,11 @@ vim.keymap.set("n", "<leader>e", vim.cmd.Ex)
 vim.keymap.set("n", "Q", "ZQ")
 -- Don't highlight search
 vim.keymap.set("n", "<Esc>", function()
-	vim.cmd([[ nohlsearch ]])
+  vim.cmd([[ nohlsearch ]])
 end)
 -- Save like in vsc**e
 vim.keymap.set("n", "<C-S>", function()
-	vim.cmd([[write]])
+  vim.cmd([[write]])
 end)
 -- Replace the work you were on
 -- TODO: to lua
@@ -32,7 +32,7 @@ vim.keymap.set("n", "{", ":keepjumps normal! {<CR>")
 vim.keymap.set("n", "}", ":keepjumps normal! }<CR>")
 -- Easy to relod current file
 vim.keymap.set("n", "<leader>%", function()
-	vim.cmd([[so]])
+  vim.cmd([[so]])
 end)
 -- tweak the way new lines are added a bit
 vim.keymap.set("n", "]<Space>", "o<esc>")

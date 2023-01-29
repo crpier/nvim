@@ -39,11 +39,11 @@ vim.opt.winbar = "   %f %m %r"
 -- highlight on yank
 local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
-	callback = function()
-		vim.highlight.on_yank()
-	end,
-	group = highlight_group,
-	pattern = "*",
+  callback = function()
+    vim.highlight.on_yank()
+  end,
+  group = highlight_group,
+  pattern = "*",
 })
 -- don't turn newlines into comments
 -- local formatoptions_group = vim.api.nvim_create_augroup('FileType', { clear = true })
@@ -55,12 +55,9 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 -- 	pattern = '*',
 -- })
 local misc_group = vim.api.nvim_create_augroup("Misc", { clear = true })
-vim.api.nvim_create_autocmd(
-	"BufReadPost",
-	{
-		command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g`\"" | endif]],
-		group = misc_group,
-	}
-)
+vim.api.nvim_create_autocmd("BufReadPost", {
+  command = [[if line("'\"") > 1 && line("'\"") <= line("$") | execute "normal! g`\"" | endif]],
+  group = misc_group,
+})
 
 vim.api.nvim_create_autocmd("BufEnter", { command = [[set formatoptions-=o]], group = misc_group })
