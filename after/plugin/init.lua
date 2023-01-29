@@ -2,8 +2,6 @@
 - operator-nonmotion
   - =c
   - =d
-  - =P
-  - =p
   - c!
   - c,
   - c.
@@ -25,16 +23,6 @@
   - yp
   - yr
   - yx 
-
-- g commands:
-  - gH
-  - gi
-  - gM
-  - gm
-  - gq
-  - gV
-  - gy
-  - g;
 
 - z commands:
   - zq

@@ -32,6 +32,9 @@ vim.keymap.set("n", "<leader>%", function() vim.cmd [[so]] end)
 vim.keymap.set("n", "]<Space>", "o<esc>")
 vim.keymap.set("n", "[<Space>", "O<esc>")
 
+-- Select in/outside the line
+vim.keymap.set("v", "al", ":<C-U>normal 0v$h<CR>")
+vim.keymap.set("v", "il", ":<C-U>normal ^vg_<CR>")
 -- Move things in visual mode
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")

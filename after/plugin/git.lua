@@ -1,8 +1,4 @@
 ------ Git ------
--- fugitive
-vim.keymap.set('n', 'gs', '<cmd>silent! tab G<CR>')
-vim.keymap.set('n', '<leader>gs', '<cmd>Git push<CR>')
-vim.keymap.set('n', '<leader>gl', '<cmd>Git pull<CR>')
 -- gitsigns
 require('gitsigns').setup {
   numhl = true,
@@ -32,26 +28,57 @@ require('gitsigns').setup {
       end)
       return '<Ignore>'
     end, { expr = true })
+
     -- Actions
-    map({ 'n', 'v' }, '<leader>hs', ':Gitsigns stage_hunk<CR>')
-    map('n', '<leader>hS', gs.stage_buffer)
-    map({ 'n', 'v' }, '<leader>hr', ':Gitsigns reset_hunk<CR>')
-    map('n', '<leader>hR', gs.reset_buffer)
-    map('n', '<leader>hu', gs.undo_stage_hunk)
-    map('n', '<leader>hp', gs.preview_hunk)
-    map('n', '<leader>hb', function()
-      gs.blame_line { full = true }
-    end)
-    map('n', '<leader>hd', gs.diffthis)
-    map('n', '<leader>hD', function()
-      gs.diffthis '~'
-    end)
-    map('n', 'yogb', gs.toggle_current_line_blame)
-    map('n', 'yogd', gs.toggle_deleted)
-    -- Text object
-    map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
-  end,
+        map('n', 'g.', gs.stage_hunk)
+        map('n', 'g>', gs.stage_buffer)
+        map('n', 'g,', gs.reset_hunk)
+        map('n', 'g<', gs.reset_buffer)
+        map('n', 'g;', gs.undo_stage_hunk)
+        map('n', 'g/', gs.preview_hunk)
+        map('n', 'gl', function() gs.blame_line { full = false } end)
+        map('n', 'gL', function() gs.blame_line { full = true} end)
+        map('n', 'dvo', gs.diffthis)
+        map('n', 'dvm', function() gs.diffthis 'master' end)
+        map('n', 'dvn', function() gs.diffthis 'main' end)
+        map('n', 'dv1', function() gs.diffthis 'HEAD~1' end)
+        map('n', 'dv2', function() gs.diffthis 'HEAD~2' end)
+        map('n', 'dv3', function() gs.diffthis 'HEAD~3' end)
+        map('n', 'dv4', function() gs.diffthis 'HEAD~4' end)
+        map('n', 'dv5', function() gs.diffthis 'HEAD~5' end)
+        map('n', 'dv6', function() gs.diffthis 'HEAD~6' end)
+        map('n', 'yogd', gs.toggle_deleted)
+
+        -- Text object
+        map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+    end,
 }
 
+--[[
+- g commands:
+  - gH
+  - g.
+  - g,
+  - g/
+  - gi
+  - gM
+  - gm
+  - gq
+  - gV
+  - gy
+  - g;
+]]
 
+-- fugitive
+vim.keymap.set('n', 'gs', '<cmd>silent! tab G<CR>')
+vim.keymap.set('n', '<leader>gs', '<cmd>Git push<CR>')
+vim.keymap.set('n', '<leader>gu', '<cmd>Git pull<CR>')
+vim.keymap.set("n", "<leader>gl", "<cmd>tab Git log -n 10<cr>")
+vim.keymap.set("n", "<leader>gL", "<cmd>tab Git log<cr>")
+vim.keymap.set("n", "<leader>gb", "<cmd>Git blame<CR>")
+
+
+-- Still on the fence about these
+-- vim.keymap.set("n", "<leader>gc", "<cmd>Git clean -fd<CR>")
+-- vim.keymap.set("n", "gh", "<cmd>Git fetch<cr>")
 
