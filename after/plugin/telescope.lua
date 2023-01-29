@@ -11,7 +11,10 @@ telescope.setup({
 		},
 	},
 })
-require("project_nvim").setup({})
+require("project_nvim").setup({
+    ignore_lsp = {"sumneko_lua"},
+    silent_chdir = false,
+})
 telescope.load_extension("fzf")
 telescope.load_extension("projects")
 

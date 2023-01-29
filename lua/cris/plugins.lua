@@ -14,31 +14,25 @@ local packer_bootstrap = ensure_packer()
 return require("packer").startup(function(use)
 	use("wbthomason/packer.nvim")
 
-	use({
-		"VonHeikemen/lsp-zero.nvim",
-		branch = "v1.x",
-		requires = {
-			-- LSP
-			{ "neovim/nvim-lspconfig" },
-			{ "williamboman/mason.nvim" },
-			{ "williamboman/mason-lspconfig.nvim" },
-			{ "j-hui/fidget.nvim" },
-			{ "folke/neodev.nvim" },
-			{ "jose-elias-alvarez/null-ls.nvim" },
+	-- LSP
+	use({ "neovim/nvim-lspconfig" })
+	use({ "williamboman/mason.nvim" })
+	use({ "williamboman/mason-lspconfig.nvim" })
+	use({ "j-hui/fidget.nvim" })
+	use({ "folke/neodev.nvim" })
+	use({ "jose-elias-alvarez/null-ls.nvim" })
 
-			-- Snippets
-			{ "L3MON4D3/LuaSnip" },
-			{ "rafamadriz/friendly-snippets" },
+	-- Snippets
+	use({ "L3MON4D3/LuaSnip" })
+	use({ "rafamadriz/friendly-snippets" })
 
-			-- Autocompletion
-			{ "hrsh7th/nvim-cmp" },
-			{ "hrsh7th/cmp-nvim-lsp" },
-			{ "hrsh7th/cmp-path" },
-			{ "saadparwaiz1/cmp_luasnip" },
-			{ "hrsh7th/cmp-nvim-lua" },
-			{ "hrsh7th/cmp-emoji" },
-		},
-	})
+	-- Autocompletion
+	use({ "hrsh7th/nvim-cmp" })
+	use({ "hrsh7th/cmp-nvim-lsp" })
+	use({ "hrsh7th/cmp-path" })
+	use({ "saadparwaiz1/cmp_luasnip" })
+	use({ "hrsh7th/cmp-nvim-lua" })
+	use({ "hrsh7th/cmp-emoji" })
 
 	-- Treesitter
 	use({ "nvim-treesitter/nvim-treesitter", run = { ":TSUpdate" } })
@@ -82,6 +76,7 @@ return require("packer").startup(function(use)
 	use({ "numToStr/Comment.nvim" }) -- "gc" to comment visual regions/lines
 
 	-- New commands
+	-- TODO: mapping
 	use({ "ojroques/vim-oscyank" })
 	use("mbbill/undotree")
 
