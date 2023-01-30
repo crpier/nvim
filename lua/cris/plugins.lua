@@ -47,7 +47,7 @@ return require("packer").startup(function(use)
     "nvim-treesitter/nvim-treesitter-textobjects",
   }
 
-  -- Telescope stuff
+  -- Telescope
   use {
     "nvim-telescope/telescope.nvim",
     branch = "0.1.x",
@@ -59,6 +59,22 @@ return require("packer").startup(function(use)
     run = "make",
   }
   use { "ahmedkhalf/project.nvim" }
+
+  -- DAP
+  use 'mfussenegger/nvim-dap'
+  use {
+    'rcarriga/nvim-dap-ui',
+    requires = { 'mfussenegger/nvim-dap', 'mfussenegger/nvim-dap-python' },
+  }
+  use 'mfussenegger/nvim-dap-python'
+  use {
+    'theHamsta/nvim-dap-virtual-text',
+    requires = { 'mfussenegger/nvim-dap', 'mfussenegger/nvim-dap-python' },
+    config = function()
+      -- TODO: get this setup outta here
+      require('nvim-dap-virtual-text').setup {}
+    end,
+  }
 
   -- Looks
   use "rebelot/kanagawa.nvim"
@@ -99,8 +115,12 @@ return require("packer").startup(function(use)
   -- Filetype
   use { "dag/vim-fish", ft = "fish" }
 
+  -- Trials
+  use 'eandrju/cellular-automaton.nvim'
   if packer_bootstrap then
     require("packer").sync()
   end
+  use 'm4xshen/autoclose.nvim'
+
   require "impatient"
 end)
