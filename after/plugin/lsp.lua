@@ -6,9 +6,7 @@ require("neodev").setup()
 require("mason").setup()
 require("mason-lspconfig").setup {
   ensure_installed = {
-    "sumneko_lua",
     "pyright",
-    "gopls",
   },
 }
 local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
