@@ -3,6 +3,8 @@ vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 vim.api.nvim_set_hl(0, "WinSeparator", { bg = "none" })
 
+local navic = require "nvim-navic"
+local wpm = require "wpm"
 -- Lualine
 require("lualine").setup {
   options = {
@@ -14,8 +16,10 @@ require("lualine").setup {
   sections = {
     lualine_a = {},
     lualine_b = { "branch", "diff", "diagnostics" },
-    lualine_c = {},
-    lualine_x = {},
+    lualine_c = {
+      { navic.get_location, cond = navic.is_available },
+    },
+    lualine_x = {wpm.wpm},
     -- TODO: put lsp clients here
     lualine_y = { "filetype" },
     lualine_z = { "location" },

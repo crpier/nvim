@@ -9,8 +9,9 @@ require("mason-lspconfig").setup {
     "pyright",
   },
 }
+require("nvim-navic").setup()
 local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
-local lsp_attach = function(_, bufnr)
+local lsp_attach = function(client, bufnr)
   local opts = { buffer = bufnr }
   vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
   vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
@@ -21,6 +22,9 @@ local lsp_attach = function(_, bufnr)
   vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
   vim.keymap.set("n", "d;", vim.diagnostic.open_float, opts)
   vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+    if client.server_capabilities.documentSymbolProvider then
+        require("nvim-navic").attach(client, bufnr)
+    end
 end
 local lspconfig = require "lspconfig"
 require("mason-lspconfig").setup_handlers {

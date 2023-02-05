@@ -13,7 +13,7 @@ end)
 vim.keymap.set("n", "<C-S>", function()
   vim.cmd [[write]]
 end)
--- Replace the work you were on
+-- Replace the word you were on
 -- TODO: to lua
 vim.keymap.set("n", "g%", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 -- Easier to move between windows
@@ -22,7 +22,7 @@ vim.keymap.set("n", "<C-j>", "<C-w>j")
 vim.keymap.set("n", "<C-k>", "<C-w>k")
 vim.keymap.set("n", "<C-l>", "<C-w>l")
 -- Easier to exit terminal
-vim.keymap.set("t", [[<C-\\>]], [[<C-\><C-n>]])
+vim.keymap.set("t", [[<C-/>]], [[<C-\><C-n>]])
 vim.keymap.set("t", "<C-h>", [[<C-\><C-n><C-w>h]])
 vim.keymap.set("t", "<C-j>", [[<C-\><C-n><C-w>j]])
 vim.keymap.set("t", "<C-k>", [[<C-\><C-n><C-w>k]])

@@ -46,6 +46,7 @@ return require("packer").startup(function(use)
   use { -- Additional text objects via treesitter
     "nvim-treesitter/nvim-treesitter-textobjects",
   }
+  use { "nvim-treesitter/playground" }
 
   -- Telescope
   use {
@@ -61,19 +62,15 @@ return require("packer").startup(function(use)
   use { "ahmedkhalf/project.nvim" }
 
   -- DAP
-  use 'mfussenegger/nvim-dap'
+  use "mfussenegger/nvim-dap"
   use {
-    'rcarriga/nvim-dap-ui',
-    requires = { 'mfussenegger/nvim-dap', 'mfussenegger/nvim-dap-python' },
+    "rcarriga/nvim-dap-ui",
+    requires = { "mfussenegger/nvim-dap", "mfussenegger/nvim-dap-python" },
   }
-  use 'mfussenegger/nvim-dap-python'
+  use "mfussenegger/nvim-dap-python"
   use {
-    'theHamsta/nvim-dap-virtual-text',
-    requires = { 'mfussenegger/nvim-dap', 'mfussenegger/nvim-dap-python' },
-    config = function()
-      -- TODO: get this setup outta here
-      require('nvim-dap-virtual-text').setup {}
-    end,
+    "theHamsta/nvim-dap-virtual-text",
+    requires = { "mfussenegger/nvim-dap", "mfussenegger/nvim-dap-python" },
   }
 
   -- Looks
@@ -116,11 +113,41 @@ return require("packer").startup(function(use)
   use { "dag/vim-fish", ft = "fish" }
 
   -- Trials
-  use 'eandrju/cellular-automaton.nvim'
+  use "eandrju/cellular-automaton.nvim"
   if packer_bootstrap then
     require("packer").sync()
   end
-  use 'm4xshen/autoclose.nvim'
+  use "m4xshen/autoclose.nvim"
+  use {
+    "ckolkey/ts-node-action",
+    requires = { "nvim-treesitter" },
+  }
+  use { "folke/todo-comments.nvim" }
+  use {
+    "kevinhwang91/nvim-bqf",
+    ft = "qf",
+    config = function()
+      require("bqf").setup()
+    end,
+  }
+  use {
+    "junegunn/fzf",
+    run = function()
+      vim.fn["fzf#install"]()
+    end,
+  }
+  -- TODO: don't use this on SSH_CLIENT I think?
+  use {
+    "SmiteshP/nvim-navic",
+    requires = "neovim/nvim-lspconfig",
+  }
+  -- Lua
+  use {
+    "folke/twilight.nvim",
+  }
+  use {
+    "jcdickinson/wpm.nvim",
+  }
 
   require "impatient"
 end)

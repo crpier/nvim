@@ -34,3 +34,4 @@ vim.keymap.set('n', '<F9>', require('dap').step_out)
 vim.keymap.set('n', '<leader>du', require('dapui').toggle)
 vim.keymap.set('n', '<leader>dx', require('dap').terminate)
 -- vim.keymap.set({ 'n', 'v' }, '<C-k>', require('dapui').eval)
+require("nvim-dap-virtual-text").setup {}
