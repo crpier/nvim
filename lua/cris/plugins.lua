@@ -117,11 +117,6 @@ return require("packer").startup(function(use)
   if packer_bootstrap then
     require("packer").sync()
   end
-  use "m4xshen/autoclose.nvim"
-  use {
-    "ckolkey/ts-node-action",
-    requires = { "nvim-treesitter" },
-  }
   use { "folke/todo-comments.nvim" }
   use {
     "kevinhwang91/nvim-bqf",
@@ -145,9 +140,7 @@ return require("packer").startup(function(use)
   use {
     "folke/twilight.nvim",
   }
-  use {
-    "jcdickinson/wpm.nvim",
-  }
+   use("simrat39/rust-tools.nvim")
 
   require "impatient"
 end)

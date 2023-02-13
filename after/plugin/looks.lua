@@ -4,7 +4,6 @@ vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 vim.api.nvim_set_hl(0, "WinSeparator", { bg = "none" })
 
 local navic = require "nvim-navic"
-local wpm = require "wpm"
 -- Lualine
 require("lualine").setup {
   options = {
@@ -19,7 +18,7 @@ require("lualine").setup {
     lualine_c = {
       { navic.get_location, cond = navic.is_available },
     },
-    lualine_x = {wpm.wpm},
+    lualine_x = {},
     -- TODO: put lsp clients here
     lualine_y = { "filetype" },
     lualine_z = { "location" },

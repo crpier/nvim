@@ -23,5 +23,3 @@ end)
 -- oscyank
 -- TODO: only do this when on SSH_CLIENT
 vim.keymap.set("v", "<leader>y", ":OSCYank<CR>")
-
-require("autoclose").setup({})
