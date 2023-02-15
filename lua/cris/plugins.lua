@@ -28,6 +28,11 @@ return require("packer").startup(function(use)
   use { "jose-elias-alvarez/null-ls.nvim" }
   -- TODO: should not run on headless server
   use "RRethy/vim-illuminate"
+  -- TODO: don't use this on SSH_CLIENT I think?
+  use {
+    "SmiteshP/nvim-navic",
+    requires = "neovim/nvim-lspconfig",
+  }
 
   -- Snippets
   use { "L3MON4D3/LuaSnip" }
@@ -125,22 +130,12 @@ return require("packer").startup(function(use)
       require("bqf").setup()
     end,
   }
-  use {
-    "junegunn/fzf",
-    run = function()
-      vim.fn["fzf#install"]()
-    end,
-  }
-  -- TODO: don't use this on SSH_CLIENT I think?
-  use {
-    "SmiteshP/nvim-navic",
-    requires = "neovim/nvim-lspconfig",
-  }
   -- Lua
   use {
     "folke/twilight.nvim",
   }
-   use("simrat39/rust-tools.nvim")
+
+  use "simrat39/rust-tools.nvim"
 
   require "impatient"
 end)
