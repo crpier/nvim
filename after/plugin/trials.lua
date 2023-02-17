@@ -1,5 +1,3 @@
-require("ts-node-action").setup {}
-vim.keymap.set("n", "<leader>n", require("ts-node-action").node_action)
 local todo = require "todo-comments"
 -- TODO: lol
 todo.setup {}
@@ -14,4 +12,3 @@ require("twilight").setup {
 }
 
 vim.keymap.set("n", "mr", "<cmd>CellularAutomaton make_it_rain<cr>")
-require("wpm").setup {}
