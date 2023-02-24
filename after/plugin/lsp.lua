@@ -39,17 +39,6 @@ require("mason-lspconfig").setup_handlers {
 vim.keymap.set("n", "<leader>li", "<cmd>LspInfo<CR>")
 vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<CR>")
 
--- illuminate
-require("illuminate").configure {
-  min_count_to_highlight = 2,
-}
-vim.keymap.set("n", "<C-n>", function()
-  require("illuminate").goto_next_reference(false)
-end)
-vim.keymap.set("n", "<C-p>", function()
-  require("illuminate").goto_prev_reference(false)
-end)
-
 -- null-ls
 local null_ls = require "null-ls"
 null_ls.setup {

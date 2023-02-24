@@ -16,6 +16,15 @@ vim.keymap.set("n", "<leader>pi", packer.install)
 vim.keymap.set("n", "<leader>ps", packer.sync)
 vim.keymap.set("n", "<leader>pS", packer.status)
 
+packer.init {
+  compile_on_sync = true,
+  git = { clone_timeout = 6000 },
+  display = {
+    open_fn = function()
+      return require("packer.util").float { border = "single" }
+    end,
+  },
+}
 return require("packer").startup(function(use)
   use "wbthomason/packer.nvim"
 
@@ -26,8 +35,6 @@ return require("packer").startup(function(use)
   use { "j-hui/fidget.nvim" }
   use { "folke/neodev.nvim" }
   use { "jose-elias-alvarez/null-ls.nvim" }
-  -- TODO: should not run on headless server
-  use "RRethy/vim-illuminate"
   -- TODO: don't use this on SSH_CLIENT I think?
   use {
     "SmiteshP/nvim-navic",
@@ -137,6 +144,8 @@ return require("packer").startup(function(use)
 
   use "simrat39/rust-tools.nvim"
   use "akinsho/toggleterm.nvim"
+  use "norcalli/nvim-colorizer.lua"
+  use "lukas-reineke/indent-blankline.nvim"
 
   require "impatient"
 end)
