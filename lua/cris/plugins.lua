@@ -147,5 +147,6 @@ return require("packer").startup(function(use)
   use "norcalli/nvim-colorizer.lua"
   use "lukas-reineke/indent-blankline.nvim"
 
+  use {'akinsho/bufferline.nvim', tag = "v3.*", requires = 'nvim-tree/nvim-web-devicons'}
   require "impatient"
 end)

@@ -2,6 +2,22 @@
 -- Neodev for working on nvim config
 require("neodev").setup()
 
+local border = {
+  { "╭", "FloatBorder" },
+  { "─", "FloatBorder" },
+  { "╮", "FloatBorder" },
+  { "│", "FloatBorder" },
+  { "╯", "FloatBorder" },
+  { "─", "FloatBorder" },
+  { "╰", "FloatBorder" },
+  { "│", "FloatBorder" },
+}
+
+local handlers = {
+  ["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = border }),
+  ["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border }),
+}
+
 -- Actual LSP setup
 require("mason").setup()
 require("mason-lspconfig").setup {
@@ -9,6 +25,7 @@ require("mason-lspconfig").setup {
     "pyright",
   },
 }
+-- TODO: if SSH_CLIENT forego nvim-navic
 require("nvim-navic").setup()
 local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
 local lsp_attach = function(client, bufnr)
@@ -22,9 +39,9 @@ local lsp_attach = function(client, bufnr)
   vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
   vim.keymap.set("n", "d;", vim.diagnostic.open_float, opts)
   vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-    if client.server_capabilities.documentSymbolProvider then
-        require("nvim-navic").attach(client, bufnr)
-    end
+  if client.server_capabilities.documentSymbolProvider then
+    require("nvim-navic").attach(client, bufnr)
+  end
 end
 local lspconfig = require "lspconfig"
 require("mason-lspconfig").setup_handlers {
@@ -32,6 +49,7 @@ require("mason-lspconfig").setup_handlers {
     lspconfig[server_name].setup {
       on_attach = lsp_attach,
       capabilities = lsp_capabilities,
+      handlers = handlers,
     }
   end,
 }
@@ -45,6 +63,8 @@ null_ls.setup {
   sources = {
     null_ls.builtins.formatting.stylua,
     null_ls.builtins.formatting.black,
+    null_ls.builtins.formatting.ruff,
+    null_ls.builtins.formatting.prettier,
   },
 }
 

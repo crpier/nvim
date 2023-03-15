@@ -31,8 +31,6 @@ vim.opt.smartindent = true
 -- Only one statuline
 vim.opt.laststatus = 3
 -- Show filename at the top
--- TODO: if SSH_CLIENT use `%F` and forego nvim-navic
-vim.opt.winbar = "   %f %m %r"
 vim.o.termguicolors = true
 
 ---- Autocommands ----
