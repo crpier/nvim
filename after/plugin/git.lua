@@ -1,7 +1,9 @@
 ------ Git ------
 -- gitsigns
+vim.api.nvim_set_hl(0, "GitSignsAddNr", { bg = "none" })
 require("gitsigns").setup {
   numhl = true,
+  signcolumn = false,
   on_attach = function(bufnr)
     local gs = package.loaded.gitsigns
     local function map(mode, l, r, opts)
@@ -71,6 +73,22 @@ require("gitsigns").setup {
 
     -- Text object
     map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>")
+
+    local hls = {
+      "GitSignsAddNr",
+      "GitSignsChangeNr",
+      "GitSignsDeleteNr",
+      "GitSignsTopdeleteNr",
+      "GitSignsChangedeleteNr",
+      "GitSignsUntrackedNr",
+    }
+
+    -- Adjust GitSigns highlights to have bg=none, but keep the old fg
+    for _, hl in ipairs(hls) do
+      local old_highlight = vim.api.nvim_get_hl_by_name(hl, true)
+      old_highlight.background = nil
+      vim.api.nvim_set_hl(0, hl, old_highlight)
+    end
   end,
 }
 
@@ -88,7 +106,6 @@ require("gitsigns").setup {
   - gy
   - g;
 ]]
-
 -- fugitive
 vim.keymap.set("n", "gs", "<cmd>silent! tab G<CR>")
 vim.keymap.set("n", "<leader>gs", "<cmd>Git push<CR>")

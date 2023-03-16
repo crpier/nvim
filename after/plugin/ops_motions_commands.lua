@@ -3,7 +3,7 @@ require("Comment").setup()
 
 -- fast-jobs
 local fast_jobs = require "fast-jobs"
-vim.keymap.set("n", "yr<CR>", fast_jobs.create_window)
+vim.keymap.set("n", "yrq", fast_jobs.create_window)
 vim.keymap.set("n", "yr1", function()
   fast_jobs.run_cmd_async(1)
 end)
@@ -21,5 +21,5 @@ vim.keymap.set("n", "yr5", function()
 end)
 
 -- oscyank
--- TODO: only do this when on SSH_CLIENT
-vim.keymap.set("v", "<leader>y", ":OSCYank<CR>")
+-- TODO: only do this when on SSH_CLIENT, otherwise use unnamed register
+vim.keymap.set("v", "<leader>y", ":OSCYankVisual<CR>")

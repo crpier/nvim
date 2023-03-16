@@ -1,8 +1,6 @@
 local todo = require "todo-comments"
 -- TODO: lol
 todo.setup {}
-vim.keymap.set("n", "]t", todo.jump_next)
-vim.keymap.set("n", "[t", todo.jump_prev)
 vim.keymap.set("n", "st", "<cmd>TodoTelescope<CR>")
 
 require("twilight").setup {
@@ -13,6 +11,10 @@ require("twilight").setup {
 
 vim.keymap.set("n", "mr", "<cmd>CellularAutomaton make_it_rain<cr>")
 require("colorizer").setup()
+
+-- vim.api.nvim_set_hl(0, "IndentBlanklineChar", { fg = "#31313a" })
+-- vim.api.nvim_set_hl(0, "IndentBlanklineContextChar", { fg = "#4f4f58" })
+
 require("indent_blankline").setup {
   indentLine_enabled = 1,
   filetype_exclude = {
@@ -30,5 +32,5 @@ require("indent_blankline").setup {
   show_trailing_blankline_indent = false,
   show_first_indent_level = false,
   show_current_context = true,
-  show_current_context_start = true,
+  show_current_context_start = false,
 }

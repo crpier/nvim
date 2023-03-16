@@ -3,18 +3,18 @@
 require("neodev").setup()
 
 local border = {
-  { "╭", "FloatBorder" },
-  { "─", "FloatBorder" },
-  { "╮", "FloatBorder" },
-  { "│", "FloatBorder" },
-  { "╯", "FloatBorder" },
-  { "─", "FloatBorder" },
-  { "╰", "FloatBorder" },
-  { "│", "FloatBorder" },
+  { "╭", "Normal" },
+  { "─", "Normal" },
+  { "╮", "Normal" },
+  { "│", "Normal" },
+  { "╯", "Normal" },
+  { "─", "Normal" },
+  { "╰", "Normal" },
+  { "│", "Normal" },
 }
 
 local handlers = {
-  ["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = border }),
+  ["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "single", style = "minimal" }),
   ["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border }),
 }
 
@@ -60,13 +60,19 @@ vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<CR>")
 -- null-ls
 local null_ls = require "null-ls"
 null_ls.setup {
+  border = "single",
   sources = {
+    -- lua
     null_ls.builtins.formatting.stylua,
+    -- js/ts/react
+    null_ls.builtins.formatting.prettier,
+    -- python
     null_ls.builtins.formatting.black,
     null_ls.builtins.formatting.ruff,
-    null_ls.builtins.formatting.prettier,
   },
 }
+
+vim.diagnostic.config { float = { border = "single" } }
 
 -- fidget
 require("fidget").setup()
