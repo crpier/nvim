@@ -74,7 +74,7 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
   group = misc_group,
 })
 -- Make vim know Jenkinsfiles are groovy code
-vim.api.nvim_create_autocmd({ "FileType" }, {
+vim.api.nvim_create_autocmd({ "BufEnter" }, {
   pattern = { "Jenkinsfile" },
   callback = function()
     vim.opt_local.ft = "groovy"

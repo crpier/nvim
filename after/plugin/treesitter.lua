@@ -59,4 +59,21 @@ require("nvim-treesitter.configs").setup {
       },
     },
   },
+  refactor = {
+    highlight_definitions = {
+      enable = true,
+      clear_on_cursor_move = false,
+    },
+    navigation = {
+      enable = true,
+      -- Assign keymaps to false to disable them, e.g. `goto_definition = false`.
+      keymaps = {
+        goto_definition = false,
+        list_definitions = false,
+        list_definitions_toc = false,
+        goto_next_usage = "<C-n>",
+        goto_previous_usage = "<C-p>",
+      },
+    },
+  },
 }
