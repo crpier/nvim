@@ -1,7 +1,10 @@
 ------ TreeSitter ------
 require("nvim-treesitter.configs").setup {
-  ensure_installed = { "python", "go", "lua", "help", "bash" },
-  highlight = { enable = true },
+  ensure_installed = { "python", "go", "lua", "help", "bash", "markdown" },
+  highlight = {
+    enable = true,
+    additional_vim_regex_highlighting = { "markdown" },
+  },
   indent = {
     enable = false,
     --disable = { 'python' },
@@ -74,6 +77,11 @@ require("nvim-treesitter.configs").setup {
         goto_next_usage = "<C-n>",
         goto_previous_usage = "<C-p>",
       },
+    },
+    query_linter = {
+      enable = true,
+      use_virtual_text = true,
+      lint_events = { "BufWrite", "CursorHold" },
     },
   },
 }

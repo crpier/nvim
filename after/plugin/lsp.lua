@@ -68,7 +68,8 @@ null_ls.setup {
     null_ls.builtins.formatting.prettier,
     -- python
     null_ls.builtins.formatting.black,
-    null_ls.builtins.formatting.ruff,
+    -- null_ls.builtins.diagnostics.ruff,
+    -- null_ls.builtins.diagnostics.mypy,
   },
 }
 
