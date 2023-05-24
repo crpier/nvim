@@ -33,6 +33,7 @@ return require("packer").startup(function(use)
   use { "williamboman/mason.nvim" }
   use { "williamboman/mason-lspconfig.nvim" }
   use { "j-hui/fidget.nvim" }
+  -- TODO: not on SSH_CLIENT
   use { "folke/neodev.nvim" }
   use { "jose-elias-alvarez/null-ls.nvim" }
   -- TODO: don't use this on SSH_CLIENT I think?
@@ -108,7 +109,7 @@ return require("packer").startup(function(use)
   use { "numToStr/Comment.nvim" } -- "gc" to comment visual regions/lines
 
   -- New commands
-  -- TODO: mapping
+  -- only on $SSH_CLIENT
   use { "ojroques/vim-oscyank" }
   use "mbbill/undotree"
 
@@ -150,5 +151,5 @@ return require("packer").startup(function(use)
   use {'akinsho/bufferline.nvim', tag = "v3.*", requires = 'nvim-tree/nvim-web-devicons'}
 
   use "nvim-treesitter/nvim-treesitter-refactor"
-  require "impatient"
+  pcall(require,"impatient")
 end)
