@@ -30,8 +30,10 @@ if ok then
       "pyright",
     },
   }
-  -- TODO: if SSH_CLIENT forego nvim-navic
-  require("nvim-navic").setup()
+  local ok_navic, navic = pcall(require, "nvim-navic")
+  if ok_navic then
+      navic.setup()
+  end
   local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
   local lsp_attach = function(client, bufnr)
     local opts = { buffer = bufnr }
@@ -44,8 +46,8 @@ if ok then
     vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
     vim.keymap.set("n", "d;", vim.diagnostic.open_float, opts)
     vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-    if client.server_capabilities.documentSymbolProvider then
-      require("nvim-navic").attach(client, bufnr)
+    if client.server_capabilities.documentSymbolProvider and ok_navic then
+      navic.attach(client, bufnr)
     end
   end
   local lspconfig = require "lspconfig"
@@ -81,5 +83,9 @@ if ok then
   vim.diagnostic.config { float = { border = "single" } }
 
   -- fidget
-  require("fidget").setup()
+  require("fidget").setup {
+    window = {
+      blend = 0,
+    },
+  }
 end

@@ -30,8 +30,11 @@ vim.opt.expandtab = true
 vim.opt.smartindent = true
 -- Only one statuline
 vim.opt.laststatus = 3
--- Show filename at the top
 vim.o.termguicolors = true
+-- Allow closing folds using treesitter contexts
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+vim.opt.foldlevel = 99
 
 ---- Autocommands ----
 -- highlight on yank
@@ -90,4 +93,4 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
   end,
 })
 -- Don't insert comment leader when pressing o/O on comment line
-vim.api.nvim_create_autocmd("BufEnter", { command = [[set formatoptions-=o]], group = misc_group })
+vim.api.nvim_create_autocmd("BufEnter", { command = [[set formatoptions-=to]], group = misc_group })

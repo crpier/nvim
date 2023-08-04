@@ -54,29 +54,34 @@ if ok then
   -- })
 
   -- Snippets
-  require("luasnip.loaders.from_vscode").lazy_load()
-  local ls = require "luasnip"
-  -- <c-k> is my expansion key
-  -- this will expand the current item or jump to the next item within the snippet.
-  vim.keymap.set({ "i", "s" }, "<c-k>", function()
-    if ls.expand_or_jumpable() then
-      ls.expand_or_jump()
+  local ok_ls, ls = pcall(require, "luasnip")
+  if ok_ls then
+    local ok_ls_loader, ls_loader = pcall(require, "luasnip.loaders.from_vscode")
+    if ok_ls_loader then
+      ls_loader.lazy_load()
     end
-  end, { silent = true })
+    -- <c-k> is my expansion key
+    -- this will expand the current item or jump to the next item within the snippet.
+    vim.keymap.set({ "i", "s" }, "<c-k>", function()
+      if ls.expand_or_jumpable() then
+        ls.expand_or_jump()
+      end
+    end, { silent = true })
 
-  -- <c-j> is my jump backwards key.
-  -- this always moves to the previous item within the snippet
-  vim.keymap.set({ "i", "s" }, "<c-j>", function()
-    if ls.jumpable(-1) then
-      ls.jump(-1)
-    end
-  end, { silent = true })
+    -- <c-j> is my jump backwards key.
+    -- this always moves to the previous item within the snippet
+    vim.keymap.set({ "i", "s" }, "<c-j>", function()
+      if ls.jumpable(-1) then
+        ls.jump(-1)
+      end
+    end, { silent = true })
 
-  -- <c-l> is selecting within a list of options.
-  -- This is useful for choice nodes (introduced in the forthcoming episode 2)
-  vim.keymap.set("i", "<c-l>", function()
-    if ls.choice_active() then
-      ls.change_choice(1)
-    end
-  end)
+    -- <c-l> is selecting within a list of options.
+    -- This is useful for choice nodes (introduced in the forthcoming episode 2)
+    vim.keymap.set("i", "<c-l>", function()
+      if ls.choice_active() then
+        ls.change_choice(1)
+      end
+    end)
+  end
 end

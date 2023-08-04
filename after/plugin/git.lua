@@ -1,11 +1,11 @@
 ------ Git ------
 -- gitsigns
-vim.api.nvim_set_hl(0, "GitSignsAddNr", { bg = "none" })
+-- vim.api.nvim_set_hl(0, "GitSignsAddNr", { bg = "none" })
 local ok, gitsigns = pcall(require, "gitsigns")
 if ok then
   gitsigns.setup {
-    numhl = true,
-    signcolumn = false,
+    -- numhl = true,
+    -- signcolumn = false,
     on_attach = function(bufnr)
       local gs = package.loaded.gitsigns
       local function map(mode, l, r, opts)
@@ -76,21 +76,21 @@ if ok then
       -- Text object
       map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>")
 
-      local hls = {
-        "GitSignsAddNr",
-        "GitSignsChangeNr",
-        "GitSignsDeleteNr",
-        "GitSignsTopdeleteNr",
-        "GitSignsChangedeleteNr",
-        "GitSignsUntrackedNr",
-      }
+      -- local hls = {
+      --   "GitSignsAddNr",
+      --   "GitSignsChangeNr",
+      --   "GitSignsDeleteNr",
+      --   "GitSignsTopdeleteNr",
+      --   "GitSignsChangedeleteNr",
+      --   "GitSignsUntrackedNr",
+      -- }
 
       -- Adjust GitSigns highlights to have bg=none, but keep the old fg
-      for _, hl in ipairs(hls) do
-        local old_highlight = vim.api.nvim_get_hl_by_name(hl, true)
-        old_highlight.background = nil
-        vim.api.nvim_set_hl(0, hl, old_highlight)
-      end
+      -- for _, hl in ipairs(hls) do
+      --   local old_highlight = vim.api.nvim_get_hl_by_name(hl, true)
+      --   old_highlight.background = nil
+      --   vim.api.nvim_set_hl(0, hl, old_highlight)
+      -- end
     end,
   }
 end

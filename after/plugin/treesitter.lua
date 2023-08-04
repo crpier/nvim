@@ -1,8 +1,8 @@
 ------ TreeSitter ------
+local on_local_machine = (os.getenv "SSH_CLIENT" == nil)
 local ok_config, treesitter_configs = pcall(require, "nvim-treesitter.configs")
 if ok_config then
   local ok_textobjects = pcall(require, "nvim-treesitter-textobjects")
-  -- TODO: only when not on SSH_CLIENT
   local config = {
     ensure_installed = { "python", "bash" },
     highlight = {
@@ -14,7 +14,7 @@ if ok_config then
       --disable = { 'python' },
     },
     incremental_selection = {
-      enable = true,
+      enable = on_local_machine,
       keymaps = {
         init_selection = "<c-space>",
         node_incremental = "<c-space>",
@@ -24,7 +24,7 @@ if ok_config then
     },
     refactor = {
       highlight_definitions = {
-        enable = true,
+        enable = false,
         clear_on_cursor_move = false,
       },
       navigation = {
@@ -39,7 +39,7 @@ if ok_config then
         },
       },
       query_linter = {
-        enable = true,
+        enable = on_local_machine,
         use_virtual_text = true,
         lint_events = { "BufWrite", "CursorHold" },
       },

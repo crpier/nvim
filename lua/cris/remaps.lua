@@ -1,8 +1,6 @@
 -- Set leader
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
--- Easy open netrw
-vim.keymap.set("n", "<leader>e", vim.cmd.Ex)
 -- Easy exit
 vim.keymap.set("n", "Q", "ZQ")
 -- Don't highlight search
@@ -28,8 +26,8 @@ vim.keymap.set("t", "<C-j>", [[<C-\><C-n><C-w>j]])
 vim.keymap.set("t", "<C-k>", [[<C-\><C-n><C-w>k]])
 vim.keymap.set("t", "<C-l>", [[<C-\><C-n><C-w>l]])
 -- Don't save { and } in jumplist
-vim.keymap.set("n", "{", ":keepjumps normal! {<CR>")
-vim.keymap.set("n", "}", ":keepjumps normal! }<CR>")
+vim.keymap.set("n", "{", ":keepjumps normal! {<CR>", { silent = true })
+vim.keymap.set("n", "}", ":keepjumps normal! }<CR>", { silent = true })
 -- Easy to relod current file
 vim.keymap.set("n", "<leader>%", function()
   vim.cmd [[so]]

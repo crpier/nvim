@@ -20,18 +20,41 @@ if ok then
   telescope.load_extension "projects"
 
   local builtin = require "telescope.builtin"
-  -- TODO: this doesn't seem to find all files
-  vim.keymap.set("n", "sF", builtin.find_files)
+  vim.keymap.set("n", "sF", function() builtin.find_files({hidden=true}) end)
   vim.keymap.set("n", "sf", builtin.git_files)
   vim.keymap.set("n", "s/", function()
-    ---@diagnostic disable-next-line: param-type-mismatch
-    require("telescope.builtin").grep_string { search = vim.fn.input "Grep > " }
+    require("telescope.builtin").grep_string {
+      search = vim.fn.input "Grep > ",
+      vimgrep_arguments = {
+        "rg",
+        "--color=never",
+        "--no-heading",
+        "--with-filename",
+        "--line-number",
+        "--column",
+        "--smart-case",
+        "--hidden",
+      },
+    }
   end)
   vim.keymap.set("n", "sk", builtin.keymaps)
   vim.keymap.set("n", "<leader><space>", builtin.buffers)
   vim.keymap.set("n", "sp", telescope.extensions.projects.projects)
   vim.keymap.set("n", "sc", builtin.git_status)
-  vim.keymap.set("n", "sw", builtin.grep_string)
+  vim.keymap.set("n", "sw", function()
+    builtin.grep_string {
+      vimgrep_arguments = {
+        "rg",
+        "--color=never",
+        "--no-heading",
+        "--with-filename",
+        "--line-number",
+        "--column",
+        "--smart-case",
+        "--hidden",
+      },
+    }
+  end)
   vim.keymap.set("n", "ss", builtin.lsp_document_symbols)
   vim.keymap.set("n", "sb", builtin.git_branches)
 end

@@ -32,26 +32,53 @@ return require("packer").startup(function(use)
   use { "neovim/nvim-lspconfig" }
   use { "williamboman/mason.nvim" }
   use { "williamboman/mason-lspconfig.nvim" }
-  use { "j-hui/fidget.nvim" }
-  -- TODO: not on SSH_CLIENT
-  use { "folke/neodev.nvim" }
+  use { "j-hui/fidget.nvim", tag = "legacy" }
+  use {
+    "folke/neodev.nvim",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end,
+  }
   use { "jose-elias-alvarez/null-ls.nvim" }
-  -- TODO: don't use this on SSH_CLIENT I think?
   use {
     "SmiteshP/nvim-navic",
     requires = "neovim/nvim-lspconfig",
+
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end,
   }
 
   -- Snippets
-  use { "L3MON4D3/LuaSnip" }
-  use { "rafamadriz/friendly-snippets" }
+  use {
+    "L3MON4D3/LuaSnip",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end,
+  }
+  use {
+    "rafamadriz/friendly-snippets",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end,
+  }
 
   -- Autocompletion
   use { "hrsh7th/nvim-cmp" }
   use { "hrsh7th/cmp-nvim-lsp" }
   use { "hrsh7th/cmp-path" }
-  use { "saadparwaiz1/cmp_luasnip" }
-  use { "hrsh7th/cmp-nvim-lua" }
+  use {
+    "saadparwaiz1/cmp_luasnip",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end,
+  }
+  use {
+    "hrsh7th/cmp-nvim-lua",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end,
+  }
   use { "hrsh7th/cmp-emoji" }
 
   -- Treesitter
@@ -59,7 +86,12 @@ return require("packer").startup(function(use)
   use { -- Additional text objects via treesitter
     "nvim-treesitter/nvim-treesitter-textobjects",
   }
-  use { "nvim-treesitter/playground" }
+  use {
+    "nvim-treesitter/playground",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end,
+  }
 
   -- Telescope
   use {
@@ -87,7 +119,6 @@ return require("packer").startup(function(use)
   }
 
   -- Looks
-  use "rebelot/kanagawa.nvim"
   use {
     "nvim-lualine/lualine.nvim",
     requires = { "kyazdani42/nvim-web-devicons", opt = true },
@@ -98,7 +129,12 @@ return require("packer").startup(function(use)
 
   -- Git
   use "tpope/vim-fugitive"
-  use "tpope/vim-rhubarb"
+  use {
+    "tpope/vim-rhubarb",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end,
+  }
   use "lewis6991/gitsigns.nvim"
 
   -- Operators and motions
@@ -109,47 +145,78 @@ return require("packer").startup(function(use)
   use { "numToStr/Comment.nvim" } -- "gc" to comment visual regions/lines
 
   -- New commands
-  -- only on $SSH_CLIENT
   use { "ojroques/vim-oscyank" }
-  use "mbbill/undotree"
-
-  -- Misc
-  use { "alec-gibson/nvim-tetris" }
-  use "lewis6991/impatient.nvim"
-  use "crpier/fast-jobs.nvim"
-  -- Detect tabstop and shiftwidth automatically
-  use "tpope/vim-sleuth"
-  use "renerocksai/calendar-vim"
-  use "renerocksai/telekasten.nvim"
-
-  -- Filetype
-  use { "dag/vim-fish", ft = "fish" }
-
-  -- Trials
-  use "eandrju/cellular-automaton.nvim"
-  if packer_bootstrap then
-    require("packer").sync()
-  end
-  use { "folke/todo-comments.nvim" }
   use {
-    "kevinhwang91/nvim-bqf",
-    ft = "qf",
-    config = function()
-      require("bqf").setup()
+    "mbbill/undotree",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
     end,
   }
+
+  -- Misc
+  use "lewis6991/impatient.nvim"
+  use {
+    "crpier/fast-jobs.nvim",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end,
+  }
+  -- Detect tabstop and shiftwidth automatically
+  use "tpope/vim-sleuth"
+
+  use {
+    "renerocksai/calendar-vim",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end,
+  }
+  use {
+    "renerocksai/telekasten.nvim",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end,
+  }
+
+  -- Filetype
+  use {
+    "dag/vim-fish",
+    ft = "fish",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end,
+  }
+
+  -- Trials
+  use {
+    "eandrju/cellular-automaton.nvim",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end,
+  }
+
+  use { "folke/todo-comments.nvim" }
   -- Lua
   use {
     "folke/twilight.nvim",
   }
 
-  use "simrat39/rust-tools.nvim"
-  use "akinsho/toggleterm.nvim"
   use "norcalli/nvim-colorizer.lua"
   use "lukas-reineke/indent-blankline.nvim"
 
-  use {'akinsho/bufferline.nvim', tag = "v3.*", requires = 'nvim-tree/nvim-web-devicons'}
+  use { "akinsho/bufferline.nvim", tag = "v3.*", requires = "nvim-tree/nvim-web-devicons" }
 
   use "nvim-treesitter/nvim-treesitter-refactor"
-  pcall(require,"impatient")
+
+  use "nvim-tree/nvim-tree.lua"
+  use "ellisonleao/gruvbox.nvim"
+
+  use "HiPhish/rainbow-delimiters.nvim"
+  use "github/copilot.vim"
+
+  -- use "folke/flash.nvim"
+
+  pcall(require, "impatient")
+  if packer_bootstrap then
+    require("packer").sync()
+  end
 end)
