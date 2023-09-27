@@ -35,7 +35,7 @@ end)
 -- tweak the way new lines are added a bit
 vim.keymap.set("n", "]<Space>", "o<esc>")
 vim.keymap.set("n", "[<Space>", "O<esc>")
--- Search the selected test
+-- Search the selected text
 vim.keymap.set("v", "//", [[y/\V<C-R>=escape(@",'/\')<CR><CR>]])
 -- Print full path to current root
 vim.keymap.set("n", "y!", "<cmd>lua print(vim.loop.cwd())<cr>")

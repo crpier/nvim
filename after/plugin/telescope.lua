@@ -25,16 +25,16 @@ if ok then
   vim.keymap.set("n", "s/", function()
     require("telescope.builtin").grep_string {
       search = vim.fn.input "Grep > ",
-      vimgrep_arguments = {
-        "rg",
-        "--color=never",
-        "--no-heading",
-        "--with-filename",
-        "--line-number",
-        "--column",
-        "--smart-case",
-        "--hidden",
-      },
+      -- vimgrep_arguments = {
+      --   "rg",
+      --   "--color=never",
+      --   "--no-heading",
+      --   "--with-filename",
+      --   "--line-number",
+      --   "--column",
+      --   "--smart-case",
+      --   "--hidden",
+      -- },
     }
   end)
   vim.keymap.set("n", "sk", builtin.keymaps)
@@ -43,16 +43,16 @@ if ok then
   vim.keymap.set("n", "sc", builtin.git_status)
   vim.keymap.set("n", "sw", function()
     builtin.grep_string {
-      vimgrep_arguments = {
-        "rg",
-        "--color=never",
-        "--no-heading",
-        "--with-filename",
-        "--line-number",
-        "--column",
-        "--smart-case",
-        "--hidden",
-      },
+      -- vimgrep_arguments = {
+      --   "rg",
+      --   "--color=never",
+      --   "--no-heading",
+      --   "--with-filename",
+      --   "--line-number",
+      --   "--column",
+      --   "--smart-case",
+      --   "--hidden",
+      -- },
     }
   end)
   vim.keymap.set("n", "ss", builtin.lsp_document_symbols)

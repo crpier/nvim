@@ -3,7 +3,8 @@
 local ok_dap, dap = pcall(require, "dap")
 local ok_dap_python, dap_python = pcall(require, "dap-python")
 local ok_dap_ui, dap_ui = pcall(require, "dap-ui")
-if ok_dap and ok_dap_ui and ok_dap_python then
+local ok_dap_repl_hl, dap_repl_hl = pcall(require, "dap-repl-highlights")
+if ok_dap and ok_dap_ui and ok_dap_python and ok_dap_repl_hl then
   dap_python.setup "/usr/bin/python3"
   dap.configurations = { python = {} }
   table.insert(dap.configurations.python, {
@@ -17,6 +18,7 @@ if ok_dap and ok_dap_ui and ok_dap_python then
   })
 
   dap_ui.setup()
+  dap_repl_hl.setup()
   dap.listeners.after.event_initialized["dapui_config"] = function()
     ---@diagnostic disable-next-line: missing-parameter
     dap_ui.open()

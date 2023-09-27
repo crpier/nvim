@@ -212,6 +212,7 @@ return require("packer").startup(function(use)
 
   use "HiPhish/rainbow-delimiters.nvim"
   use "github/copilot.vim"
+  use "LiadOz/nvim-dap-repl-highlights"
 
   -- use "folke/flash.nvim"
 
