@@ -201,7 +201,8 @@ return require("packer").startup(function(use)
   }
 
   use "norcalli/nvim-colorizer.lua"
-  use "lukas-reineke/indent-blankline.nvim"
+  -- update to latest version
+  use { "lukas-reineke/indent-blankline.nvim", tag="v2.20.8" }
 
   use { "akinsho/bufferline.nvim", tag = "v3.*", requires = "nvim-tree/nvim-web-devicons" }
 
