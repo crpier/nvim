@@ -75,8 +75,9 @@ if ok then
       null_ls.builtins.formatting.prettier,
       -- python
       null_ls.builtins.formatting.black,
-      -- null_ls.builtins.diagnostics.ruff,
-      -- null_ls.builtins.diagnostics.mypy,
+      null_ls.builtins.formatting.isort,
+      null_ls.builtins.diagnostics.ruff,
+      null_ls.builtins.diagnostics.mypy,
     },
   }
 
