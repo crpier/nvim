@@ -39,7 +39,6 @@ return require("packer").startup(function(use)
       return os.getenv "SSH_CLIENT" == nil
     end,
   }
-  use { "jose-elias-alvarez/null-ls.nvim" }
   use {
     "SmiteshP/nvim-navic",
     requires = "neovim/nvim-lspconfig",
@@ -86,6 +85,7 @@ return require("packer").startup(function(use)
   use { -- Additional text objects via treesitter
     "nvim-treesitter/nvim-treesitter-textobjects",
   }
+  use "nvim-treesitter/nvim-treesitter-refactor"
   use {
     "nvim-treesitter/playground",
     cond = function()
@@ -104,7 +104,11 @@ return require("packer").startup(function(use)
     requires = { "nvim-telescope/telescope.nvim" },
     run = "make",
   }
+  use 'nvim-telescope/telescope-ui-select.nvim'
   use { "ahmedkhalf/project.nvim" }
+
+  -- Navigation
+  use "nvim-tree/nvim-tree.lua"
 
   -- DAP
   use "mfussenegger/nvim-dap"
@@ -117,15 +121,25 @@ return require("packer").startup(function(use)
     "theHamsta/nvim-dap-virtual-text",
     requires = { "mfussenegger/nvim-dap", "mfussenegger/nvim-dap-python" },
   }
+  use "LiadOz/nvim-dap-repl-highlights"
 
   -- Looks
   use {
     "nvim-lualine/lualine.nvim",
-    requires = { "kyazdani42/nvim-web-devicons", opt = true },
   }
+  use { "kyazdani42/nvim-web-devicons", cond = function()
+    return os.getenv "SSH_CLIENT" == nil
+  end }
+  use "norcalli/nvim-colorizer.lua"
+  use "lukas-reineke/indent-blankline.nvim"
+  use { "akinsho/bufferline.nvim", tag = "v3.*" }
+  use "ellisonleao/gruvbox.nvim"
+  use "HiPhish/rainbow-delimiters.nvim"
+
 
   -- Navigation
   use "theprimeagen/harpoon"
+  use "folke/todo-comments.nvim"
 
   -- Git
   use "tpope/vim-fugitive"
@@ -143,6 +157,12 @@ return require("packer").startup(function(use)
     "kylechui/nvim-surround",
   }
   use { "numToStr/Comment.nvim" } -- "gc" to comment visual regions/lines
+  use {
+    "crpier/fast-jobs.nvim",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end,
+  }
 
   -- New commands
   use { "ojroques/vim-oscyank" }
@@ -155,15 +175,16 @@ return require("packer").startup(function(use)
 
   -- Misc
   use "lewis6991/impatient.nvim"
+  use { "github/copilot.vim",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end }
   use {
-    "crpier/fast-jobs.nvim",
+    "eandrju/cellular-automaton.nvim",
     cond = function()
       return os.getenv "SSH_CLIENT" == nil
     end,
   }
-  -- Detect tabstop and shiftwidth automatically
-  use "tpope/vim-sleuth"
-
   use {
     "renerocksai/calendar-vim",
     cond = function()
@@ -177,6 +198,10 @@ return require("packer").startup(function(use)
     end,
   }
 
+
+  -- Detect tabstop and shiftwidth automatically
+  use "tpope/vim-sleuth"
+
   -- Filetype
   use {
     "dag/vim-fish",
@@ -188,34 +213,8 @@ return require("packer").startup(function(use)
 
   -- Trials
   use {
-    "eandrju/cellular-automaton.nvim",
-    cond = function()
-      return os.getenv "SSH_CLIENT" == nil
-    end,
-  }
-
-  use { "folke/todo-comments.nvim" }
-  -- Lua
-  use {
     "folke/twilight.nvim",
   }
-
-  use "norcalli/nvim-colorizer.lua"
-  -- update to latest version
-  use { "lukas-reineke/indent-blankline.nvim", tag="v2.20.8" }
-
-  use { "akinsho/bufferline.nvim", tag = "v3.*", requires = "nvim-tree/nvim-web-devicons" }
-
-  use "nvim-treesitter/nvim-treesitter-refactor"
-
-  use "nvim-tree/nvim-tree.lua"
-  use "ellisonleao/gruvbox.nvim"
-
-  use "HiPhish/rainbow-delimiters.nvim"
-  use "github/copilot.vim"
-  use "LiadOz/nvim-dap-repl-highlights"
-
-  -- use "folke/flash.nvim"
 
   pcall(require, "impatient")
   if packer_bootstrap then

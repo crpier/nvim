@@ -32,7 +32,7 @@ if ok then
   }
   local ok_navic, navic = pcall(require, "nvim-navic")
   if ok_navic then
-      navic.setup()
+    navic.setup()
   end
   local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
   local lsp_attach = function(client, bufnr)
@@ -63,23 +63,6 @@ if ok then
   -- some lsp maps
   vim.keymap.set("n", "<leader>li", "<cmd>LspInfo<CR>")
   vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<CR>")
-
-  -- null-ls
-  local null_ls = require "null-ls"
-  null_ls.setup {
-    border = "single",
-    sources = {
-      -- lua
-      null_ls.builtins.formatting.stylua,
-      -- js/ts/react
-      null_ls.builtins.formatting.prettier,
-      -- python
-      null_ls.builtins.formatting.black,
-      null_ls.builtins.formatting.isort,
-      null_ls.builtins.diagnostics.ruff,
-      null_ls.builtins.diagnostics.mypy,
-    },
-  }
 
   vim.diagnostic.config { float = { border = "single" } }
 

@@ -1,6 +1,6 @@
 -- harpoon
-local ok, mark = pcall(require, "harpoon.mark")
-if ok then
+local harpoon_ok, mark = pcall(require, "harpoon.mark")
+if harpoon_ok then
   local ui = require "harpoon.ui"
   local term = require "harpoon.term"
 
@@ -22,3 +22,23 @@ if ok then
     term.gotoTerminal(1)
   end)
 end
+
+local todo_ok, todo = pcall(require, "todo-comments")
+if todo_ok then
+  -- TODO: lol
+  todo.setup {}
+  vim.keymap.set("n", "st", "<cmd>TodoTelescope<CR>")
+end
+
+local ok_nvimtree, nvimtree = pcall(require, "nvim-tree")
+if ok_nvimtree then
+  nvimtree.setup {
+    update_focused_file = {
+      enable = true,
+      update_root = true,
+      ignore_list = {},
+    },
+  }
+  vim.keymap.set("n", "<leader>e", "<cmd>NvimTreeToggle<CR>")
+end
+

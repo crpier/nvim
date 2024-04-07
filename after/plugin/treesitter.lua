@@ -23,9 +23,15 @@ if ok_config then
       },
     },
     refactor = {
+      smart_rename = {
+        enable = true,
+        keymaps = {
+          smart_rename = "<leader>rn",
+        },
+      },
       highlight_definitions = {
-        enable = false,
-        clear_on_cursor_move = false,
+        enable = on_local_machine,
+        clear_on_cursor_move = true,
       },
       navigation = {
         enable = true,
