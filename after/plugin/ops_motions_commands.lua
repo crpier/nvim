@@ -31,7 +31,6 @@ end
 
 
 -- oscyank
--- TODO: only do this when on SSH_CLIENT, otherwise use unnamed register
 vim.keymap.set("v", "<leader>y", ":OSCYankVisual<CR>")
 
 -- cellular-automaton
@@ -79,7 +78,7 @@ let g:copilot_no_tab_map = v:true
 
 local ok_mini = pcall(require, "mini.splitjoin")
 if ok_mini then
-  local _, bufremove = pcall(require, 'mini.bufremove')
+  local _, bufremove = pcall(require, "mini.bufremove")
   vim.keymap.set("n", "<leader>bd", bufremove.delete)
 
   -- use gS to toggle split/join

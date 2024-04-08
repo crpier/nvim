@@ -25,9 +25,10 @@ end
 
 local todo_ok, todo = pcall(require, "todo-comments")
 if todo_ok then
-  -- TODO: lol
   todo.setup {}
   vim.keymap.set("n", "st", "<cmd>TodoTelescope<CR>")
+  vim.keymap.set("n", "]t", todo.jump_next)
+  vim.keymap.set("n", "[t", todo.jump_prev)
 end
 
 local ok_nvimtree, nvimtree = pcall(require, "nvim-tree")

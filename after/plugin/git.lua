@@ -14,18 +14,18 @@ if ok then
         vim.keymap.set(mode, l, r, opts)
       end
       -- Navigation
-      map("n", "]h", function()
+      map("n", "]c", function()
         if vim.wo.diff then
-          return "]h"
+          return "]c"
         end
         vim.schedule(function()
           gs.next_hunk()
         end)
         return "<Ignore>"
       end, { expr = true })
-      map("n", "[h", function()
+      map("n", "[c", function()
         if vim.wo.diff then
-          return "[h"
+          return "[c"
         end
         vim.schedule(function()
           gs.prev_hunk()

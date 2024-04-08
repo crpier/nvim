@@ -14,11 +14,11 @@ vim.o.smartcase = true
 -- Jump to result while typing search query
 vim.o.incsearch = true
 -- Always pad the edges
-vim.o.scrolloff = 8
+vim.o.scrolloff = 4
 -- Decrease update time
-vim.o.updatetime = 250
+vim.o.updatetime = 150
 -- Always show the sign column
-vim.wo.signcolumn = "yes"
+vim.wo.signcolumn = "yes:1"
 vim.o.completeopt = "menuone,noselect"
 -- No wrapping of text
 vim.o.wrap = false
@@ -35,8 +35,18 @@ vim.o.termguicolors = true
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 vim.opt.foldlevel = 99
+-- Highlight current line
+vim.opt.cursorline = true
 
 ---- Autocommands ----
+-- set colorscheme
+vim.api.nvim_create_autocmd("ColorScheme", {
+  callback = function()
+    vim.api.nvim_set_hl(0, "CursorLine", { bg = "#303030" })
+    vim.api.nvim_set_hl(0, "TSDefinitionUsage", { bg = "#303030" })
+  end,
+})
+
 -- highlight on yank
 local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
 vim.api.nvim_create_autocmd("TextYankPost", {
@@ -92,5 +102,5 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
     vim.opt_local.spell = true
   end,
 })
--- Don't insert comment leader when pressing o/O on comment line
-vim.api.nvim_create_autocmd("BufEnter", { command = [[set formatoptions-=to]], group = misc_group })
+-- Don't insert comment leader when pressing o/O on comment line by removing `o` option
+vim.api.nvim_create_autocmd("BufEnter", { command = [[set formatoptions=jcrql]], group = misc_group })

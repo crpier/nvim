@@ -1,5 +1,4 @@
 -- debugger
--- TODO: find a way to add configs dynamically
 local ok_dap, dap = pcall(require, "dap")
 local ok_dap_python, dap_python = pcall(require, "dap-python")
 local ok_dap_ui, dap_ui = pcall(require, "dap-ui")

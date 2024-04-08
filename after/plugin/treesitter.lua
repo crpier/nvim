@@ -26,7 +26,7 @@ if ok_config then
       smart_rename = {
         enable = true,
         keymaps = {
-          smart_rename = "<leader>rn",
+          smart_rename = "<leader>trn",
         },
       },
       highlight_definitions = {

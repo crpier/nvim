@@ -1,7 +1,7 @@
 local ok_gruvbox, gruvbox = pcall(require, "gruvbox")
 if ok_gruvbox then
   gruvbox.setup {
-    transparent_mode = true
+    transparent_mode = true,
   }
   vim.cmd.colorscheme "gruvbox"
 end
@@ -10,7 +10,12 @@ local ok_navic, navic = pcall(require, "nvim-navic")
 local ok_lualine, lualine = pcall(require, "lualine")
 local navic_part = nil
 if ok_navic then
-  navic_part = { function() return navic.get_location() end, cond = navic.is_available }
+  navic_part = {
+    function()
+      return navic.get_location()
+    end,
+    cond = navic.is_available,
+  }
 end
 if ok_lualine then
   -- Lualine
@@ -27,7 +32,6 @@ if ok_lualine then
         navic_part,
       },
       lualine_x = { "" },
-      -- TODO: put lsp clients here
       lualine_y = { "filetype" },
       lualine_z = { "location" },
     },
