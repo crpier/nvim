@@ -47,6 +47,8 @@ return require("packer").startup(function(use)
       return os.getenv "SSH_CLIENT" == nil
     end,
   }
+  use { "mfussenegger/nvim-lint" }
+  use { "stevearc/conform.nvim" }
 
   -- Snippets
   use {
@@ -104,7 +106,7 @@ return require("packer").startup(function(use)
     requires = { "nvim-telescope/telescope.nvim" },
     run = "make",
   }
-  use 'nvim-telescope/telescope-ui-select.nvim'
+  use "nvim-telescope/telescope-ui-select.nvim"
   use { "ahmedkhalf/project.nvim" }
 
   -- Navigation
@@ -127,15 +129,17 @@ return require("packer").startup(function(use)
   use {
     "nvim-lualine/lualine.nvim",
   }
-  use { "kyazdani42/nvim-web-devicons", cond = function()
-    return os.getenv "SSH_CLIENT" == nil
-  end }
+  use {
+    "kyazdani42/nvim-web-devicons",
+    cond = function()
+      return os.getenv "SSH_CLIENT" == nil
+    end,
+  }
   use "norcalli/nvim-colorizer.lua"
   use "lukas-reineke/indent-blankline.nvim"
   use { "akinsho/bufferline.nvim", tag = "v3.*" }
-  use "ellisonleao/gruvbox.nvim"
+  use { "ellisonleao/gruvbox.nvim" }
   use "HiPhish/rainbow-delimiters.nvim"
-
 
   -- Navigation
   use "theprimeagen/harpoon"
@@ -153,6 +157,10 @@ return require("packer").startup(function(use)
 
   -- Operators and motions
   use { "tpope/vim-unimpaired" }
+  -- Collection of various small independent plugins/modules
+  use {
+    "echasnovski/mini.nvim",
+  }
   use {
     "kylechui/nvim-surround",
   }
@@ -175,10 +183,12 @@ return require("packer").startup(function(use)
 
   -- Misc
   use "lewis6991/impatient.nvim"
-  use { "github/copilot.vim",
+  use {
+    "github/copilot.vim",
     cond = function()
       return os.getenv "SSH_CLIENT" == nil
-    end }
+    end,
+  }
   use {
     "eandrju/cellular-automaton.nvim",
     cond = function()
@@ -197,7 +207,6 @@ return require("packer").startup(function(use)
       return os.getenv "SSH_CLIENT" == nil
     end,
   }
-
 
   -- Detect tabstop and shiftwidth automatically
   use "tpope/vim-sleuth"

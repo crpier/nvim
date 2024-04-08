@@ -1,7 +1,7 @@
 ------ LSP ------
 -- Neodev for working on nvim config
-local ok, neodev = pcall(require, "neodev")
-if ok then
+local ok_neodev, neodev = pcall(require, "neodev")
+if ok_neodev then
   neodev.setup()
 end
 
@@ -22,8 +22,8 @@ local handlers = {
 }
 
 -- Actual LSP setup
-local ok, mason = pcall(require, "mason")
-if ok then
+local ok_mason, mason = pcall(require, "mason")
+if ok_mason then
   mason.setup()
   require("mason-lspconfig").setup {
     ensure_installed = {
@@ -32,20 +32,10 @@ if ok then
   }
   local ok_navic, navic = pcall(require, "nvim-navic")
   if ok_navic then
-    navic.setup()
+    navic.setup {}
   end
   local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
   local lsp_attach = function(client, bufnr)
-    local opts = { buffer = bufnr }
-    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-    vim.keymap.set("n", "rn", vim.lsp.buf.rename, opts)
-    vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-    vim.keymap.set("n", "gq", vim.lsp.buf.format, opts)
-    vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
-    vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
-    vim.keymap.set("n", "d;", vim.diagnostic.open_float, opts)
-    vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
     if client.server_capabilities.documentSymbolProvider and ok_navic then
       navic.attach(client, bufnr)
     end
@@ -61,6 +51,16 @@ if ok then
     end,
   }
   -- some lsp maps
+  vim.keymap.set("n", "gd", vim.lsp.buf.definition)
+  vim.keymap.set("n", "K", vim.lsp.buf.hover)
+  -- TODO: I'd like to change this to something that doesn't overwrite defaults
+  vim.keymap.set("n", "rn", vim.lsp.buf.rename)
+  vim.keymap.set("n", "gr", vim.lsp.buf.references)
+  -- vim.keymap.set("n", "gq", vim.lsp.buf.format)
+  vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
+  vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
+  vim.keymap.set("n", "d;", vim.diagnostic.open_float)
+  vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action)
   vim.keymap.set("n", "<leader>li", "<cmd>LspInfo<CR>")
   vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<CR>")
 
@@ -72,4 +72,48 @@ if ok then
       blend = 0,
     },
   }
+end
+
+-- nvim-lint
+local lint_ok, lint = pcall(require, "lint")
+if lint_ok then
+  -- TODO: ensure these are installed by Mason, but not on SSH
+  lint.linters_by_ft = lint.linters_by_ft or {}
+  lint.linters_by_ft["markdown"] = { "markdownlint" }
+  lint.linters_by_ft["dockerfile"] = { "hadolint" }
+  lint.linters_by_ft["json"] = { "jsonlint" }
+  lint.linters_by_ft["terraform"] = { "tflint" }
+  lint.linters_by_ft["text"] = { "vale" }
+  lint.linters_by_ft["lua"] = { "luacheck" }
+
+  -- disable default linters
+  lint.linters_by_ft["clojure"] = nil
+  lint.linters_by_ft["inko"] = nil
+  lint.linters_by_ft["janet"] = nil
+  lint.linters_by_ft["rst"] = nil
+  lint.linters_by_ft["ruby"] = nil
+
+  -- Create autocommand which carries out the actual linting
+  -- on the specified events.
+  local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
+  vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
+    group = lint_augroup,
+    callback = function()
+      require("lint").try_lint()
+    end,
+  })
+end
+
+-- conform
+local ok_conform, conform = pcall(require, "conform")
+if ok_conform then
+  conform.setup {
+    notify_on_error = true,
+    formatters_by_ft = {
+      lua = { "stylua" },
+      python = { "ruff_fix", "ruff_format" },
+      markdown = { "markdownlint" },
+    },
+  }
+  vim.keymap.set("n", "gq", conform.format)
 end

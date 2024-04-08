@@ -9,7 +9,7 @@
   - cd
   - co
   - cp
-  - cx 
+  - cx
   - cy
   - d=
   - dc
