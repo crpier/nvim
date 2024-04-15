@@ -26,6 +26,7 @@ local ok_mason, mason = pcall(require, "mason")
 if ok_mason then
   mason.setup()
   require("mason-lspconfig").setup {
+    -- TODO: only when not on ssh
     ensure_installed = {
       "pyright",
     },
@@ -63,7 +64,12 @@ if ok_mason then
   vim.keymap.set("n", "<leader>li", "<cmd>LspInfo<CR>")
   vim.keymap.set("n", "<leader>lr", "<cmd>LspRestart<CR>")
 
-  vim.diagnostic.config { float = { border = "single" } }
+  vim.diagnostic.config {
+    float = {
+      source = true,
+      border = "rounded",
+    },
+  }
 
   -- fidget
   require("fidget").setup {
@@ -84,6 +90,7 @@ if lint_ok then
   lint.linters_by_ft["terraform"] = { "tflint" }
   lint.linters_by_ft["text"] = { "vale" }
   lint.linters_by_ft["lua"] = { "luacheck" }
+  lint.linters_by_ft["python"] = { "mypy", "ruff" }
 
   -- disable default linters
   lint.linters_by_ft["clojure"] = nil
@@ -112,6 +119,7 @@ if ok_conform then
       lua = { "stylua" },
       python = { "ruff_fix", "ruff_format" },
       markdown = { "markdownlint" },
+      javascript = { "prettierd" },
     },
   }
   vim.keymap.set("n", "gq", conform.format)

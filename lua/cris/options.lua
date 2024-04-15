@@ -39,13 +39,6 @@ vim.opt.foldlevel = 99
 vim.opt.cursorline = true
 
 ---- Autocommands ----
--- set colorscheme
-vim.api.nvim_create_autocmd("ColorScheme", {
-  callback = function()
-    vim.api.nvim_set_hl(0, "CursorLine", { bg = "#303030" })
-    vim.api.nvim_set_hl(0, "TSDefinitionUsage", { bg = "#303030" })
-  end,
-})
 
 -- highlight on yank
 local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })

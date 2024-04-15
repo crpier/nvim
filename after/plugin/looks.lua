@@ -4,7 +4,15 @@ if ok_gruvbox then
     transparent_mode = true,
   }
   vim.cmd.colorscheme "gruvbox"
+  vim.o.background = "dark"
 end
+-- set colorscheme
+vim.api.nvim_create_autocmd("ColorScheme", {
+  callback = function()
+    vim.api.nvim_set_hl(0, "CursorLine", { bg = "#303030" })
+    vim.api.nvim_set_hl(0, "TSDefinitionUsage", { bg = "#303030" })
+  end,
+})
 
 local ok_navic, navic = pcall(require, "nvim-navic")
 local ok_lualine, lualine = pcall(require, "lualine")

@@ -115,6 +115,7 @@ vim.keymap.set("n", "<leader>gu", "<cmd>Git pull<CR>")
 vim.keymap.set("n", "<leader>gl", "<cmd>tab Git log -n 10<cr>")
 vim.keymap.set("n", "<leader>gL", "<cmd>tab Git log<cr>")
 vim.keymap.set("n", "<leader>gb", "<cmd>Git blame<CR>")
+vim.keymap.set("n", "<leader>ga", "<cmd>Git add .<CR>")
 
 -- Still on the fence about these
 -- vim.keymap.set("n", "<leader>gc", "<cmd>Git clean -fd<CR>")
