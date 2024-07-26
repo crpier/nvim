@@ -1,7 +1,9 @@
 ------ LSP ------
 -- Neodev for working on nvim config
+local ON_LOCAL = os.getenv "SSH_CLIENT" == nil
+
 local ok_neodev, neodev = pcall(require, "neodev")
-if ok_neodev then
+if ok_neodev and ON_LOCAL then
   neodev.setup()
 end
 
@@ -56,8 +58,12 @@ if ok_mason then
   vim.keymap.set("n", "K", vim.lsp.buf.hover)
   vim.keymap.set("n", "gr", vim.lsp.buf.references)
   -- vim.keymap.set("n", "gq", vim.lsp.buf.format)
-  vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
-  vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
+  vim.keymap.set("n", "]d", function()
+    vim.diagnostic.jump { count = 1, float = true }
+  end)
+  vim.keymap.set("n", "[d", function()
+    vim.diagnostic.jump { count = -1, float = true }
+  end)
   vim.keymap.set("n", "d;", vim.diagnostic.open_float)
   vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename)
   vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action)
@@ -81,10 +87,9 @@ end
 
 -- nvim-lint
 local lint_ok, lint = pcall(require, "lint")
-if lint_ok then
+if lint_ok and ON_LOCAL then
   -- TODO: ensure these are installed by Mason, but not on SSH
   lint.linters_by_ft = lint.linters_by_ft or {}
-  lint.linters_by_ft["markdown"] = { "markdownlint" }
   lint.linters_by_ft["dockerfile"] = { "hadolint" }
   lint.linters_by_ft["json"] = { "jsonlint" }
   lint.linters_by_ft["terraform"] = { "tflint" }
@@ -92,6 +97,7 @@ if lint_ok then
   lint.linters_by_ft["python"] = { "mypy", "ruff" }
 
   -- disable default linters
+  lint.linters_by_ft["markdown"] = nil
   lint.linters_by_ft["text"] = nil
   lint.linters_by_ft["clojure"] = nil
   lint.linters_by_ft["inko"] = nil
@@ -112,12 +118,12 @@ end
 
 -- conform
 local ok_conform, conform = pcall(require, "conform")
-if ok_conform then
+if ok_conform and ON_LOCAL then
   conform.setup {
     notify_on_error = true,
     formatters_by_ft = {
       lua = { "stylua" },
-      python = { "ruff_fix", "ruff_format" },
+      python = { "ruff_fix", "ruff_format", "ruff_organize_imports" },
       markdown = { "markdownlint" },
       javascript = { "prettierd" },
       rust = { "rustfmt" },

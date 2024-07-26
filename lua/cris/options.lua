@@ -37,6 +37,7 @@ vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
 vim.opt.foldlevel = 99
 -- Highlight current line
 vim.opt.cursorline = true
+vim.o.textwidth = 0
 
 ---- Autocommands ----
 

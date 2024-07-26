@@ -76,11 +76,7 @@ imap <silent><script><expr> <S-Tab> copilot#Accept("\<CR>")
 let g:copilot_no_tab_map = v:true
 ]]
 
-local ok_mini = pcall(require, "mini.splitjoin")
-if ok_mini then
-  local _, bufremove = pcall(require, "mini.bufremove")
+local ok_bufremove, bufremove = pcall(require, "mini.bufremove")
+if ok_bufremove then
   vim.keymap.set("n", "<leader>bd", bufremove.delete)
-
-  -- use gS to toggle split/join
-  require("mini.splitjoin").setup()
 end

@@ -1,20 +1,20 @@
 ------ TreeSitter ------
-local on_local_machine = (os.getenv "SSH_CLIENT" == nil)
+local ON_LOCAL = (os.getenv "SSH_CLIENT" == nil)
 local ok_config, treesitter_configs = pcall(require, "nvim-treesitter.configs")
+
 if ok_config then
   local ok_textobjects = pcall(require, "nvim-treesitter-textobjects")
   local config = {
-    ensure_installed = { "python", "bash", "html", "javascript" },
+    ensure_installed = { "python", "bash" },
     highlight = {
       enable = true,
       additional_vim_regex_highlighting = { "markdown" },
     },
     indent = {
       enable = false,
-      --disable = { 'python' },
     },
     incremental_selection = {
-      enable = on_local_machine,
+      enable = ON_LOCAL,
       keymaps = {
         init_selection = "<c-space>",
         node_incremental = "<c-space>",
@@ -30,7 +30,7 @@ if ok_config then
         },
       },
       highlight_definitions = {
-        enable = on_local_machine,
+        enable = ON_LOCAL,
         clear_on_cursor_move = true,
       },
       navigation = {
@@ -45,7 +45,7 @@ if ok_config then
         },
       },
       query_linter = {
-        enable = on_local_machine,
+        enable = ON_LOCAL,
         use_virtual_text = true,
         lint_events = { "BufWrite", "CursorHold" },
       },
@@ -98,4 +98,9 @@ if ok_config then
     }
   end
   treesitter_configs.setup(config)
+end
+
+local ok_outline, outline = pcall(require, "symbols-outline")
+if ok_outline then
+  outline.setup()
 end
