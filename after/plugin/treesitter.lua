@@ -4,7 +4,7 @@ local ok_config, treesitter_configs = pcall(require, "nvim-treesitter.configs")
 if ok_config then
   local ok_textobjects = pcall(require, "nvim-treesitter-textobjects")
   local config = {
-    ensure_installed = { "python", "bash" },
+    ensure_installed = { "python", "bash", "html", "javascript" },
     highlight = {
       enable = true,
       additional_vim_regex_highlighting = { "markdown" },

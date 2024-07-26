@@ -88,11 +88,11 @@ if lint_ok then
   lint.linters_by_ft["dockerfile"] = { "hadolint" }
   lint.linters_by_ft["json"] = { "jsonlint" }
   lint.linters_by_ft["terraform"] = { "tflint" }
-  lint.linters_by_ft["text"] = { "vale" }
   lint.linters_by_ft["lua"] = { "luacheck" }
   lint.linters_by_ft["python"] = { "mypy", "ruff" }
 
   -- disable default linters
+  lint.linters_by_ft["text"] = nil
   lint.linters_by_ft["clojure"] = nil
   lint.linters_by_ft["inko"] = nil
   lint.linters_by_ft["janet"] = nil
@@ -120,6 +120,9 @@ if ok_conform then
       python = { "ruff_fix", "ruff_format" },
       markdown = { "markdownlint" },
       javascript = { "prettierd" },
+      rust = { "rustfmt" },
+      typescriptreact = { "prettierd" },
+      go = { "gofmt" },
     },
   }
   vim.keymap.set("n", "gq", conform.format)

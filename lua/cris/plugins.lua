@@ -137,7 +137,7 @@ return require("packer").startup(function(use)
   }
   use "norcalli/nvim-colorizer.lua"
   use "lukas-reineke/indent-blankline.nvim"
-  use { "akinsho/bufferline.nvim", tag = "v3.*" }
+  use { "akinsho/bufferline.nvim" }
   use { "ellisonleao/gruvbox.nvim" }
   use "HiPhish/rainbow-delimiters.nvim"
 
@@ -224,6 +224,14 @@ return require("packer").startup(function(use)
   use {
     "folke/twilight.nvim",
   }
+
+  -- TODO: 
+  -- use {
+  --   "mrcjkb/rustaceanvim",
+  --   lazy = false, -- This plugin is already lazy
+  -- }
+
+  -- use('crispgm/nvim-go')
 
   pcall(require, "impatient")
   if packer_bootstrap then
