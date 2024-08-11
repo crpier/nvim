@@ -69,13 +69,6 @@ if ok_telekasten then
   })
 end
 
--- Copilot
--- use <S-Tab> to accept copilot suggestions
-vim.cmd [[
-imap <silent><script><expr> <S-Tab> copilot#Accept("\<CR>")
-let g:copilot_no_tab_map = v:true
-]]
-
 local ok_bufremove, bufremove = pcall(require, "mini.bufremove")
 if ok_bufremove then
   vim.keymap.set("n", "<leader>bd", bufremove.delete)

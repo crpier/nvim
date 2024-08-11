@@ -78,11 +78,7 @@ if ok_mason then
   }
 
   -- fidget
-  require("fidget").setup {
-    window = {
-      blend = 0,
-    },
-  }
+  require("fidget").setup()
 end
 
 -- nvim-lint

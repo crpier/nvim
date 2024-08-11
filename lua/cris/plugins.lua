@@ -165,10 +165,6 @@ return require("packer").startup(function(use)
   -- Misc
   use "lewis6991/impatient.nvim"
   use {
-    "github/copilot.vim",
-    cond = ON_LOCAL,
-  }
-  use {
     "eandrju/cellular-automaton.nvim",
     cond = ON_LOCAL,
   }
