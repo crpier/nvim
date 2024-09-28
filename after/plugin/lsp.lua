@@ -1,11 +1,5 @@
 ------ LSP ------
--- Neodev for working on nvim config
 local ON_LOCAL = os.getenv "SSH_CLIENT" == nil
-
-local ok_neodev, neodev = pcall(require, "neodev")
-if ok_neodev and ON_LOCAL then
-  neodev.setup()
-end
 
 local border = {
   { "╭", "Normal" },
@@ -86,8 +80,10 @@ local lint_ok, lint = pcall(require, "lint")
 if lint_ok and ON_LOCAL then
   -- TODO: ensure these are installed by Mason, but not on SSH
   lint.linters_by_ft = lint.linters_by_ft or {}
-  lint.linters_by_ft["dockerfile"] = { "hadolint" }
-  lint.linters_by_ft["json"] = { "jsonlint" }
+  -- TODO: use hadolint if available
+  lint.linters_by_ft["dockerfile"] = nil
+  -- TODO: use jsonlint if available
+  lint.linters_by_ft["json"] = nil
   lint.linters_by_ft["terraform"] = { "tflint" }
   lint.linters_by_ft["lua"] = { "luacheck" }
   lint.linters_by_ft["python"] = { "mypy", "ruff" }
@@ -100,6 +96,7 @@ if lint_ok and ON_LOCAL then
   lint.linters_by_ft["janet"] = nil
   lint.linters_by_ft["rst"] = nil
   lint.linters_by_ft["ruby"] = nil
+  lint.linters_by_ft["Avante"] = nil
 
   -- Create autocommand which carries out the actual linting
   -- on the specified events.

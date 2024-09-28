@@ -3,9 +3,10 @@ if ok_gruvbox then
   gruvbox.setup {
     transparent_mode = true,
   }
-  vim.cmd.colorscheme "gruvbox"
   vim.o.background = "dark"
+  vim.cmd [[colorscheme gruvbox]]
 end
+
 -- set colorscheme
 vim.api.nvim_create_autocmd("ColorScheme", {
   callback = function()
@@ -50,8 +51,6 @@ local ok_bufferline, bufferline = pcall(require, "bufferline")
 if ok_bufferline then
   bufferline.setup {}
 end
-
-require("colorizer").setup()
 
 require("ibl").setup {}
 

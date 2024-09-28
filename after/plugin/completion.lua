@@ -34,6 +34,7 @@ if ok then
       ["<Tab>"] = cmp.mapping.confirm { select = true },
     },
     sources = cmp.config.sources({
+      { name = "cmp_ai" },
       { name = "nvim_lsp" },
       { name = "luasnip" }, -- For luasnip users.
     }, {
@@ -42,7 +43,6 @@ if ok then
       { name = "emoji" },
     }),
   }
-
 
   -- Snippets
   local ok_ls, ls = pcall(require, "luasnip")
@@ -75,4 +75,15 @@ if ok then
       end
     end)
   end
+end
+
+local ok_supermaven, supermaven = pcall(require, "supermaven-nvim")
+if ok_supermaven then
+  supermaven.setup {
+    keymaps = {
+      accept_suggestion = "<S-Tab>",
+      clear_suggestion = "<C-BS>",
+      accept_word = "<C-Tab>",
+    },
+  }
 end

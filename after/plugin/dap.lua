@@ -1,35 +1,39 @@
 -- debugger
 local ok_dap, dap = pcall(require, "dap")
+local ok_dap_ui, dap_ui = pcall(require, "dapui")
+local ok_dap_virtual_text, dap_virtual_text = pcall(require, "nvim-dap-virtual-text")
 local ok_dap_python, dap_python = pcall(require, "dap-python")
-local ok_dap_ui, dap_ui = pcall(require, "dap-ui")
-local ok_dap_repl_hl, dap_repl_hl = pcall(require, "dap-repl-highlights")
-if ok_dap and ok_dap_ui and ok_dap_python and ok_dap_repl_hl then
-  dap_python.setup "/usr/bin/python3"
-  dap.configurations = { python = {} }
-  table.insert(dap.configurations.python, {
-    type = "python",
-    request = "launch",
-    name = "Launch current file with CWD as PYTHONPATH",
-    program = "/home/crpier/.local/bin/pytest",
-    args = { "/home/crpier/Projects/typetest/main.py" },
-    env = { PYTHONPATH = "/home/crpier/Projects/typetest" },
-    justMyCode = false,
-  })
+local ok_dap_repl_hl, dap_repl_hl = pcall(require, "nvim-dap-repl-highlights")
+
+if ok_dap and ok_dap_ui and ok_dap_virtual_text and ok_dap_python and ok_dap_repl_hl then
+  dap_python.setup(vim.loop.cwd() .. "/.venv/bin/python")
+  dap.configurations.python = {
+    {
+      type = "python",
+      request = "launch",
+      name = "Launch current file with CWD as PYTHONPATH",
+      program = "snek/snektest/cli.py",
+      args = { "tests.unit.snektest.test.root_fixture_is_started_up" },
+      env = { PYTHONPATH = vim.loop.cwd() },
+      cwd = vim.loop.cwd(),
+      justMyCode = true,
+    },
+  }
 
   dap_ui.setup()
-  dap_repl_hl.setup()
+  -- dap_repl_hl.setup()
   dap.listeners.after.event_initialized["dapui_config"] = function()
     ---@diagnostic disable-next-line: missing-parameter
     dap_ui.open()
   end
-  dap.listeners.before.event_terminated["dapui_config"] = function()
-    ---@diagnostic disable-next-line: missing-parameter
-    dap_ui.close()
-  end
-  dap.listeners.before.event_exited["dapui_config"] = function()
-    ---@diagnostic disable-next-line: missing-parameter
-    dap_ui.close()
-  end
+  -- dap.listeners.before.event_terminated["dapui_config"] = function()
+  --   ---@diagnostic disable-next-line: missing-parameter
+  --   dap_ui.close()
+  -- end
+  -- dap.listeners.before.event_exited["dapui_config"] = function()
+  --   ---@diagnostic disable-next-line: missing-parameter
+  --   dap_ui.close()
+  -- end
 
   vim.keymap.set("n", "<leader>dc", dap.continue)
   vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint)
@@ -40,5 +44,5 @@ if ok_dap and ok_dap_ui and ok_dap_python and ok_dap_repl_hl then
   vim.keymap.set("n", "<leader>du", dap_ui.toggle)
   vim.keymap.set("n", "<leader>dx", dap.terminate)
   vim.keymap.set({ "n", "v" }, "<C-;>", dap_ui.eval)
-  require("nvim-dap-virtual-text").setup {}
+  dap_virtual_text.setup {}
 end
