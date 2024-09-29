@@ -1,13 +1,13 @@
--- Set leader
+-- Set leader to spaceq
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 -- Easy exit
 vim.keymap.set("n", "Q", "ZQ")
--- Don't highlight search
+-- Stop search Highlighting
 vim.keymap.set("n", "<Esc>", function()
   vim.cmd [[ nohlsearch ]]
 end)
--- Save like in vsc**e
+-- Save like in vsc*de
 vim.keymap.set("n", "<C-S>", function()
   vim.cmd [[write]]
 end)
@@ -60,4 +60,3 @@ vim.keymap.set("n", "<C-Q>", function()
   end
   vim.cmd "copen"
 end)
-

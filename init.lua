@@ -1,2 +1,2 @@
 vim.loader.enable()
-require "cris"
+require("config.init")

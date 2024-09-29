@@ -1,33 +1,11 @@
 local ON_LOCAL = os.getenv "SSH_CLIENT" == nil
 
-local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-  local out = vim.fn.system { "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath }
-  if vim.v.shell_error ~= 0 then
-    vim.api.nvim_echo({
-      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out, "WarningMsg" },
-      { "\nPress any key to exit..." },
-    }, true, {})
-    vim.fn.getchar()
-    os.exit(1)
-  end
-end
-vim.opt.rtp:prepend(lazypath)
-
--- Make sure to setup `mapleader` and `maplocalleader` before
--- loading lazy.nvim so that mappings are correct.
--- This is also a good place to setup other settings (vim.opt)
-vim.g.mapleader = " "
-vim.g.maplocalleader = "\\"
-
-require("lazy").setup {
+local lazy = require "lazy"
+lazy.setup {
   spec = {
     -- add your plugins here
     { "neovim/nvim-lspconfig" },
     -- LSP
-    { "williamboman/mason.nvim" },
     { "williamboman/mason-lspconfig.nvim" },
     { "j-hui/fidget.nvim", cond = ON_LOCAL },
     {
@@ -41,7 +19,7 @@ require("lazy").setup {
         },
       },
     },
-    { "Bilal2453/luvit-meta", lazy = true },
+    { "Bilal2453/luvit-meta" },
     { -- optional completion source for require statements and module annotations
       "hrsh7th/nvim-cmp",
       opts = function(_, opts)
@@ -59,8 +37,6 @@ require("lazy").setup {
       "SmiteshP/nvim-navic",
       cond = ON_LOCAL,
     },
-    { "mfussenegger/nvim-lint", cond = ON_LOCAL },
-    { "stevearc/conform.nvim", cond = ON_LOCAL },
 
     -- Snippets
     {
@@ -104,17 +80,6 @@ require("lazy").setup {
     },
 
     -- Telescope
-    { "nvim-lua/plenary.nvim" },
-    {
-      "nvim-telescope/telescope.nvim",
-    },
-    {
-      "nvim-telescope/telescope-fzf-native.nvim",
-      build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release",
-    },
-    "nvim-telescope/telescope-ui-select.nvim",
-    -- use a fork until  vim.lsp.buf_get_clients() is removed from upstream
-    { "LennyPhoenix/project.nvim", lazy = false, branch = "fix-get_clients" },
 
     -- Navigation
     { "nvim-tree/nvim-tree.lua", cond = ON_LOCAL },
@@ -131,12 +96,9 @@ require("lazy").setup {
     {
       "nvim-lualine/lualine.nvim",
     },
-    {
-      "kyazdani42/nvim-web-devicons",
-    },
     { "lukas-reineke/indent-blankline.nvim" },
     { "akinsho/bufferline.nvim" },
-    { "ellisonleao/gruvbox.nvim" },
+    { "ellisonleao/gruvbox.nvim", lazy = false },
     { "HiPhish/rainbow-delimiters.nvim", cond = ON_LOCAL },
 
     -- Navigation
@@ -164,7 +126,7 @@ require("lazy").setup {
     { "mbbill/undotree", cond = ON_LOCAL },
 
     -- Misc
-    { "eandrju/cellular-automaton.nvim", cond = ON_LOCAL },
+    { "eandrju/cellular-automaton.nvim", cond = ON_LOCAL, cmd = "CellularAutomaton" },
 
     -- Detect tabstop and shiftwidth automatically
     { "tpope/vim-sleuth" },
@@ -180,12 +142,9 @@ require("lazy").setup {
     { "MeanderingProgrammer/render-markdown.nvim", ft = { "markdown", "Avante" } },
     { "MunifTanjim/nui.nvim" },
   },
-  -- Configure any other settings here. See the documentation for more details.
-  -- colorscheme that will be used when installing plugins.
-  install = { colorscheme = { "habamax" } },
-  -- automatically check for plugin updates
-  checker = { enabled = true },
+  checker = { enabled = false },
   defaults = {
     lazy = true,
   },
+  vim.keymap.set("n", "<leader>la", require("lazy").home),
 }
