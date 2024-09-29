@@ -2,7 +2,7 @@ return {
   {
     "yetone/avante.nvim",
     build = "make",
-    cmd = "AvanteAsk",
+    cmd = "AvanteToggle",
     dependencies = { "MeanderingProgrammer/render-markdown.nvim", "MunifTanjim/nui.nvim" },
     config = function()
       require("avante_lib").load()

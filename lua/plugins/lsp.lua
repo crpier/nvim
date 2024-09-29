@@ -74,7 +74,6 @@ return {
       }
       require("fidget").setup {}
     end,
-    cmd = "Mason",
   },
 
   {
