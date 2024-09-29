@@ -2,7 +2,7 @@ return {
   {
     "kylechui/nvim-surround",
     -- TODO: check if we can add keys
-    lazy = false,
+    event = "VeryLazy",
     config = function()
       require("nvim-surround").setup()
     end,
@@ -82,4 +82,12 @@ return {
     },
   },
   { "mbbill/undotree", cmd = "UndotreeToggle" },
+  {
+    "tummetott/unimpaired.nvim",
+    event = "VeryLazy",
+    opts = {
+      -- add options here if you wish to override the default settings
+    },
+  },
+  -- TODO: check https://github.com/lewis6991/hover.nvim out
 }

@@ -8,8 +8,8 @@ return {
       "hrsh7th/cmp-nvim-lua",
       "hrsh7th/cmp-emoji",
     },
-    -- TODO: lazy load based on some event or something
-    lazy = false,
+    -- TODO: lazy load based on some other event I guess?
+    event = "VeryLazy",
     config = function()
       local cmp = require "cmp"
       cmp.setup {
@@ -38,7 +38,7 @@ return {
   -- TODO: lazy load this (or even better, make sure it's installed only on machines that want it?
   {
     "supermaven-inc/supermaven-nvim",
-    lazy = false,
+    event = "VeryLazy",
     config = function()
       require("supermaven-nvim").setup {
         keymaps = {

@@ -14,7 +14,7 @@ local handlers = {
   ["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = border }),
 }
 
--- TODO: can I lazy load mason?
+-- TODO: can I lazy load lsp?
 return {
   {
     "williamboman/mason.nvim",
@@ -24,7 +24,7 @@ return {
       "neovim/nvim-lspconfig",
       "j-hui/fidget.nvim",
     },
-    lazy = false,
+    event = "VeryLazy",
     config = function()
       local mason = require "mason"
       mason.setup()
@@ -103,8 +103,8 @@ return {
       lint.linters_by_ft["Avante"] = nil
 
       local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
-      -- TODO: experiment with more granular events
-      vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
+      -- TODO: this looks like something that should be configured outside of this repo
+      vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave", "TextChanged" }, {
         group = lint_augroup,
         callback = function()
           require("lint").try_lint()

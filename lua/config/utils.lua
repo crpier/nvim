@@ -1,9 +1,10 @@
 local M = {}
 
--- False when running on a server via SSH
+--- False when running on a server via SSH
+--- @type boolean
 M.ON_LOCAL = os.getenv "SSH_CLIENT" == nil
 
--- Installs lazy.nvim if not installed
+--- Installs lazy.nvim if not installed
 M.setup_lazy = function()
   local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
   if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -22,8 +23,8 @@ M.setup_lazy = function()
   vim.opt.rtp:prepend(lazypath)
 end
 
--- Get lsp client for current buffer
--- @return string|nil
+--- Get lsp client for current buffer
+--- @return string|nil
 local function find_lsp_root()
   local ft = vim.api.nvim_get_option_value("filetype", { buf = 0 })
   local lsp_clients = vim.lsp.get_clients { bufnr = 0 }
@@ -43,8 +44,8 @@ local function find_lsp_root()
   return nil
 end
 
--- Get the lowest parent dir that contains a .git dir
--- @return string|nil
+--- Get the lowest parent dir that contains a .git dir
+--- @return string|nil
 local function find_project_root()
   local search_dir = vim.fn.expand("%:p:h", true)
   local markers = { ".git", "Makefile", "package.json", "pyproject.toml", ".svn" }
@@ -61,8 +62,8 @@ local function find_project_root()
   return nil
 end
 
--- Find the root dir for the current buffer
--- @return string|nil
+--- Find the root dir for the current buffer
+--- @return string|nil
 local function find_root()
   local lsp_root = find_lsp_root()
   if lsp_root ~= nil then
@@ -71,14 +72,14 @@ local function find_root()
   return find_project_root()
 end
 
--- Helper variable to store the last root
--- This helps us avoid unnecessary cd calls
--- @type string|nil
+--- Helper variable to store the last root
+--- This helps us avoid unnecessary cd calls
+--- @type string|nil
 M.root = nil
 
--- Autocmd to change the cwd to the root of the project
--- whenever we enter a buffer or attach to a new lsp client
--- @param verbose boolean Whether to print a message when changing the cwd. Defaults to true
+--- Autocmd to change the cwd to the root of the project
+--- whenever we enter a buffer or attach to a new lsp client
+--- @param verbose boolean Whether to print a message when changing the cwd. Defaults to true
 M.enable_set_root_autocmd = function(verbose)
   if verbose == nil then
     verbose = true

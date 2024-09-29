@@ -47,6 +47,9 @@ return {
     },
   },
 
+  -- TODO: try to be smarter about enabling this, so that we get highlighting
+  -- maybe an autocommand on BufRead that checks if there's a todo in the buffer?
+  -- maybe also a InsertLeave?
   {
     "folke/todo-comments.nvim",
     dependencies = {

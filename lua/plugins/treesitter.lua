@@ -2,8 +2,7 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     run = { ":TSUpdate" },
-    -- TODO: maybe lazy load only when TS grammar is installed?
-    lazy = false,
+    event = "VeryLazy",
     dependencies = { "nvim-treesitter/nvim-treesitter-textobjects", "nvim-treesitter/nvim-treesitter-refactor" },
     config = function()
       local config = {
