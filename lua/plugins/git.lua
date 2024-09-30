@@ -85,6 +85,7 @@ return {
     end,
     keys = {
       {
+        -- TODO: make this toggle-able so that it can be kept in in the background
         "<leader>lg",
         function()
           local Terminal = require("toggleterm.terminal").Terminal

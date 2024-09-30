@@ -45,9 +45,10 @@ return {
       require("supermaven-nvim").setup {
         keymaps = {
           accept_suggestion = "<S-Tab>",
-          clear_suggestion = "<C-BS>",
-          accept_word = "<C-Tab>",
+          clear_suggestion = "<S-BS>",
+          accept_word = "<S-Esc>",
         },
+        log_level = "off",
       }
     end,
   },
