@@ -125,7 +125,7 @@ return {
       require("outline").setup {}
     end,
     keys = { {
-      "<leader>o",
+      "<leader>s",
       function()
         require("outline").toggle()
       end,

@@ -99,6 +99,9 @@ return {
         folder = "daily",
         date_format = "%Y-%m/%Y-%m-%d",
       },
+      ui = {
+        enable = false,
+      },
     },
   },
 }
