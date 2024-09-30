@@ -1,5 +1,4 @@
 return {
-  -- TODO: find a fugitive alternative
   {
     "lewis6991/gitsigns.nvim",
     event = "VeryLazy",

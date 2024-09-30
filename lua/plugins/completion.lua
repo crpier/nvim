@@ -35,10 +35,12 @@ return {
       }
     end,
   },
-  -- TODO: lazy load this (or even better, make sure it's installed only on machines that want it?
   {
     "supermaven-inc/supermaven-nvim",
     event = "VeryLazy",
+    cond = function()
+      return require("config.utils").load_local_options().supermaven_enabled
+    end,
     config = function()
       require("supermaven-nvim").setup {
         keymaps = {

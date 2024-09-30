@@ -4,6 +4,9 @@ return {
     build = "make",
     cmd = "AvanteToggle",
     dependencies = { "MeanderingProgrammer/render-markdown.nvim", "MunifTanjim/nui.nvim" },
+    cond = function()
+      return require("config.utils").load_local_options().avante_enabled
+    end,
     config = function()
       require("avante_lib").load()
       require("avante").setup {

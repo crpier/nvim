@@ -98,4 +98,34 @@ M.enable_set_root_autocmd = function(verbose)
   })
 end
 
+M.default_options = {
+  --- @type boolean Whether to use avante (requires a api key)
+  avante_enabled = false,
+  --- @type boolean Whether to use supermaven
+  --- supermaven bugs you to to login if you enable it.
+  --- That's the main reason I made this table for local configs lol
+  supermaven_enabled = false,
+}
+
+--- read local config from ~/.config/local_configs/nvim.lua
+--- if it exists, merge it with the default config
+--- and return the result table
+M.load_local_options = (function()
+  local cached_options = nil
+  return function()
+    if cached_options then
+      return cached_options
+    end
+    cached_options = M.default_options
+    local local_configs = vim.fn.expand "~/.config/local_configs/nvim.lua"
+    if vim.fn.filereadable(local_configs) == 1 then
+      local local_config = dofile(local_configs)
+      if local_config ~= nil then
+        cached_options = vim.tbl_deep_extend("force", M.default_options, local_config)
+      end
+    end
+    return cached_options
+  end
+end)()
+
 return M

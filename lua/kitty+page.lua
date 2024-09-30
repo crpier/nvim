@@ -3,7 +3,7 @@ return function(INPUT_LINE_NUMBER, CURSOR_LINE, CURSOR_COLUMN)
   -- TODO: when pressing i or smth, open a floating window to type I guess?
   print("kitty sent:", INPUT_LINE_NUMBER, CURSOR_LINE, CURSOR_COLUMN)
   vim.opt.encoding = "utf-8"
-  vim.opt.clipboard = "unnamed"
+  vim.opt.clipboard = "unnamedplus"
   vim.opt.compatible = false
   vim.opt.number = true
   vim.opt.relativenumber = true
