@@ -10,9 +10,13 @@ return {
   },
   {
     "MeanderingProgrammer/render-markdown.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
     ft = { "markdown", "Avante" },
     config = function()
-      require("render-markdown").setup {}
+      require("render-markdown").setup {
+        render_modes = true,
+        anti_conceal = { enabled = false },
+      }
     end,
   },
 

@@ -75,4 +75,30 @@ return {
       }
     end,
   },
+  {
+    "epwalsh/obsidian.nvim",
+    version = "*", -- recommended, use latest release instead of latest commit
+    keys = {
+      { "<leader>on", "<cmd>ObsidianNew<cr>" },
+      { "<leader>od", "<cmd>ObsidianDailies<cr>" },
+      { "<leader>oq", "<cmd>ObsidianQuickSwitch<cr>" },
+      { "<leader>ot", "<cmd>ObsidianToday<cr>" },
+      { "<leader>os", "<cmd>ObsidianSearch<cr>" },
+    },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    opts = {
+      workspaces = {
+        {
+          name = "vault",
+          path = "~/vault",
+        },
+      },
+      daily_notes = {
+        folder = "daily",
+        date_format = "%Y-%m/%Y-%m-%d",
+      },
+    },
+  },
 }

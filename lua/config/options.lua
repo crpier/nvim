@@ -38,6 +38,7 @@ vim.opt.foldlevel = 99
 -- Highlight current line
 vim.opt.cursorline = true
 vim.o.textwidth = 0
+vim.o.conceallevel = 2
 
 ---- Autocommands ----
 
