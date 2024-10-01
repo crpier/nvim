@@ -98,6 +98,7 @@ return {
           path = "~/vault",
         },
       },
+      disable_frontmatter = true,
       daily_notes = {
         folder = "daily",
         date_format = "%Y-%m/%Y-%m-%d",

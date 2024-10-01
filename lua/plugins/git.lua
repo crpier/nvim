@@ -118,7 +118,7 @@ return {
   {
     "tpope/vim-fugitive",
     dependencies = { "tpope/vim-rhubarb" },
-    cmd = { "Git", "GBrowse" },
+    cmd = { "Git", "GBrowse", "Gvdiff", },
     keys = { {
       "gs",
       function()
