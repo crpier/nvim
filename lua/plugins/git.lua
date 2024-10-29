@@ -118,12 +118,32 @@ return {
   {
     "tpope/vim-fugitive",
     dependencies = { "tpope/vim-rhubarb" },
-    cmd = { "Git", "GBrowse", "Gvdiff", },
-    keys = { {
-      "gs",
-      function()
-        vim.cmd "tab Git"
-      end,
-    } },
+    cmd = { "Git", "GBrowse", "Gvdiffsplit" },
+    keys = {
+      {
+        "gs",
+        function()
+          vim.cmd "tab Git"
+        end,
+      },
+      {
+        "<leader>gu",
+        function()
+          vim.cmd "Git pull"
+        end,
+      },
+      {
+        "<leader>gs",
+        function()
+          vim.cmd "Git push"
+        end,
+      },
+      {
+        "<leader>ga",
+        function()
+          vim.cmd "Git add ."
+        end,
+      },
+    },
   },
 }

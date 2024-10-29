@@ -87,6 +87,16 @@ return {
       { "<leader>oq", "<cmd>ObsidianQuickSwitch<cr>" },
       { "<leader>ot", "<cmd>ObsidianToday<cr>" },
       { "<leader>os", "<cmd>ObsidianSearch<cr>" },
+      { "<leader>oa", "<cmd>ObsidianTags<cr>" },
+      {
+        "<leader>of",
+        function()
+          require("telescope.builtin").find_files {
+            cwd = "~/vault",
+            find_command = { "fd", "--type", "f", "--color", "never", "--exclude", "daily" },
+          }
+        end,
+      },
     },
     dependencies = {
       "nvim-lua/plenary.nvim",

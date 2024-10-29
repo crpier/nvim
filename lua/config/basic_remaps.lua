@@ -11,6 +11,9 @@ end)
 vim.keymap.set("n", "<C-S>", function()
   vim.cmd [[write]]
 end)
+vim.keymap.set("i", "<C-S>", function()
+  vim.cmd [[write]]
+end)
 -- Easier to move between windows
 vim.keymap.set("n", "<C-h>", "<C-w>h")
 vim.keymap.set("n", "<C-j>", "<C-w>j")

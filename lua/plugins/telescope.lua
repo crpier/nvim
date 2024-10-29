@@ -6,6 +6,7 @@ return {
       "kyazdani42/nvim-web-devicons",
       "nvim-telescope/telescope-fzf-native.nvim",
       "nvim-telescope/telescope-ui-select.nvim",
+      ft = "Dashboard",
     },
     config = function()
       local telescope = require "telescope"
@@ -81,6 +82,12 @@ return {
         "sw",
         function()
           require("telescope.builtin").grep_string {}
+        end,
+      },
+      {
+        "sm",
+        function()
+          require("telescope.builtin").marks {}
         end,
       },
       {

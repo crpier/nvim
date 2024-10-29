@@ -2,7 +2,7 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     run = { ":TSUpdate" },
-    event = "VeryLazy",
+    lazy = false,
     dependencies = { "nvim-treesitter/nvim-treesitter-textobjects", "nvim-treesitter/nvim-treesitter-refactor" },
     config = function()
       local config = {

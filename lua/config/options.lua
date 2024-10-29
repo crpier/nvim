@@ -1,3 +1,4 @@
+-- TODO: make spelling part of the local config
 vim.wo.relativenumber = true
 vim.wo.number = true
 -- Enable mouse mode
@@ -38,6 +39,8 @@ vim.opt.foldlevel = 99
 -- Highlight current line
 vim.opt.cursorline = true
 vim.o.textwidth = 0
+vim.o.splitright = true
+vim.o.splitbelow = true
 
 ---- Autocommands ----
 
@@ -82,7 +85,7 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
 })
 -- Make vim know Jenkinsfiles are groovy code
 vim.api.nvim_create_autocmd({ "BufEnter" }, {
-  pattern = { "Jenkinsfile" },
+  pattern = { "*Jenkinsfile" },
   callback = function()
     vim.opt_local.ft = "groovy"
   end,

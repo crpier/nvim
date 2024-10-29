@@ -66,18 +66,6 @@ return {
     end,
   },
   {
-    "MeanderingProgrammer/render-markdown.nvim",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
-    ft = { "markdown", "Avante" },
-    config = function()
-      require("render-markdown").setup {
-        render_modes = true,
-        anti_conceal = { enabled = false },
-      }
-    end,
-  },
-
-  {
     "nvim-lualine/lualine.nvim",
     lazy = false,
     dependencies = {
@@ -106,7 +94,10 @@ return {
             navic_part,
           },
           lualine_x = { "" },
-          lualine_y = { "filetype" },
+          lualine_y = {},
+          -- TODO: make this configurable from local config
+          -- for some reason, this slows neovim down considerably on macos
+          -- lualine_y = { "filetype" },
           lualine_z = { "location" },
         },
       }
@@ -161,7 +152,8 @@ return {
               key_hl = "group",
               key_format = " [%s]", -- `%s` will be substituted with value of `key`
               action = function()
-                require("telescope.builtin").find_files { hidden = true }
+                -- TODO: use find_files if not in a git repo
+                require("telescope.builtin").git_files { hidden = true }
               end,
             },
             {
