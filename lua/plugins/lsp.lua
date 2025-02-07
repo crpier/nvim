@@ -90,7 +90,7 @@ return {
       lint.linters_by_ft["json"] = nil
       lint.linters_by_ft["terraform"] = { "tflint" }
       lint.linters_by_ft["lua"] = { "luacheck" }
-      lint.linters_by_ft["python"] = { "mypy", "ruff" }
+      lint.linters_by_ft["python"] = { "ruff" }
 
       -- Disable default linters
       lint.linters_by_ft["markdown"] = nil

@@ -41,6 +41,9 @@ vim.opt.cursorline = true
 vim.o.textwidth = 0
 vim.o.splitright = true
 vim.o.splitbelow = true
+vim.o.colorcolumn = "80"
+vim.o.conceallevel = 2
+vim.o.spellfile = vim.fn.expand("~/.config/local_configs/en.utf-8.add")
 
 ---- Autocommands ----
 

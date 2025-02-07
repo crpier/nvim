@@ -31,7 +31,7 @@ return {
             },
           },
           highlight_definitions = {
-            enable = true,
+            enable = require("config.utils").load_local_options().treesitter_highlight_definitions,
             clear_on_cursor_move = true,
           },
           navigation = {

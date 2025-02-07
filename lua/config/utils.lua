@@ -105,6 +105,8 @@ M.default_options = {
   --- supermaven bugs you to to login if you enable it.
   --- That's the main reason I made this table for local configs lol
   supermaven_enabled = false,
+  treesitter_highlight_definitions = true,
+  local_plugins = {},
 }
 
 --- read local config from ~/.config/local_configs/nvim.lua

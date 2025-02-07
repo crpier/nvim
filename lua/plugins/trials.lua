@@ -3,7 +3,7 @@ return {
     "yetone/avante.nvim",
     build = "make",
     cmd = "AvanteToggle",
-    dependencies = { "MeanderingProgrammer/render-markdown.nvim", "MunifTanjim/nui.nvim" },
+    dependencies = { "MunifTanjim/nui.nvim" },
     cond = function()
       return require("config.utils").load_local_options().avante_enabled
     end,
@@ -102,19 +102,39 @@ return {
       "nvim-lua/plenary.nvim",
     },
     opts = {
+      note_frontmatter_func = function(note)
+        if note.title then
+          note:add_alias(note.title)
+        end
+
+        local out = { tags = note.tags }
+
+        if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
+          for k, v in pairs(note.metadata) do
+            out[k] = v
+          end
+        end
+        return out
+      end,
+
+      note_path_func = function(spec)
+        local path = spec.dir / tostring(spec.title)
+        return path:with_suffix ".md"
+      end,
+
       workspaces = {
         {
           name = "vault",
           path = "~/vault",
         },
       },
-      disable_frontmatter = true,
       daily_notes = {
         folder = "daily",
         date_format = "%Y-%m/%Y-%m-%d",
       },
+      -- disable pretty markdown
       ui = {
-        enable = false,
+        enable = true,
       },
     },
   },

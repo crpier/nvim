@@ -78,6 +78,7 @@ return {
           require("mini.bufremove").delete()
         end,
         mode = "n",
+        desc = "Remove buffer",
       },
     },
   },
