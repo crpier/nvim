@@ -86,9 +86,16 @@ return {
   {
     "tummetott/unimpaired.nvim",
     event = "VeryLazy",
-    opts = {
-      -- add options here if you wish to override the default settings
-    },
+    config = function()
+      require("unimpaired").setup {
+        keymaps = {
+          tnext = false,
+          tprev = false,
+          tfirst = false,
+          tlast = false,
+        },
+      }
+    end,
   },
   -- TODO: check https://github.com/lewis6991/hover.nvim out
 }

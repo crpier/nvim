@@ -29,7 +29,7 @@ vim.opt.softtabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
 vim.opt.smartindent = true
--- Only one statuline
+-- Only one statusline
 vim.opt.laststatus = 3
 vim.o.termguicolors = true
 -- Allow closing folds using treesitter contexts

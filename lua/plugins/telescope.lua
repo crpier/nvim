@@ -67,6 +67,13 @@ return {
         end,
       },
       {
+        "sd",
+        function()
+          require("telescope.builtin").diagnostics {}
+        end,
+        desc = "Open all diagnostics in Telescope",
+      },
+      {
         "sk",
         function()
           require("telescope.builtin").keymaps()
