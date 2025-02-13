@@ -106,6 +106,7 @@ M.default_options = {
   --- That's the main reason I made this table for local configs lol
   supermaven_enabled = false,
   treesitter_highlight_definitions = true,
+  project_base_dirs = {},
   local_plugins = {},
 }
 

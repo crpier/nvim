@@ -16,6 +16,9 @@ return function(INPUT_LINE_NUMBER, CURSOR_LINE, CURSOR_COLUMN)
   vim.o.smartcase = true
   vim.opt.showcmd = false
   vim.opt.scrollback = INPUT_LINE_NUMBER + CURSOR_LINE
+
+  vim.keymap.set("n", "Q", "ZQ")
+
   local term_buf = vim.api.nvim_create_buf(true, false)
   local term_io = vim.api.nvim_open_term(term_buf, {})
   local group = vim.api.nvim_create_augroup("kitty+page", {})

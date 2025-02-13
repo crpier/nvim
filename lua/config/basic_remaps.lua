@@ -4,7 +4,7 @@ vim.g.maplocalleader = " "
 -- Easy exit
 vim.keymap.set("n", "Q", "ZQ")
 -- Stop search Highlighting
-vim.keymap.set("n", "<S-Esc>", function()
+vim.keymap.set("n", "<Esc>", function()
   vim.cmd [[ nohlsearch ]]
 end)
 -- Save like in vsc*de

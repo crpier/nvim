@@ -6,10 +6,19 @@ return {
       "kyazdani42/nvim-web-devicons",
       "nvim-telescope/telescope-fzf-native.nvim",
       "nvim-telescope/telescope-ui-select.nvim",
+      "nvim-telescope/telescope-project.nvim",
       ft = "Dashboard",
     },
     config = function()
       local telescope = require "telescope"
+      local project_base_dirs = {
+        { path = "~/Projects", max_depth = 2 },
+        "~/.config/nvim",
+        "~/.dotfiles",
+        "~/vault",
+      }
+      vim.tbl_deep_extend("force", project_base_dirs, require("config.utils").load_local_options().project_base_dirs)
+
       telescope.setup {
         extensions = {
           fzf = {
@@ -19,6 +28,9 @@ return {
             case_mode = "smart_case", -- or "ignore_case" or "respect_case"
             -- the default case_mode is "smart_case"
           },
+          project = {
+            base_dirs = project_base_dirs,
+          },
           ["ui-select"] = {
             require("telescope.themes").get_dropdown {},
           },
@@ -26,6 +38,7 @@ return {
       }
       telescope.load_extension "fzf"
       telescope.load_extension "ui-select"
+      telescope.load_extension "project"
     end,
     keys = {
       {
@@ -109,28 +122,18 @@ return {
           require("telescope.builtin").git_branches()
         end,
       },
-    },
-  },
-  {
-    "nvim-telescope/telescope-fzf-native.nvim",
-    build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release",
-  },
-  { "nvim-telescope/telescope-ui-select.nvim" },
-  {
-    "nvim-telescope/telescope-project.nvim",
-    dependencies = { "nvim-telescope/telescope.nvim" },
-    config = function()
-      -- TODO: add some nicer options (like auto-adding projects)
-      require("telescope").load_extension "project"
-    end,
-    keys = {
       {
         "sp",
         function()
           require("telescope").extensions.project.project {}
         end,
+        desc = "Search projects",
       },
     },
+  },
+  {
+    "nvim-telescope/telescope-fzf-native.nvim",
+    build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release",
   },
   {
     "hedyhli/outline.nvim",

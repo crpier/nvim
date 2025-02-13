@@ -29,9 +29,7 @@ return {
       local mason = require "mason"
       mason.setup()
       require("mason-lspconfig").setup {
-        ensure_installed = {
-          "pyright",
-        },
+        ensure_installed = {},
       }
       local navic = require "nvim-navic"
       navic.setup {}
