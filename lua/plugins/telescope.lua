@@ -7,8 +7,9 @@ return {
       "nvim-telescope/telescope-fzf-native.nvim",
       "nvim-telescope/telescope-ui-select.nvim",
       "nvim-telescope/telescope-project.nvim",
-      ft = "Dashboard",
     },
+    ft = "Dashboard",
+    cmd = "Telescope",
     config = function()
       local telescope = require "telescope"
       local project_base_dirs = {
@@ -128,6 +129,14 @@ return {
           require("telescope").extensions.project.project {}
         end,
         desc = "Search projects",
+      },
+      -- TODO: I'd like something that only shows registers 0-9
+      {
+        "sr",
+        function()
+          require("telescope.builtin").registers()
+        end,
+        desc = "Search registers",
       },
     },
   },

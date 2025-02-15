@@ -78,44 +78,6 @@ return {
   },
   -- amongst your other plugins
   {
-    "akinsho/toggleterm.nvim",
-    version = "*",
-    config = function()
-      require("toggleterm").setup {}
-    end,
-    keys = {
-      {
-        -- TODO: make this toggle-able so that it can be kept in in the background
-        "<leader>lg",
-        function()
-          local Terminal = require("toggleterm.terminal").Terminal
-          local lazygit = Terminal:new {
-            cmd = "lazygit",
-            dir = "git_dir",
-            direction = "float",
-            float_opts = {
-              border = "none",
-              width = vim.o.columns,
-              height = vim.o.lines,
-            },
-            -- function to run on opening the terminal
-            on_open = function(term)
-              vim.cmd "startinsert!"
-              vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", { noremap = true, silent = true })
-            end,
-            -- function to run on closing the terminal
-            on_close = function(term)
-              vim.cmd "startinsert!"
-            end,
-          }
-
-          lazygit:open()
-        end,
-      },
-    },
-    lazy = false,
-  },
-  {
     "tpope/vim-fugitive",
     dependencies = { "tpope/vim-rhubarb" },
     cmd = { "Git", "GBrowse", "Gvdiffsplit" },

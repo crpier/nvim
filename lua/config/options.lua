@@ -45,6 +45,7 @@ vim.o.colorcolumn = "80"
 vim.o.conceallevel = 2
 vim.o.spellfile = vim.fn.expand("~/.config/local_configs/en.utf-8.add")
 
+-- TODO: somewhere here I should set my browser?
 ---- Autocommands ----
 
 -- highlight on yank

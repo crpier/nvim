@@ -1,3 +1,5 @@
+-- TODO: moar textobjects
+-- https://github.com/nvim-treesitter/nvim-treesitter-textobjects
 return {
   {
     "nvim-treesitter/nvim-treesitter",
@@ -84,14 +86,29 @@ return {
               ["[M"] = "@function.outer",
               ["[]"] = "@class.outer",
             },
+            -- TODO: go to next/prev param
           },
           swap = {
             enable = true,
             swap_next = {
-              ["<leader>a"] = "@parameter.inner",
+              -- TODO: I'd like more consistency in the mnemonics
+              ["<leader>sp"] = "@parameter.inner",
+              ["<leader>sf"] = "@function.outer",
+              ["<leader>sc"] = "@class.outer",
             },
             swap_previous = {
-              ["<leader>A"] = "@parameter.inner",
+              ["<leader>sP"] = "@parameter.inner",
+              ["<leader>sF"] = "@function.outer",
+              ["<leader>sC"] = "@class.outer",
+            },
+          },
+          lsp_interop = {
+            enable = true,
+            border = "none",
+            floating_preview_opts = {},
+            peek_definition_code = {
+              ["<leader>k"] = "@function.outer",
+              ["<leader>K"] = "@class.outer",
             },
           },
         },

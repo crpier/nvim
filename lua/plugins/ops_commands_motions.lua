@@ -69,19 +69,6 @@ return {
       },
     },
   },
-  {
-    "echasnovski/mini.nvim",
-    keys = {
-      {
-        "<leader>bd",
-        function()
-          require("mini.bufremove").delete()
-        end,
-        mode = "n",
-        desc = "Remove buffer",
-      },
-    },
-  },
   { "mbbill/undotree", cmd = "UndotreeToggle" },
   {
     "tummetott/unimpaired.nvim",
@@ -93,6 +80,8 @@ return {
           tprev = false,
           tfirst = false,
           tlast = false,
+          enable_colorcolumn = false,
+          disable_colorcolumn = false,
         },
       }
     end,

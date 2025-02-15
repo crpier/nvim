@@ -1,3 +1,4 @@
+-- TODO: change key to start avante (or change the treesitter swap key)
 return {
   {
     "yetone/avante.nvim",
