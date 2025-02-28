@@ -1,44 +1,11 @@
 return {
   {
-    "stevearc/quicker.nvim",
-    event = "FileType qf",
-    config = function()
-      require("quicker").setup {
-        constrain_cursor = true,
-        follow = {
-          -- When quickfix window is open, scroll to closest item to the cursor
-          enabled = true,
-        },
-        keys = {
-          {
-            ">",
-            function()
-              require("quicker").expand { before = 2, after = 2, add_to_existing = true }
-            end,
-            desc = "Expand quickfix context",
-          },
-          {
-            "<",
-            function()
-              require("quicker").collapse()
-            end,
-            desc = "Collapse quickfix context",
-          },
-        },
-      }
-      vim.keymap.set("n", "<C-Q>", function()
-        require("quicker").toggle()
-      end, {
-        desc = "Toggle quickfix",
-      })
-    end,
-  },
-  {
     "chrisgrieser/nvim-various-textobjs",
     event = "VeryLazy",
     opts = {
       keymaps = {
         useDefaults = true,
+        disabledDefaults = { "r" },
       },
     },
     keys = {

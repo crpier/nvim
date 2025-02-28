@@ -18,7 +18,9 @@ return {
         "~/.dotfiles",
         "~/vault",
       }
-      vim.tbl_deep_extend("force", project_base_dirs, require("config.utils").load_local_options().project_base_dirs)
+      for _, v in ipairs(require("config.utils").load_local_options().project_base_dirs) do
+        table.insert(project_base_dirs, v)
+      end
 
       telescope.setup {
         extensions = {

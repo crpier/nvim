@@ -44,6 +44,7 @@ vim.o.splitbelow = true
 vim.o.colorcolumn = "80"
 vim.o.conceallevel = 2
 vim.o.spellfile = vim.fn.expand("~/.config/local_configs/en.utf-8.add")
+vim.o.shell = "fish"
 
 -- TODO: somewhere here I should set my browser?
 ---- Autocommands ----
