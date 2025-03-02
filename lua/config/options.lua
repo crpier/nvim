@@ -45,6 +45,8 @@ vim.o.colorcolumn = "80"
 vim.o.conceallevel = 2
 vim.o.spellfile = vim.fn.expand("~/.config/local_configs/en.utf-8.add")
 vim.o.shell = "fish"
+-- Not sure why this isn't the default. It wasn't always like this 🤔
+vim.diagnostic.config({ virtual_text = true })
 
 -- TODO: somewhere here I should set my browser?
 ---- Autocommands ----

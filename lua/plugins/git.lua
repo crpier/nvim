@@ -87,24 +87,28 @@ return {
         function()
           vim.cmd "tab Git"
         end,
+        desc = "Git status",
       },
       {
         "<leader>gu",
         function()
           vim.cmd "Git pull"
         end,
+        desc = "Git pull",
       },
       {
         "<leader>gs",
         function()
           vim.cmd "Git push"
         end,
+        desc = "Git push",
       },
       {
         "<leader>ga",
         function()
           vim.cmd "Git add ."
         end,
+        desc = "Git add .",
       },
     },
   },

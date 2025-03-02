@@ -76,12 +76,17 @@ return {
     config = function()
       require("unimpaired").setup {
         keymaps = {
-          tnext = false,
-          tprev = false,
+          -- used by the tags plugin
           tfirst = false,
           tlast = false,
-          enable_colorcolumn = false,
+          tnext = false,
+          tprev = false,
+
+          -- Doesn't really work, because I can't re-enable the color column.
+          -- I should open an issue? 🤔
           disable_colorcolumn = false,
+          enable_colorcolumn = false,
+          toggle_colorcolumn = false,
         },
       }
     end,

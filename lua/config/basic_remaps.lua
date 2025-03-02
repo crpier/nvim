@@ -7,13 +7,12 @@ vim.keymap.set("n", "Q", "ZQ")
 vim.keymap.set("n", "<Esc>", function()
   vim.cmd [[ nohlsearch ]]
 end)
--- Save like in vsc*de
 vim.keymap.set("n", "<C-S>", function()
   vim.cmd [[write]]
-end)
+end, { desc = "Save like in vsc*de" })
 vim.keymap.set("i", "<C-S>", function()
   vim.cmd [[write]]
-end)
+end, { desc = "Save like in vsc*de" })
 -- Easier to move between windows
 vim.keymap.set("n", "<C-h>", "<C-w>h")
 vim.keymap.set("n", "<C-j>", "<C-w>j")

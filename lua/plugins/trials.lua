@@ -107,6 +107,20 @@ return {
         end,
         desc = "Select Scratch Buffer",
       },
+      {
+        "<leader>e",
+        function()
+          require("snacks").explorer.open()
+        end,
+        desc = "Select Scratch Buffer",
+      },
+      {
+        "<C-/>",
+        function()
+          require("snacks").terminal.toggle()
+        end,
+        desc = "Toggle bottom terminal",
+      },
     },
     ---@type snacks.Config
     opts = {
@@ -115,6 +129,7 @@ return {
       -- statuscolumn = {},
       bigfile = {},
       dim = {},
+      terminal = {},
       explorer = {
         -- your explorer configuration comes here
         -- or leave it empty to use the default settings
@@ -123,6 +138,7 @@ return {
       quickfile = {},
       lazygit = {},
       input = {},
+      scope = {},
       -- TODO: allow executing python scratch
       scratch = {},
       picker = {
@@ -132,6 +148,24 @@ return {
             -- or leave it empty to use the default settings
           },
         },
+      },
+    },
+  },
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+    },
+    keys = {
+      {
+        "<leader>?",
+        function()
+          require("which-key").show { global = false }
+        end,
+        desc = "Buffer Local Keymaps (which-key)",
       },
     },
   },

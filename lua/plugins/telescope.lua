@@ -8,7 +8,6 @@ return {
       "nvim-telescope/telescope-ui-select.nvim",
       "nvim-telescope/telescope-project.nvim",
     },
-    ft = "Dashboard",
     cmd = "Telescope",
     config = function()
       local telescope = require "telescope"

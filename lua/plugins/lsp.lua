@@ -135,6 +135,7 @@ return {
         function()
           require("conform").format()
         end,
+        desc = "Format file",
       },
     },
   },

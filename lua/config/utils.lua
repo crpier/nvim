@@ -81,6 +81,8 @@ M.root = nil
 --- whenever we enter a buffer or attach to a new lsp client
 --- @param verbose boolean Whether to print a message when changing the cwd. Defaults to true
 M.enable_set_root_autocmd = function(verbose)
+  -- TODO: I should also allow creating a list of directories that are always
+  -- root, i.e. directories beneath them are never root
   if verbose == nil then
     verbose = true
   end
@@ -99,14 +101,19 @@ M.enable_set_root_autocmd = function(verbose)
 end
 
 M.default_options = {
-  --- @type boolean Whether to use avante (requires a api key)
+  --- @type boolean Whether to enable avante.nvim (requires an key).
   avante_enabled = false,
   --- @type boolean Whether to use supermaven
   --- supermaven bugs you to to login if you enable it.
-  --- That's the main reason I made this table for local configs lol
+  --- That's the main reason I made local configs lol.
   supermaven_enabled = false,
+  --- @type boolean Whether to have treesitter highlight multiple uses
+  --- of the same definition. Noticeable performance impact on large files.
   treesitter_highlight_definitions = true,
+  --- @type table List of additional directories to look in,
+  --- for telescope-project.nvim. Same format as the `base_dirs` option.
   project_base_dirs = {},
+  --- @type table List of plugins to load, as expected by lazy.nvim.
   local_plugins = {},
 }
 
