@@ -5,7 +5,6 @@ return {
     opts = {
       keymaps = {
         useDefaults = true,
-        disabledDefaults = { "r" },
       },
     },
     keys = {
