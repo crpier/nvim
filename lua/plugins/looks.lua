@@ -10,7 +10,7 @@ return {
   },
   {
     "nvim-lualine/lualine.nvim",
-    lazy = false,
+    event = "VeryLazy",
     dependencies = {
       "SmiteshP/nvim-navic",
     },
@@ -41,6 +41,7 @@ return {
           -- TODO: make this configurable from local config
           -- for some reason, this slows neovim down considerably on macos
           -- lualine_y = { "filetype" },
+          -- TODO: Also show many lines are in the file
           lualine_z = { "location" },
         },
       }

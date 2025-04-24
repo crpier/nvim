@@ -13,8 +13,9 @@ return {
           enable = true,
           additional_vim_regex_highlighting = { "markdown" },
         },
+        -- TODO: Maybe this should depend on the language?
         indent = {
-          enable = false,
+          enable = true,
         },
         incremental_selection = {
           enable = true,
@@ -33,7 +34,9 @@ return {
             },
           },
           highlight_definitions = {
-            enable = require("config.utils").load_local_options().treesitter_highlight_definitions,
+            -- TODO: this should be enabled if there is no LSP, or if the lsp does not support `textDocument_documentHighlight`
+            -- enable = require("config.utils").load_local_options().treesitter_highlight_definitions,
+            enable = false,
             clear_on_cursor_move = true,
           },
           navigation = {
@@ -43,6 +46,7 @@ return {
               goto_definition = false,
               list_definitions = false,
               list_definitions_toc = false,
+              -- TODO: When using LSP highlight, could we also make the LSP get us to the next reference?
               goto_next_usage = "<C-n>",
               goto_previous_usage = "<C-p>",
             },

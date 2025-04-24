@@ -1,4 +1,3 @@
--- TODO: make spelling part of the local config
 vim.wo.relativenumber = true
 vim.wo.number = true
 -- Enable mouse mode
@@ -43,10 +42,10 @@ vim.o.splitright = true
 vim.o.splitbelow = true
 vim.o.colorcolumn = "80"
 vim.o.conceallevel = 2
-vim.o.spellfile = vim.fn.expand("~/.config/local_configs/en.utf-8.add")
+vim.o.spellfile = vim.fn.expand "~/.config/local_configs/en.utf-8.add"
 vim.o.shell = "fish"
 -- Not sure why this isn't the default. It wasn't always like this 🤔
-vim.diagnostic.config({ virtual_text = true })
+vim.diagnostic.config { virtual_text = true }
 
 -- TODO: somewhere here I should set my browser?
 ---- Autocommands ----

@@ -92,6 +92,7 @@ return {
         end,
         desc = "Open lazygit",
       },
+      -- TODO: add keymap for `snacks.debug.run()` inside the scratch buffer
       {
         "<leader>.",
         function()

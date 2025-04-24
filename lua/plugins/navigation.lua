@@ -63,7 +63,7 @@ return {
       {
         "st",
         "<cmd>TodoTelescope<CR>",
-        desc = "Toggle todo comments",
+        desc = "Open TODOs in telescope",
       },
       {
         "]t",

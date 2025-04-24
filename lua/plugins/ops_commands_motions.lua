@@ -74,6 +74,7 @@ return {
     "tummetott/unimpaired.nvim",
     event = "VeryLazy",
     config = function()
+      -- Keymaps defined in https://github.com/tummetott/unimpaired.nvim/blob/8e504ba95dd10a687f4e4dacd5e19db221b88534/lua/unimpaired/config.lua
       require("unimpaired").setup {
         keymaps = {
           -- used by the tags plugin

@@ -1,5 +1,4 @@
 return {
-
   {
     "hrsh7th/nvim-cmp",
     dependencies = {
@@ -25,7 +24,6 @@ return {
           ["<Tab>"] = cmp.mapping.confirm { select = true },
         },
         sources = cmp.config.sources({
-          { name = "cmp_ai" },
           { name = "nvim_lsp" },
         }, {
           { name = "buffer" },
