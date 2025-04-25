@@ -19,6 +19,20 @@ require("lazy").setup {
   defaults = {
     lazy = true,
   },
+  performance = {
+    rtp = {
+      -- Stuff I don't use.
+      disabled_plugins = {
+        "gzip",
+        "netrwPlugin",
+        "rplugin",
+        "tarPlugin",
+        "tohtml",
+        "tutor",
+        "zipPlugin",
+      },
+    },
+  },
 }
 
 utils.enable_set_root_autocmd(false)
@@ -26,3 +40,5 @@ utils.enable_set_root_autocmd(false)
 -- TODO: for this to work, I really should fix the fact when opening a file directly
 --       many things (like lsp and cmp) don't work
 -- TODO: investigate: is `yod` helpful?
+-- TODO: telescope command to view keymaps, filtered by mode
+-- TODO: make the statuscolumn wider and put different stuff in differnt columns (e.g. gitsigns, diagnostic)

@@ -47,8 +47,8 @@ return {
               list_definitions = false,
               list_definitions_toc = false,
               -- TODO: When using LSP highlight, could we also make the LSP get us to the next reference?
-              goto_next_usage = "<C-n>",
-              goto_previous_usage = "<C-p>",
+              -- goto_next_usage = "<C-n>",
+              -- goto_previous_usage = "<C-p>",
             },
           },
           query_linter = {

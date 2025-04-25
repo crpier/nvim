@@ -79,7 +79,7 @@ return {
           -- Jump to the definition of the word under your cursor.
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
-          map("grd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+          map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
 
           -- This is not Goto Definition, this is Goto Declaration.
           --  For example, in C this would take you to the header.
@@ -354,6 +354,7 @@ return {
     },
     opts = {
       notify_on_error = true,
+      -- FIXME: we should allow disabling this from local_config
       format_on_save = function(bufnr)
         local enable_filetypes = { python = true, rust_analyzer = true, lua = true }
         if enable_filetypes[vim.bo[bufnr].filetype] then

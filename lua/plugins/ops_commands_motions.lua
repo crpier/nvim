@@ -54,18 +54,21 @@ return {
         function()
           require("cellular-automaton").start_animation "make_it_rain"
         end,
+        desc = "Cellular Automaton: Make it Rain",
       },
       {
         "mcs",
         function()
           require("cellular-automaton").start_animation "scramble"
         end,
+        desc = "Cellular Automaton: Scramble",
       },
       {
         "mcl",
         function()
           require("cellular-automaton").start_animation "game_of_life"
         end,
+        desc = "Cellular Automaton: Game of Life",
       },
     },
   },
@@ -77,7 +80,7 @@ return {
       -- Keymaps defined in https://github.com/tummetott/unimpaired.nvim/blob/8e504ba95dd10a687f4e4dacd5e19db221b88534/lua/unimpaired/config.lua
       require("unimpaired").setup {
         keymaps = {
-          -- used by the tags plugin
+          -- used by the `todo-comments`
           tfirst = false,
           tlast = false,
           tnext = false,

@@ -52,11 +52,14 @@ return {
   -- maybe also a InsertLeave?
   {
     "folke/todo-comments.nvim",
+    event = "VeryLazy",
     dependencies = {
       "nvim-telescope/telescope.nvim",
     },
     config = function()
-      require("todo-comments").setup {}
+      require("todo-comments").setup {
+        signs = false,
+      }
       require("telescope").load_extension "todo-comments"
     end,
     keys = {

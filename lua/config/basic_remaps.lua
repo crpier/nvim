@@ -4,20 +4,24 @@ vim.g.maplocalleader = " "
 -- Easy exit
 vim.keymap.set("n", "Q", "ZQ")
 -- Stop search Highlighting
+-- TODO: this doesn't let flash.nvim clear highlight when doing f/t motions
 vim.keymap.set("n", "<Esc>", function()
-  vim.cmd [[ nohlsearch ]]
+  vim.cmd "nohlsearch"
+  -- Re-emit the <Esc> key so other plugins can use it
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
 end)
 vim.keymap.set("n", "<C-S>", function()
-  vim.cmd [[write]]
+  vim.cmd "write"
 end, { desc = "Save like in vsc*de" })
 vim.keymap.set("i", "<C-S>", function()
-  vim.cmd [[write]]
+  vim.cmd "write"
 end, { desc = "Save like in vsc*de" })
 -- Easier to move between windows
 vim.keymap.set("n", "<C-h>", "<C-w>h")
 vim.keymap.set("n", "<C-j>", "<C-w>j")
 vim.keymap.set("n", "<C-k>", "<C-w>k")
 vim.keymap.set("n", "<C-l>", "<C-w>l")
+-- Easier to move away from terminal windows
 vim.keymap.set("t", "<C-h>", [[<C-\><C-n><C-w>h]])
 vim.keymap.set("t", "<C-j>", [[<C-\><C-n><C-w>j]])
 vim.keymap.set("t", "<C-k>", [[<C-\><C-n><C-w>k]])
@@ -27,9 +31,9 @@ vim.keymap.set("t", [[<C-/>]], [[<C-\><C-n>]])
 -- Don't save { and } in jumplist
 vim.keymap.set("n", "{", ":keepjumps normal! {<CR>", { silent = true })
 vim.keymap.set("n", "}", ":keepjumps normal! }<CR>", { silent = true })
--- Easy to relod current file
+-- Easy to reload current file
 vim.keymap.set("n", "<leader>%", function()
-  vim.cmd [[so]]
+  vim.cmd "so"
 end)
 -- tweak the way new lines are added a bit
 vim.keymap.set("n", "]<Space>", "o<esc>")

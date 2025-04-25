@@ -1,6 +1,6 @@
 return {
   {
-    "catppuccin/nvim",
+    "catppuccin/nvid",
     name = "catppuccin",
     priority = 1000,
     lazy = false,
@@ -36,7 +36,7 @@ return {
           lualine_c = {
             navic_part,
           },
-          lualine_x = { "" },
+          lualine_x = { "overseer" },
           lualine_y = {},
           -- TODO: make this configurable from local config
           -- for some reason, this slows neovim down considerably on macos
@@ -62,5 +62,23 @@ return {
     config = function()
       require("bufferline").setup {}
     end,
+  },
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+    },
+    keys = {
+      {
+        "<leader>?",
+        function()
+          require("which-key").show { global = false }
+        end,
+        desc = "Buffer Local Keymaps (which-key)",
+      },
+    },
   },
 }
