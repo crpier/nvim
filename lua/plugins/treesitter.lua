@@ -15,7 +15,7 @@ return {
         },
         -- TODO: Maybe this should depend on the language?
         indent = {
-          enable = true,
+          enable = false,
         },
         incremental_selection = {
           enable = true,
@@ -47,8 +47,8 @@ return {
               list_definitions = false,
               list_definitions_toc = false,
               -- TODO: When using LSP highlight, could we also make the LSP get us to the next reference?
-              -- goto_next_usage = "<C-n>",
-              -- goto_previous_usage = "<C-p>",
+              goto_next_usage = "<C-n>",
+              goto_previous_usage = "<C-p>",
             },
           },
           query_linter = {
@@ -114,10 +114,11 @@ return {
             enable = true,
             border = "none",
             floating_preview_opts = {},
-            peek_definition_code = {
-              ["<leader>k"] = "@function.outer",
-              ["<leader>K"] = "@class.outer",
-            },
+            -- TODO: find another suitable keymap
+            -- peek_definition_code = {
+            --   ["<leader>k"] = "@function.outer",
+            --   ["<leader>K"] = "@class.outer",
+            -- },
           },
         },
       }

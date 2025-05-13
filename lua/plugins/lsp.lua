@@ -239,7 +239,8 @@ return {
         -- TODO: make it use the binary from the virtualenv if in one, or the mason
         -- binary otherwise. Should also show a warning/info message if using
         -- the mason binary.
-        pyright = {},
+        -- pyright = {},
+        mypy = {},
         rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -308,15 +309,16 @@ return {
     config = function()
       local lint = require "lint"
       -- Enable linters
-      -- TODO: ensure these are installed by Mason, but not on SSH
       lint.linters_by_ft = lint.linters_by_ft or {}
-      -- TODO: use hadolint if available
-      lint.linters_by_ft["dockerfile"] = nil
-      -- TODO: use jsonlint if available
-      lint.linters_by_ft["json"] = nil
-      lint.linters_by_ft["terraform"] = { "tflint" }
-      lint.linters_by_ft["lua"] = { "luacheck" }
-      lint.linters_by_ft["python"] = { "ruff" }
+      if require("config.utils").ON_LOCAL then
+        lint.linters_by_ft["lua"] = { "luacheck" }
+        lint.linters_by_ft["python"] = { "ruff" }
+        lint.linters_by_ft["terraform"] = { "tflint" }
+      else
+        lint.linters_by_ft["lua"] = nil
+        lint.linters_by_ft["python"] = nil
+        lint.linters_by_ft["terraform"] = nil
+      end
 
       -- Disable default linters
       lint.linters_by_ft["markdown"] = nil
@@ -327,6 +329,10 @@ return {
       lint.linters_by_ft["rst"] = nil
       lint.linters_by_ft["ruby"] = nil
       lint.linters_by_ft["Avante"] = nil
+      -- TODO: use hadolint if available
+      lint.linters_by_ft["dockerfile"] = nil
+      -- TODO: use jsonlint if available
+      lint.linters_by_ft["json"] = nil
 
       local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
       -- TODO: this looks like something that should be configured outside of this repo,
@@ -354,19 +360,6 @@ return {
     },
     opts = {
       notify_on_error = true,
-      -- FIXME: we should allow disabling this from local_config
-      format_on_save = function(bufnr)
-        local enable_filetypes = { python = true, rust_analyzer = true, lua = true }
-        if enable_filetypes[vim.bo[bufnr].filetype] then
-          return {
-            timeout_ms = 500,
-            lsp_format = "fallback",
-          }
-        else
-          return nil
-        end
-      end,
-
       formatters_by_ft = {
         lua = { "stylua" },
         python = { "ruff_fix", "ruff_format", "ruff_organize_imports" },

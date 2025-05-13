@@ -57,6 +57,31 @@ return {
       end,
       desc = "Debug: Step Out",
     },
+
+    {
+      "<leader>k",
+      function()
+        require("dap.ui.widgets").hover()
+      end,
+      desc = "Dap Hover",
+    },
+    {
+      "<Leader>df",
+      function()
+        local widgets = require "dap.ui.widgets"
+        widgets.centered_float(widgets.frames)
+      end,
+      desc = "Dap frames",
+    },
+    {
+      "<Leader>ds",
+      function()
+        local widgets = require "dap.ui.widgets"
+        widgets.centered_float(widgets.scopes)
+      end,
+      desc = "Dap scopes",
+    },
+
     {
       "<leader>b",
       function()
