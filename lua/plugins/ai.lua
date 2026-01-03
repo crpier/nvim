@@ -20,7 +20,7 @@ return {
   {
     "yetone/avante.nvim",
     cond = function()
-      return require("config.utils").load_local_options().supermaven_enabled
+      return require("config.utils").load_local_options().avante_enabled
     end,
     event = "VeryLazy",
     version = false, -- Never set this value to "*"! Never!
