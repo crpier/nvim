@@ -58,9 +58,7 @@ return {
     keys = {
       {
         "sto",
-        function()
-          require("snacks").picker.todo_comments()
-        end,
+        "<cmd>TodoTelescope<CR>",
         desc = "Open TODOs in snacks picker",
       },
       {

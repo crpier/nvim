@@ -8,7 +8,8 @@ return {
     dependencies = { "nvim-treesitter/nvim-treesitter-textobjects", "nvim-treesitter/nvim-treesitter-refactor" },
     config = function()
       local config = {
-        ensure_installed = {},
+        -- TODO: languages should depend on ON_LOCAL
+        ensure_installed = { "python", "markdown", "markdown_inline"},
         highlight = {
           enable = true,
           additional_vim_regex_highlighting = { "markdown" },
