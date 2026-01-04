@@ -47,7 +47,7 @@ Uses `lazy.nvim` for plugin management with lazy-loading enabled by default. All
 - `lsp.lua` - LSP configuration (nvim-lspconfig, Mason)
 - `formatting.lua` - Code formatting (conform.nvim)
 - `linting.lua` - Code linting (nvim-lint)
-- `completion.lua` - nvim-cmp completion setup
+- `completion.lua` - blink.cmp completion setup
 - `telescope.lua` - Fuzzy finding and pickers
 - `treesitter.lua` - Syntax highlighting and parsing
 - `git.lua` - Git integration

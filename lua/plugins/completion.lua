@@ -1,37 +1,50 @@
 return {
   {
-    "hrsh7th/nvim-cmp",
-    dependencies = {
-      "hrsh7th/cmp-nvim-lsp",
-      "hrsh7th/cmp-path",
-      "hrsh7th/cmp-nvim-lua",
-      "hrsh7th/cmp-emoji",
-      "hrsh7th/cmp-nvim-lsp-signature-help",
-    },
+    "saghen/blink.cmp",
+    version = "*",
     event = "InsertEnter",
-    config = function()
-      local cmp = require "cmp"
-      cmp.setup {
+    opts = {
+      keymap = {
+        preset = "default",
+        ["<C-d>"] = { "scroll_documentation_down", "fallback" },
+        ["<C-u>"] = { "scroll_documentation_up", "fallback" },
+        ["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
+        ["<C-e>"] = { "hide", "fallback" },
+        ["<Tab>"] = { "accept", "fallback" },
+      },
+      appearance = {
+        use_nvim_cmp_as_default = true,
+        -- nerd_font_variant = "mono",
+      },
+      sources = {
+        default = { "lsp", "path", "buffer"},
+        providers = {
+        },
+      },
+      completion = {
+        documentation = {
+          auto_show = true,
+          auto_show_delay_ms = 500,
+          window = {
+            border = "single",
+          },
+        },
+        menu = {
+          border = "single",
+          draw = {
+            columns = {
+              { "label", "label_description", gap = 1 },
+              { "kind_icon", "kind" },
+            },
+          },
+        },
+      },
+      signature = {
+        enabled = true,
         window = {
-          completion = cmp.config.window.bordered { border = "single" },
-          documentation = cmp.config.window.bordered { border = "single" },
+          border = "single",
         },
-        mapping = cmp.mapping.preset.insert {
-          ["<C-d>"] = cmp.mapping.scroll_docs(-4),
-          ["<C-u>"] = cmp.mapping.scroll_docs(4),
-          ["<C-Space>"] = cmp.mapping.complete(),
-          ["<C-e>"] = cmp.mapping.abort(),
-          ["<Tab>"] = cmp.mapping.confirm { select = true },
-        },
-        sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "nvim_lsp_signature_help" },
-        }, {
-          { name = "buffer" },
-          { name = "path" },
-          { name = "emoji" },
-        }),
-      }
-    end,
+      },
+    },
   },
 }

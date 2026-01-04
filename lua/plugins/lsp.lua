@@ -240,9 +240,7 @@ return {
       vim.keymap.set("n", "d;", vim.diagnostic.open_float)
 
 
-      -- TODO: try out blink.cmp
-      -- local capabilities = require("blink.cmp").get_lsp_capabilities()
-      local capabilities = {}
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
