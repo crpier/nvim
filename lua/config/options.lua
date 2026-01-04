@@ -47,7 +47,6 @@ vim.o.shell = "fish"
 -- Not sure why this isn't the default. It wasn't always like this 🤔
 vim.diagnostic.config { virtual_text = true }
 
--- TODO: somewhere here I should set my browser?
 ---- Autocommands ----
 
 -- highlight on yank

@@ -57,12 +57,11 @@ return {
         end,
         desc = "Find all files (including hidden)",
       },
-      -- TODO: I'd like these to add a space after the search term
       {
         "stp",
         function()
           require("telescope.builtin").git_files {
-            default_text = "!test .py",
+            default_text = "!tests .py ",
             prompt_title = "Python files (no tests)",
           }
         end,
@@ -72,7 +71,7 @@ return {
         "stP",
         function()
           require("telescope.builtin").git_files {
-            default_text = "'test .py",
+            default_text = "'tests .py",
             prompt_title = "Python test files",
           }
         end,
@@ -195,13 +194,62 @@ return {
         end,
         desc = "Search projects",
       },
-      -- TODO: I'd like something that only shows registers 0-9
       {
-        "sr",
+        "sra",
         function()
           require("telescope.builtin").registers()
         end,
         desc = "Search registers",
+      },
+      {
+        "srd",
+        function()
+          local pickers = require "telescope.pickers"
+          local finders = require "telescope.finders"
+          local conf = require("telescope.config").values
+          local actions = require "telescope.actions"
+          local action_state = require "telescope.actions.state"
+
+          local registers = {}
+          for i = 0, 9 do
+            local reg = tostring(i)
+            local value = vim.fn.getreg(reg)
+            if value ~= "" then
+              table.insert(registers, {
+                register = reg,
+                value = value:gsub("\n", "\\n"),
+              })
+            end
+          end
+
+          pickers
+            .new({}, {
+              prompt_title = "Registers 0-9 (Yank/Delete)",
+              finder = finders.new_table {
+                results = registers,
+                entry_maker = function(entry)
+                  return {
+                    value = entry.value,
+                    display = string.format('[%s] %s', entry.register, entry.value),
+                    ordinal = entry.register .. " " .. entry.value,
+                    register = entry.register,
+                  }
+                end,
+              },
+              sorter = conf.generic_sorter {},
+              attach_mappings = function(prompt_bufnr)
+                actions.select_default:replace(function()
+                  local selection = action_state.get_selected_entry()
+                  actions.close(prompt_bufnr)
+                  vim.fn.setreg('"', vim.fn.getreg(selection.register))
+                  vim.cmd('normal! ""p')
+                end)
+                return true
+              end,
+            })
+            :find()
+        end,
+        desc = "Search registers 0-9 (yank/delete only)",
       },
     },
   },

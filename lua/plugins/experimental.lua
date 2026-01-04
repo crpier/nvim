@@ -32,7 +32,6 @@ return {
         mode = "n",
         desc = "Delete Surrounding Indentation",
       },
-      -- TODO: mapping to copy text object and paste it right after
       {
         ">p",
         function()

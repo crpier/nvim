@@ -13,7 +13,6 @@ return {
           enable = true,
           additional_vim_regex_highlighting = { "markdown" },
         },
-        -- TODO: Maybe this should depend on the language?
         indent = {
           enable = false,
         },
@@ -112,10 +111,10 @@ return {
             border = "none",
             floating_preview_opts = {},
             -- TODO: find another suitable keymap
-            -- peek_definition_code = {
-            --   ["<leader>k"] = "@function.outer",
-            --   ["<leader>K"] = "@class.outer",
-            -- },
+            peek_definition_code = {
+              ["<leader>k"] = "@function.outer",
+              ["<leader>K"] = "@class.outer",
+            },
           },
         },
       }

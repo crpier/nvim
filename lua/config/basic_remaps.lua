@@ -50,4 +50,3 @@ vim.keymap.set("n", "y!", "<cmd>lua print(vim.loop.cwd())<cr>")
 -- Move things in visual mode
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
--- TODO: key to toggle absolute and relative line numbers

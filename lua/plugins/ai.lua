@@ -17,36 +17,4 @@ return {
       }
     end,
   },
-  {
-    "yetone/avante.nvim",
-    cond = function()
-      return require("config.utils").load_local_options().avante_enabled
-    end,
-    event = "VeryLazy",
-    version = false, -- Never set this value to "*"! Never!
-    opts = {
-      -- add any opts here
-      -- for example
-      provider = "claude",
-      claude = {
-        endpoint = "https://api.anthropic.com",
-        model = "claude-sonnet-4-5-20250929",
-        temperature = 0,
-        max_tokens = 4096,
-      },
-      hints = {
-        enabled = false,
-      },
-    },
-    -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
-    build = "make",
-    -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
-    dependencies = {
-      "nvim-treesitter/nvim-treesitter",
-      "nvim-lua/plenary.nvim",
-      "MunifTanjim/nui.nvim",
-      --- The below dependencies are optional,
-      "zbirenbaum/copilot.lua", -- for providers='copilot'
-    },
-  },
 }

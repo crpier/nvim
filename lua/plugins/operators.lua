@@ -98,5 +98,4 @@ return {
       }
     end,
   },
-  -- TODO: check https://github.com/lewis6991/hover.nvim out
 }
