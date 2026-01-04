@@ -56,14 +56,13 @@ return {
       desc = "Debug: Step Out",
     },
 
-    -- TODO: find another suitable keymap
-    -- {
-    --   "<leader>k",
-    --   function()
-    --     require("dap.ui.widgets").hover()
-    --   end,
-    --   desc = "Dap Hover",
-    -- },
+    {
+      "<leader>h",
+      function()
+        require("dap.ui.widgets").hover()
+      end,
+      desc = "Dap Hover",
+    },
     {
       "<Leader>df",
       function()

@@ -43,7 +43,6 @@ return {
               goto_definition = false,
               list_definitions = false,
               list_definitions_toc = false,
-              -- TODO: When using LSP highlight, could we also make the LSP get us to the next reference?
               goto_next_usage = "<C-n>",
               goto_previous_usage = "<C-p>",
             },
@@ -74,24 +73,19 @@ return {
             goto_next_start = {
               ["]m"] = "@function.outer",
               ["]]"] = "@class.outer",
-              ["]p"] = "@parameter.outer",
             },
             goto_next_end = {
               ["]M"] = "@function.outer",
               ["]["] = "@class.outer",
-              ["]P"] = "@parameter.outer",
             },
             goto_previous_start = {
               ["[m"] = "@function.outer",
               ["[["] = "@class.outer",
-              ["[p"] = "@parameter.outer",
             },
             goto_previous_end = {
               ["[M"] = "@function.outer",
               ["[]"] = "@class.outer",
-              ["[P"] = "@parameter.outer",
             },
-            -- TODO: go to next/prev param
           },
           swap = {
             enable = true,
@@ -110,7 +104,6 @@ return {
             enable = true,
             border = "none",
             floating_preview_opts = {},
-            -- TODO: find another suitable keymap
             peek_definition_code = {
               ["<leader>k"] = "@function.outer",
               ["<leader>K"] = "@class.outer",

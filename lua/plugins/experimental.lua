@@ -386,7 +386,7 @@ return {
       lazygit = {},
       input = {},
       scope = {},
-      -- TODO: allow executing python scratch
+      -- TODO: allow executing python scratch (with uv!)
       scratch = {},
       picker = {
         ui = {
@@ -451,11 +451,11 @@ return {
       new_notes_location = "notes_subdir",
 
       completion = {
-        nvim_cmp = true,
+        blink = true,
         min_chars = 2,
       },
     },
   },
 }
--- TODO: mb add keymap for snacks "lazy" picket
+-- TODO: mb add keymap for snacks "lazy" picker
 -- TODO: don't show an error when previewing an empty file

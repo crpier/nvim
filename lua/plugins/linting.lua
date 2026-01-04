@@ -42,8 +42,6 @@ return {
       use_linter_if_available("json", "jsonlint")
 
       local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
-      -- TODO: this looks like something that should be configured with local config
-      -- potential to add "TextChanged" on some machines
       vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
         group = lint_augroup,
         callback = function()

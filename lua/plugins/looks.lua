@@ -38,9 +38,6 @@ return {
           },
           lualine_x = { "overseer" },
           lualine_y = {},
-          -- TODO: make this configurable from local config
-          -- for some reason, this slows neovim down considerably on macos
-          -- lualine_y = { "filetype" },
           lualine_z = { "location" },
         },
       }

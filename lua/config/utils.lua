@@ -81,8 +81,6 @@ M.root = nil
 --- whenever we enter a buffer or attach to a new lsp client
 --- @param verbose boolean Whether to print a message when changing the cwd. Defaults to true
 M.enable_set_root_autocmd = function(verbose)
-  -- TODO: I should also allow creating a list of directories that are always
-  -- root, i.e. directories beneath them are never root
   if verbose == nil then
     verbose = true
   end
