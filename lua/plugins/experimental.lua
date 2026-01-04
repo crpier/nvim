@@ -1,19 +1,6 @@
--- Add to your obsidian.nvim config
-vim.api.nvim_create_user_command("ObsidianSwitchByAlias", function()
-  local client = require("obsidian").get_client()
-  local notes = client:find_notes_async("", { sync = true })
-
-  client:picker():pick_note(notes, {
-    prompt_title = "Switch Note (by title/alias)",
-    callback = function(note)
-      client:open_note(note)
-    end,
-  })
-end, {})
-
 ---@module 'obsidian'
 ---@param note obsidian.Note
-local function frontmatter_with_h1_alias(note)
+local function id_from_h1(note)
   local out = { id = note.id, aliases = note.aliases, tags = note.tags }
 
   -- Extract first H1 header from content
@@ -22,10 +9,7 @@ local function frontmatter_with_h1_alias(note)
       -- Match lines starting with "# " (single hash + space = H1)
       local h1_text = line:match "^#%s+(.+)$"
       if h1_text then
-        -- Add as alias if not already present
-        if not vim.list_contains(out.aliases, h1_text) then
-          table.insert(out.aliases, h1_text)
-        end
+        out.id = h1_text
         break -- Stop after first H1
       end
     end
@@ -453,11 +437,11 @@ return {
     version = "*", -- recommended, use latest release instead of latest commit
     cmd = { "Obsidian" },
     keys = {
+      { "<leader>of", "<cmd>Obsidian quick_switch<cr>", desc = "Open notes" },
       { "<leader>on", "<cmd>Obsidian new<cr>", desc = "Create new note" },
       { "<leader>odd", "<cmd>Obsidian dailies<cr>", desc = "Open daily notes picker" },
       { "<leader>ody", "<cmd>Obsidian yesterday<cr>", desc = "Open yesterday's daily note" },
       { "<leader>odo", "<cmd>Obsidian tomorrow<cr>", desc = "Open tomorrow's daily note" },
-      { "<leader>oo", "<cmd>Obsidian quick_switch Todo<cr>", desc = "Open Todo note" },
       { "<leader>ot", "<cmd>Obsidian today<cr>", desc = "Open today's daily note" },
       { "<leader>os", "<cmd>Obsidian search<cr>", desc = "Live grep through notes" },
       { "<leader>oa", "<cmd>Obsidian tags<cr>", desc = "Open note tags picker" },
@@ -483,7 +467,10 @@ return {
         date_format = "%Y-%m/%Y-%m-%d",
         template = "daybook.md",
       },
-      frontmatter = { func = frontmatter_with_h1_alias },
+      note_id_func = function(title)
+        return title
+      end,
+      frontmatter = { enabled = true, func = id_from_h1 },
       ui = {
         enable = false,
       },
