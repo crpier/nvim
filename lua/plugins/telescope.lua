@@ -57,6 +57,7 @@ return {
         end,
         desc = "Find all files (including hidden)",
       },
+      -- TODO: I'd like these to add a space after the search term
       {
         "stp",
         function()

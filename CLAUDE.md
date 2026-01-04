@@ -56,7 +56,6 @@ Uses `lazy.nvim` for plugin management with lazy-loading enabled by default. All
 - `operators.lua` - Text operators and motions (surround, comment, unimpaired)
 - `looks.lua` - UI and appearance
 - `ai.lua` - AI integrations
-- `misc.lua` - Miscellaneous plugins (Obsidian.nvim)
 - `experimental.lua` - Experimental plugins (snacks.nvim, overseer, mini.files)
 - `custom.lua` - Loads local plugins from user configuration
 
@@ -157,7 +156,6 @@ When modifying plugins, categorize them appropriately:
 - **Text operators/motions** → `lua/plugins/operators.lua`
 - **AI tools** → `lua/plugins/ai.lua`
 - **Experimental** → `lua/plugins/experimental.lua`
-- **Misc** → `lua/plugins/misc.lua`
 
 ## Important Behaviors
 

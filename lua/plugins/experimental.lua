@@ -136,10 +136,59 @@ return {
       picker = {
         sources = {
           explorer = {
-            -- your explorer picker configuration comes here
-            -- or leave it empty to use the default settings
           },
         },
+      },
+    },
+  },
+  {
+    "obsidian-nvim/obsidian.nvim",
+    version = "*", -- recommended, use latest release instead of latest commit
+    cmd = { "Obsidian" },
+    keys = {
+      { "<leader>on", "<cmd>Obsidian new<cr>", desc = "Create new note" },
+      { "<leader>odd", "<cmd>Obsidian dailies<cr>", desc = "Open daily notes picker" },
+      { "<leader>ody", "<cmd>Obsidian yesterday<cr>", desc = "Open yesterday's daily note" },
+      { "<leader>odo", "<cmd>Obsidian tomorrow<cr>", desc = "Open tomorrow's daily note" },
+      { "<leader>oo", "<cmd>Obsidian quick_switch Todo<cr>", desc = "Open Todo note" },
+      { "<leader>ot", "<cmd>Obsidian today<cr>", desc = "Open today's daily note" },
+      { "<leader>os", "<cmd>Obsidian search<cr>", desc = "Live grep through notes" },
+      { "<leader>oa", "<cmd>Obsidian tags<cr>", desc = "Open note tags picker" },
+      { "<leader>orn", "<cmd>Obsidian rename<cr>", desc = "Rename note" },
+      -- TODO: I'd like this to add a space at the end of the prompt
+      { "<leader>of", "<cmd>Obsidian quick_switch !daily<cr>", desc = "Open (non-daily) notes picker" },
+    },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    ---@module 'obsidian'
+    ---@type obsidian.config
+    opts = {
+      workspaces = {
+        {
+          name = "vault",
+          path = "~/vault",
+        },
+      },
+      templates = {
+        folder = "templates",
+      },
+      daily_notes = {
+        folder = "daily",
+        date_format = "%Y-%m/%Y-%m-%d",
+        template = "daily.md",
+      },
+      ui = {
+        enable = false,
+      },
+      legacy_commands = false,
+
+      notes_subdir = "limbo",
+      new_notes_location = "notes_subdir",
+
+      completion = {
+        nvim_cmp = true,
+        min_chars = 2,
       },
     },
   },
