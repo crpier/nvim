@@ -108,7 +108,7 @@ M.default_options = {
   --- That's the main reason I made local configs lol.
   supermaven_enabled = false,
   --- @type table List of additional directories to look in,
-  --- for telescope-project.nvim. Same format as the `base_dirs` option.
+  --- for project dirs. Same format as the `base_dirs` option.
   project_base_dirs = {},
   --- @type table List of plugins to load, as expected by lazy.nvim.
   local_plugins = {},

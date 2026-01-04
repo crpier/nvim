@@ -69,31 +69,22 @@ return {
           )
 
           -- Find references for the word under your cursor.
-          vim.keymap.set(
-            "n",
-            "grr",
-            require("telescope.builtin").lsp_references,
-            { buffer = event.buf, desc = "LSP: [G]oto [R]eferences" }
-          )
+          vim.keymap.set("n", "grr", function()
+            require("snacks").picker.lsp_references()
+          end, { buffer = event.buf, desc = "LSP: [G]oto [R]eferences" })
 
           -- Jump to the implementation of the word under your cursor.
           --  Useful when your language has ways of declaring types without an actual implementation.
-          vim.keymap.set(
-            "n",
-            "gri",
-            require("telescope.builtin").lsp_implementations,
-            { buffer = event.buf, desc = "LSP: [G]oto [I]mplementation" }
-          )
+          vim.keymap.set("n", "gri", function()
+            require("snacks").picker.lsp_implementations()
+          end, { buffer = event.buf, desc = "LSP: [G]oto [I]mplementation" })
 
           -- Jump to the definition of the word under your cursor.
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
-          vim.keymap.set(
-            "n",
-            "gd",
-            require("telescope.builtin").lsp_definitions,
-            { buffer = event.buf, desc = "LSP: [G]oto [D]efinition" }
-          )
+          vim.keymap.set("n", "gd", function()
+            require("snacks").picker.lsp_definitions()
+          end, { buffer = event.buf, desc = "LSP: [G]oto [D]efinition" })
 
           -- This is not Goto Definition, this is Goto Declaration.
           --  For example, in C this would take you to the header.
@@ -106,19 +97,13 @@ return {
 
           -- Fuzzy find all the symbols in your current document.
           --  Symbols are things like variables, functions, types, etc.
-          vim.keymap.set(
-            "n",
-            "grs",
-            require("telescope.builtin").lsp_document_symbols,
-            { buffer = event.buf, desc = "LSP: Open Document Symbols" }
-          )
+          vim.keymap.set("n", "grs", function()
+            require("snacks").picker.lsp_symbols()
+          end, { buffer = event.buf, desc = "LSP: Open Document Symbols" })
 
-          vim.keymap.set(
-            "n",
-            "grt",
-            require("telescope.builtin").lsp_type_definitions,
-            { buffer = event.buf, desc = "LSP: [G]oto [T]ype Definition" }
-          )
+          vim.keymap.set("n", "grt", function()
+            require("snacks").picker.lsp_type_definitions()
+          end, { buffer = event.buf, desc = "LSP: [G]oto [T]ype Definition" })
 
           vim.keymap.set("n", "K", function()
             vim.lsp.buf.hover { border = "rounded" }

@@ -7,9 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Required Packages
 
 **Core dependencies:**
-- `git` - Required for lazy.nvim plugin manager
-- `fd` - Must be available as `fd` (not `fdfind` as on some Ubuntu systems) for Telescope file finding
-- `cmake` - Required to build telescope-fzf-native.nvim
+- `git` - Required for lazy.nvim plugin manager and snacks.picker git integration
+- `fd` - Must be available as `fd` (not `fdfind` as on some Ubuntu systems) for snacks.picker file finding
 - `make` - Required for building some plugins (e.g., avante.nvim)
 - `curl` or `wget` - For downloading plugins and tools
 
@@ -26,7 +25,7 @@ LSP servers configured in `lua/plugins/lsp.lua` require their respective languag
 
 **Optional but recommended:**
 - `lazygit` - For the snacks.nvim lazygit integration (`<leader>lg`)
-- `ripgrep` (`rg`) - Faster grep for Telescope live_grep (though fd can work as fallback)
+- `ripgrep` (`rg`) - Faster grep for snacks.picker live grep (though fd can work as fallback)
 
 ### Tools Managed by Mason
 
@@ -48,7 +47,7 @@ Uses `lazy.nvim` for plugin management with lazy-loading enabled by default. All
 - `formatting.lua` - Code formatting (conform.nvim)
 - `linting.lua` - Code linting (nvim-lint)
 - `completion.lua` - blink.cmp completion setup
-- `telescope.lua` - Fuzzy finding and pickers
+- `experimental.lua` - Experimental plugins including snacks.nvim (with snacks.picker for all fuzzy finding/picking)
 - `treesitter.lua` - Syntax highlighting and parsing
 - `git.lua` - Git integration
 - `dap.lua` - Debugging adapter protocol
@@ -68,7 +67,6 @@ Uses `lazy.nvim` for plugin management with lazy-loading enabled by default. All
 ### Local Configuration System
 The config supports machine-specific settings via `~/.config/local_configs/nvim.lua`:
 - Can override default options (avante_enabled, supermaven_enabled, treesitter_highlight_definitions)
-- Can add project base directories for telescope-project
 - Can load additional local plugins
 - Spell file is also stored in local_configs: `~/.config/local_configs/en.utf-8.add`
 
@@ -119,21 +117,27 @@ Important core mappings from `lua/config/basic_remaps.lua`:
 - `J` / `K` in visual mode - Move lines up/down
 - `y!` - Print current working directory
 
-Telescope mappings (from `lua/plugins/telescope.lua`):
+Snacks.picker mappings (from `lua/plugins/experimental.lua`):
 - `sf` - Git files
 - `sF` - All files (including hidden)
 - `stp` - Python files (no tests) - pre-filtered with `!test .py`
 - `stP` - Python test files only - pre-filtered with `test .py`
 - `stl` - Lua files - pre-filtered with `.lua`
 - `sl` - Live grep
-- `skk` - All keymaps
-- `skn` - Normal mode keymaps only
-- `ski` - Insert mode keymaps only
-- `skv` - Visual mode keymaps only
+- `su` - Fuzzy find in current buffer
+- `so` - Old/recent files
+- `s/` - Grep with user input
 - `sd` - Diagnostics
-- `sp` - Projects
-
-**Note**: Pre-filtered searches (`stp`, `stP`, `stl`) show the filter in the search box and you can edit it before searching.
+- `sk` - All keymaps
+- `s<space>` - Buffers
+- `sw` - Search word under cursor
+- `sm` - Marks
+- `sgc` - Git status (changed files)
+- `sgb` - Git branches
+- `sp` - Projects (scans base dirs for git repos)
+- `sra` - All registers
+- `srd` - Registers 0-9 (yank/delete only)
+- `sto` - TODO comments (from todo-comments.nvim)
 
 LSP mappings (when LSP attached):
 - `gd`, `gri`, `grr`, `grt`, `grD`, `grs` - Various goto/reference commands
@@ -149,7 +153,7 @@ When modifying plugins, categorize them appropriately:
 - **Formatting** → `lua/plugins/formatting.lua`
 - **Linting** → `lua/plugins/linting.lua`
 - **Completion** → `lua/plugins/completion.lua`
-- **Navigation/Finding** → `lua/plugins/telescope.lua` or `lua/plugins/navigation.lua`
+- **Navigation/Finding** → `lua/plugins/experimental.lua` (snacks.picker) or `lua/plugins/navigation.lua`
 - **Git** → `lua/plugins/git.lua`
 - **UI/Appearance** → `lua/plugins/looks.lua`
 - **Debugging** → `lua/plugins/dap.lua`

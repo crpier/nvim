@@ -53,20 +53,18 @@ return {
   {
     "folke/todo-comments.nvim",
     event = "VeryLazy",
-    dependencies = {
-      "nvim-telescope/telescope.nvim",
-    },
     config = function()
       require("todo-comments").setup {
         signs = false,
       }
-      require("telescope").load_extension "todo-comments"
     end,
     keys = {
       {
         "sto",
-        "<cmd>TodoTelescope<CR>",
-        desc = "Open TODOs in telescope",
+        function()
+          require("snacks").picker.todo_comments()
+        end,
+        desc = "Open TODOs in snacks picker",
       },
       {
         "]t",
