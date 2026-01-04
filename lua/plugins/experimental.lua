@@ -1,3 +1,46 @@
+-- Add to your obsidian.nvim config
+vim.api.nvim_create_user_command("ObsidianSwitchByAlias", function()
+  local client = require("obsidian").get_client()
+  local notes = client:find_notes_async("", { sync = true })
+
+  client:picker():pick_note(notes, {
+    prompt_title = "Switch Note (by title/alias)",
+    callback = function(note)
+      client:open_note(note)
+    end,
+  })
+end, {})
+
+---@module 'obsidian'
+---@param note obsidian.Note
+local function frontmatter_with_h1_alias(note)
+  local out = { id = note.id, aliases = note.aliases, tags = note.tags }
+
+  -- Extract first H1 header from content
+  if note.contents then
+    for _, line in ipairs(note.contents) do
+      -- Match lines starting with "# " (single hash + space = H1)
+      local h1_text = line:match "^#%s+(.+)$"
+      if h1_text then
+        -- Add as alias if not already present
+        if not vim.list_contains(out.aliases, h1_text) then
+          table.insert(out.aliases, h1_text)
+        end
+        break -- Stop after first H1
+      end
+    end
+  end
+
+  -- Preserve any custom metadata
+  if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
+    for k, v in pairs(note.metadata) do
+      out[k] = v
+    end
+  end
+
+  return out
+end
+
 return {
   {
     "chrisgrieser/nvim-various-textobjs",
@@ -297,7 +340,7 @@ return {
             local name = vim.fn.fnamemodify(project_path, ":t")
             table.insert(items, {
               text = string.format("%-30s  %s", name, project_path),
-              file = project_path,  -- For preview - will show directory contents
+              file = project_path, -- For preview - will show directory contents
               path = project_path,
               name = name,
             })
@@ -419,8 +462,6 @@ return {
       { "<leader>os", "<cmd>Obsidian search<cr>", desc = "Live grep through notes" },
       { "<leader>oa", "<cmd>Obsidian tags<cr>", desc = "Open note tags picker" },
       { "<leader>orn", "<cmd>Obsidian rename<cr>", desc = "Rename note" },
-      -- TODO: I'd like this to add a space at the end of the prompt
-      { "<leader>of", "<cmd>Obsidian quick_switch !daily<cr>", desc = "Open (non-daily) notes picker" },
     },
     dependencies = {
       "nvim-lua/plenary.nvim",
@@ -438,10 +479,11 @@ return {
         folder = "templates",
       },
       daily_notes = {
-        folder = "daily",
+        folder = "daybook",
         date_format = "%Y-%m/%Y-%m-%d",
-        template = "daily.md",
+        template = "daybook.md",
       },
+      frontmatter = { func = frontmatter_with_h1_alias },
       ui = {
         enable = false,
       },
