@@ -143,27 +143,4 @@ return {
       },
     },
   },
-  {
-    -- TODO: Actually use this lol
-    "stevearc/overseer.nvim",
-    lazy = false,
-    opts = {},
-  },
-  {
-    "echasnovski/mini.files",
-    -- TODO: lazy needs to be false for the case where I open a dir from shell
-    -- (e.g. `nvim .`). Find a way to lazily open the explorer in this case too.
-    lazy = false,
-    opts = {},
-    keys = {
-      {
-        "<leader>e",
-        mode = "n",
-        function()
-          MiniFiles.open(vim.fn.expand "%:s")
-        end,
-        desc = "Toggle Explorer",
-      },
-    },
-  },
 }

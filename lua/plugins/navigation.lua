@@ -64,7 +64,7 @@ return {
     end,
     keys = {
       {
-        "st",
+        "sto",
         "<cmd>TodoTelescope<CR>",
         desc = "Open TODOs in telescope",
       },

@@ -44,10 +44,11 @@ return {
     end,
     keys = {
       {
-        "sff",
+        "sf",
         function()
           require("telescope.builtin").git_files()
         end,
+        desc = "Search git files",
       },
       {
         "sF",
@@ -56,9 +57,8 @@ return {
         end,
         desc = "Find all files (including hidden)",
       },
-      -- Pre-filtered file searches
       {
-        "sfp",
+        "stp",
         function()
           require("telescope.builtin").git_files {
             default_text = "!test .py",
@@ -68,7 +68,7 @@ return {
         desc = "Search Python files (excluding tests)",
       },
       {
-        "sfP",
+        "stP",
         function()
           require("telescope.builtin").git_files {
             default_text = "'test .py",
@@ -78,7 +78,7 @@ return {
         desc = "Search Python test files only",
       },
       {
-        "sfl",
+        "stl",
         function()
           require("telescope.builtin").git_files {
             default_text = "'.lua",
@@ -92,18 +92,21 @@ return {
         function()
           require("telescope.builtin").live_grep()
         end,
+        desc = "Search live grep",
       },
       {
         "su",
         function()
           require("telescope.builtin").current_buffer_fuzzy_find()
         end,
+        desc = "Fuzzy find in current buffer",
       },
       {
         "so",
         function()
           require("telescope.builtin").oldfiles()
         end,
+        desc = "Search old files",
       },
       {
         "s/",
@@ -112,6 +115,7 @@ return {
             search = vim.fn.input "Grep > ",
           }
         end,
+        desc = "Search word from user input",
       },
       {
         "sd",
@@ -153,30 +157,35 @@ return {
         function()
           require("telescope.builtin").buffers()
         end,
+        desc = "Search buffers",
       },
       {
         "sw",
         function()
           require("telescope.builtin").grep_string {}
         end,
+        desc = "Search word under cursor",
       },
       {
         "sm",
         function()
           require("telescope.builtin").marks {}
         end,
+        desc = "Search marks",
       },
       {
         "sgc",
         function()
           require("telescope.builtin").git_status()
         end,
+        desc = "Search files with git changes",
       },
       {
         "sgb",
         function()
           require("telescope.builtin").git_branches()
         end,
+        desc = "Search git branches",
       },
       {
         "sp",

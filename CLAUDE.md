@@ -121,11 +121,11 @@ Important core mappings from `lua/config/basic_remaps.lua`:
 - `y!` - Print current working directory
 
 Telescope mappings (from `lua/plugins/telescope.lua`):
-- `sff` - Git files
+- `sf` - Git files
 - `sF` - All files (including hidden)
-- `sfp` - Python files (no tests) - pre-filtered with `!test .py`
-- `sfP` - Python test files only - pre-filtered with `test .py`
-- `sfl` - Lua files - pre-filtered with `.lua`
+- `stp` - Python files (no tests) - pre-filtered with `!test .py`
+- `stP` - Python test files only - pre-filtered with `test .py`
+- `stl` - Lua files - pre-filtered with `.lua`
 - `sl` - Live grep
 - `skk` - All keymaps
 - `skn` - Normal mode keymaps only
@@ -134,7 +134,7 @@ Telescope mappings (from `lua/plugins/telescope.lua`):
 - `sd` - Diagnostics
 - `sp` - Projects
 
-**Note**: Pre-filtered searches (sfp, sfP, sfl, sfj, sfc) show the filter in the search box and you can edit it before searching.
+**Note**: Pre-filtered searches (`stp`, `stP`, `stl`) show the filter in the search box and you can edit it before searching.
 
 LSP mappings (when LSP attached):
 - `gd`, `gri`, `grr`, `grt`, `grD`, `grs` - Various goto/reference commands
