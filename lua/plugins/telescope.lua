@@ -44,7 +44,7 @@ return {
     end,
     keys = {
       {
-        "sf",
+        "sff",
         function()
           require("telescope.builtin").git_files()
         end,
@@ -54,6 +54,38 @@ return {
         function()
           require("telescope.builtin").find_files { hidden = true }
         end,
+        desc = "Find all files (including hidden)",
+      },
+      -- Pre-filtered file searches
+      {
+        "sfp",
+        function()
+          require("telescope.builtin").git_files {
+            default_text = "!test .py",
+            prompt_title = "Python files (no tests)",
+          }
+        end,
+        desc = "Search Python files (excluding tests)",
+      },
+      {
+        "sfP",
+        function()
+          require("telescope.builtin").git_files {
+            default_text = "'test .py",
+            prompt_title = "Python test files",
+          }
+        end,
+        desc = "Search Python test files only",
+      },
+      {
+        "sfl",
+        function()
+          require("telescope.builtin").git_files {
+            default_text = "'.lua",
+            prompt_title = "Lua files",
+          }
+        end,
+        desc = "Search Lua files",
       },
       {
         "sl",
@@ -89,10 +121,32 @@ return {
         desc = "Open all diagnostics in Telescope",
       },
       {
-        "sk",
+        "skk",
         function()
           require("telescope.builtin").keymaps()
         end,
+        desc = "Search all keymaps",
+      },
+      {
+        "skn",
+        function()
+          require("telescope.builtin").keymaps { modes = { "n" } }
+        end,
+        desc = "Search normal mode keymaps",
+      },
+      {
+        "ski",
+        function()
+          require("telescope.builtin").keymaps { modes = { "i" } }
+        end,
+        desc = "Search insert mode keymaps",
+      },
+      {
+        "skv",
+        function()
+          require("telescope.builtin").keymaps { modes = { "v", "x" } }
+        end,
+        desc = "Search visual mode keymaps",
       },
       {
         "s<space>",

@@ -36,9 +36,4 @@ require("lazy").setup {
 }
 
 utils.enable_set_root_autocmd(false)
--- TODO: would be cool to have a command like `no` that opens nvim on the last opened file
--- TODO: for this to work, I really should fix the fact when opening a file directly
---       many things (like lsp and cmp) don't work
--- TODO: investigate: is `yod` helpful?
--- TODO: telescope command to view keymaps, filtered by mode
--- TODO: make the statuscolumn wider and put different stuff in differnt columns (e.g. gitsigns, diagnostic)
+-- TODO: investigate: is `yod` (Toggle diff) helpful?
