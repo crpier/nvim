@@ -111,9 +111,19 @@ return {
     },
     ---@type snacks.Config
     opts = {
-      -- TODO: I guess this can take a few configs when I find out what
-      -- markers are conflicting
-      -- statuscolumn = {},
+      statuscolumn = {
+        enabled = true,
+        left = { "mark", "sign" }, -- priority of signs on the left (high to low)
+        right = { "fold", "git" }, -- priority of signs on the right (high to low)
+        folds = {
+          open = true, -- show open fold icons
+          git_hl = false, -- use Git Signs hl for fold icons
+        },
+        git = {
+          patterns = { "GitSign" }, -- patterns to match for git signs
+        },
+        refresh = 50, -- refresh at most every 50ms
+      },
       bigfile = {},
       dim = {},
       terminal = {},
@@ -137,10 +147,7 @@ return {
     -- TODO: Actually use this lol
     "stevearc/overseer.nvim",
     lazy = false,
-    config = function()
-      require("overseer").setup()
-      require("overseer").register_template {}
-    end,
+    opts = {},
   },
   {
     "echasnovski/mini.files",

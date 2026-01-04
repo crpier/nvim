@@ -8,8 +8,7 @@ return {
       "hrsh7th/cmp-emoji",
       "hrsh7th/cmp-nvim-lsp-signature-help",
     },
-    -- TODO: lazy load based on some other event I guess?
-    event = "VeryLazy",
+    event = "InsertEnter",
     config = function()
       local cmp = require "cmp"
       cmp.setup {

@@ -3,7 +3,7 @@
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    run = { ":TSUpdate" },
+    build = ":TSUpdate",
     lazy = false,
     dependencies = { "nvim-treesitter/nvim-treesitter-textobjects", "nvim-treesitter/nvim-treesitter-refactor" },
     config = function()
@@ -34,8 +34,6 @@ return {
             },
           },
           highlight_definitions = {
-            -- TODO: this should be enabled if there is no LSP, or if the lsp does not support `textDocument_documentHighlight`
-            -- enable = require("config.utils").load_local_options().treesitter_highlight_definitions,
             enable = false,
             clear_on_cursor_move = true,
           },
@@ -99,15 +97,14 @@ return {
           swap = {
             enable = true,
             swap_next = {
-              -- TODO: I'd like more consistency in the mnemonics
-              ["<leader>sp"] = "@parameter.inner",
-              ["<leader>sf"] = "@function.outer",
-              ["<leader>sc"] = "@class.outer",
+              ["<leader>tsp"] = "@parameter.inner",
+              ["<leader>tsf"] = "@function.outer",
+              ["<leader>tsc"] = "@class.outer",
             },
             swap_previous = {
-              ["<leader>sP"] = "@parameter.inner",
-              ["<leader>sF"] = "@function.outer",
-              ["<leader>sC"] = "@class.outer",
+              ["<leader>tsP"] = "@parameter.inner",
+              ["<leader>tsF"] = "@function.outer",
+              ["<leader>tsC"] = "@class.outer",
             },
           },
           lsp_interop = {
@@ -124,10 +121,5 @@ return {
       }
       require("nvim-treesitter.configs").setup(config)
     end,
-  },
-  {
-    "nvim-treesitter/playground",
-    cmd = "TSPlaygroundToggle",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
 }

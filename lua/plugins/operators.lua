@@ -1,8 +1,12 @@
 return {
   {
     "kylechui/nvim-surround",
-    -- TODO: check if we can add keys
-    event = "VeryLazy",
+    keys = {
+      { "ys", mode = "n" },
+      { "ds", mode = "n" },
+      { "cs", mode = "n" },
+      { "S", mode = "x" },
+    },
     config = function()
       require("nvim-surround").setup()
     end,
@@ -10,8 +14,7 @@ return {
 
   {
     "numToStr/Comment.nvim",
-    -- TODO: check if we can add keys
-    lazy = false,
+    event = "VeryLazy",
     config = function()
       require("Comment").setup()
     end,

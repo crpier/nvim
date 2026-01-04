@@ -4,7 +4,6 @@ vim.g.maplocalleader = " "
 -- Easy exit
 vim.keymap.set("n", "Q", "ZQ")
 -- Stop search Highlighting
--- TODO: this doesn't let flash.nvim clear highlight when doing f/t motions
 vim.keymap.set("n", "<Esc>", function()
   vim.cmd "nohlsearch"
   -- Re-emit the <Esc> key so other plugins can use it

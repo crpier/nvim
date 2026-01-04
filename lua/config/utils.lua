@@ -107,9 +107,6 @@ M.default_options = {
   --- supermaven bugs you to to login if you enable it.
   --- That's the main reason I made local configs lol.
   supermaven_enabled = false,
-  --- @type boolean Whether to have treesitter highlight multiple uses
-  --- of the same definition. Noticeable performance impact on large files.
-  treesitter_highlight_definitions = true,
   --- @type table List of additional directories to look in,
   --- for telescope-project.nvim. Same format as the `base_dirs` option.
   project_base_dirs = {},
