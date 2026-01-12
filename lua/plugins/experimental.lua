@@ -110,6 +110,13 @@ return {
         end,
         desc = "Toggle bottom terminal",
       },
+      {
+        "<leader>e",
+        function()
+          require("snacks").explorer()
+        end,
+        desc = "Toggle bottom terminal",
+      },
     },
     ---@type snacks.Config
     opts = {
@@ -133,6 +140,7 @@ return {
       lazygit = {},
       input = {},
       scope = {},
+      explorer = {},
       -- TODO: allow executing python scratch (with uv!)
       scratch = {},
     },
@@ -201,11 +209,20 @@ return {
         folder = "daybook",
         date_format = "%Y/%Y-%m-%d",
         default_tags = { "daybook" },
-        template =  "daybook" ,
+        template = "daybook",
       },
       ui = {
         enable = false,
       },
     },
+  },
+  {
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    build = "cd app && npm install",
+    init = function()
+      vim.g.mkdp_filetypes = { "markdown" }
+    end,
+    ft = { "markdown" },
   },
 }
