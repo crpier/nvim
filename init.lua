@@ -36,4 +36,3 @@ require("lazy").setup {
 }
 
 utils.enable_set_root_autocmd(false)
--- TODO: investigate: is `yod` (Toggle diff) helpful?

@@ -234,8 +234,6 @@ return {
       local servers = {
         -- Lua for Neovim configuration
         lua_ls = {},
-        -- Python
-        pyright = {},
         -- TypeScript/JavaScript
         ts_ls = {},
         -- Go
