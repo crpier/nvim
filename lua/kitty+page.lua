@@ -1,6 +1,4 @@
 return function(INPUT_LINE_NUMBER, CURSOR_LINE, CURSOR_COLUMN)
-  -- TODO: also apply theme
-  -- TODO: when pressing i or smth, open a floating window to type I guess?
   print("kitty sent:", INPUT_LINE_NUMBER, CURSOR_LINE, CURSOR_COLUMN)
   vim.opt.encoding = "utf-8"
   vim.opt.clipboard = "unnamedplus"

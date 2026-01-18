@@ -1,15 +1,15 @@
--- TODO: moar textobjects
--- https://github.com/nvim-treesitter/nvim-treesitter-textobjects
 return {
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     lazy = false,
-    dependencies = { "nvim-treesitter/nvim-treesitter-textobjects", "nvim-treesitter/nvim-treesitter-refactor" },
+    dependencies = {
+      { "nvim-treesitter/nvim-treesitter-textobjects", branch = "main" },
+      "nvim-treesitter/nvim-treesitter-refactor",
+    },
     config = function()
       local config = {
-        -- TODO: languages should depend on ON_LOCAL
-        ensure_installed = { "markdown", "markdown_inline"},
+        ensure_installed = { "markdown", "markdown_inline" },
         highlight = {
           enable = true,
           additional_vim_regex_highlighting = { "markdown" },
@@ -28,10 +28,7 @@ return {
         },
         refactor = {
           smart_rename = {
-            enable = true,
-            keymaps = {
-              smart_rename = "<leader>trn",
-            },
+            enable = false,
           },
           highlight_definitions = {
             enable = false,
@@ -47,11 +44,6 @@ return {
               goto_next_usage = "<C-n>",
               goto_previous_usage = "<C-p>",
             },
-          },
-          query_linter = {
-            enable = true,
-            use_virtual_text = true,
-            lint_events = { "BufWrite", "CursorHold" },
           },
         },
         textobjects = {

@@ -88,7 +88,6 @@ return {
         end,
         desc = "Open lazygit",
       },
-      -- TODO: add keymap for `snacks.debug.run()` inside the scratch buffer
       {
         "<leader>.",
         function()
@@ -141,7 +140,6 @@ return {
       input = {},
       scope = {},
       explorer = {},
-      -- TODO: allow executing python scratch (with uv!)
       scratch = {},
     },
   },
@@ -160,7 +158,6 @@ return {
       { "<leader>os", "<cmd>ObsidianSearch<cr>", desc = "Live grep through notes" },
       { "<leader>oa", "<cmd>ObsidianTags<cr>", desc = "Open note tags picker" },
       { "<leader>orn", "<cmd>ObsidianRename<cr>", desc = "Rename note" },
-      -- TODO: this doesn't seem to activate obsidian plugin 🤔
       {
         "<leader>of",
         function()
