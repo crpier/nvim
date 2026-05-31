@@ -43,32 +43,6 @@ return {
           map("n", "gL", function()
             gs.blame_line { full = true }
           end)
-          map("n", "dvo", gs.diffthis)
-          map("n", "dvm", function()
-            gs.diffthis "master"
-          end)
-          map("n", "dvn", function()
-            gs.diffthis "main"
-          end)
-          map("n", "dv1", function()
-            gs.diffthis "HEAD~1"
-          end)
-          map("n", "dv2", function()
-            gs.diffthis "HEAD~2"
-          end)
-          map("n", "dv3", function()
-            gs.diffthis "HEAD~3"
-          end)
-          map("n", "dv4", function()
-            gs.diffthis "HEAD~4"
-          end)
-          map("n", "dv5", function()
-            gs.diffthis "HEAD~5"
-          end)
-          map("n", "dv6", function()
-            gs.diffthis "HEAD~6"
-          end)
-          map("n", "yogd", gs.toggle_deleted)
 
           -- Text object
           map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>")

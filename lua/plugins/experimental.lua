@@ -141,6 +141,13 @@ return {
       scope = {},
       explorer = {},
       scratch = {},
+      picker = {
+        sources = {
+          explorer = {
+            hidden = true,
+          },
+        }
+      },
     },
   },
   {
@@ -222,4 +229,5 @@ return {
     end,
     ft = { "markdown" },
   },
+  { "sindrets/diffview.nvim", cmd = { "DiffviewOpen" } },
 }

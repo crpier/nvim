@@ -21,6 +21,7 @@ return {
         javascript = { "prettierd" },
         rust = { "rustfmt" },
         typescriptreact = { "prettierd" },
+        typescript = { "prettierd" },
         go = { "gofmt" },
       },
     },
