@@ -8,4 +8,4 @@
 - Rewrite `conform.nvim` and `nvim-lint` as separate units of work.
 - Replace Mason-managed LSP/tool installation with explicit external installation and plain `lspconfig` setup.
 - Decide which `unimpaired.nvim` mappings are actually used before expanding the local replacement.
-- Prototype a local usage-audit module/plugin that tracks used keymaps and commands, then reports configured mappings/commands that are rarely or never used.
+- Done: local `config.usage_audit` tracks keymap and command usage in `stdpath('state')/usage-audit.json` and exposes `:UsageAuditReport` / `:UsageAuditReset`.

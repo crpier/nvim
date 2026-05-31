@@ -3,6 +3,7 @@ local utils = require "config.utils"
 utils.setup_lazy()
 
 require "config.options"
+require("config.usage_audit").setup()
 require "config.basic_remaps"
 require("config.plugin_replacements").setup()
 
