@@ -1,3 +1,5 @@
+local picker_keys = require("config.pickers").keys()
+
 return {
   {
     "folke/snacks.nvim",
@@ -5,7 +7,7 @@ return {
       "nvim-tree/nvim-web-devicons",
     },
     lazy = false,
-    keys = {
+    keys = vim.list_extend({
       {
         "<leader>bd",
         function()
@@ -57,9 +59,9 @@ return {
         function()
           require("snacks").explorer()
         end,
-        desc = "Toggle bottom terminal",
+        desc = "Toggle file explorer",
       },
-    },
+    }, picker_keys),
     ---@type snacks.Config
     opts = {
       statuscolumn = {
@@ -110,12 +112,7 @@ return {
       { "<leader>orn", "<cmd>ObsidianRename<cr>", desc = "Rename note" },
       {
         "<leader>of",
-        function()
-          require("telescope.builtin").find_files {
-            cwd = "~/vault",
-            find_command = { "fd", "--type", "f", "--color", "never", "--exclude", "daily" },
-          }
-        end,
+        require("config.pickers").non_daily_notes,
         desc = "Open (non-daily) notes picker",
       },
     },

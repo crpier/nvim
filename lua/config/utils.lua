@@ -121,12 +121,12 @@ M.load_local_options = (function()
     if cached_options then
       return cached_options
     end
-    cached_options = M.default_options
+    cached_options = vim.deepcopy(M.default_options)
     local local_configs = vim.fn.expand "~/.config/local_configs/nvim.lua"
     if vim.fn.filereadable(local_configs) == 1 then
       local local_config = dofile(local_configs)
       if local_config ~= nil then
-        cached_options = vim.tbl_deep_extend("force", M.default_options, local_config)
+        cached_options = vim.tbl_deep_extend("force", vim.deepcopy(M.default_options), local_config)
       end
     end
     return cached_options

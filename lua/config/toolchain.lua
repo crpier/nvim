@@ -27,7 +27,12 @@ local formatters_by_ft = {
 }
 
 local mason_tools = {
+  "luacheck",
+  "markdownlint",
+  "prettierd",
+  "ruff",
   "stylua",
+  "tflint",
 }
 
 function M.lsp_servers()
