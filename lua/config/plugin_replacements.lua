@@ -56,6 +56,7 @@ end
 
 local function setup_text_helpers()
   local text_helpers = require "config.text_helpers"
+  vim.keymap.set({ "o", "x" }, "r", text_helpers.rest_of_paragraph, { desc = "Rest of paragraph text object" })
   vim.keymap.set("n", "dsi", text_helpers.delete_surrounding_indentation, { desc = "Delete surrounding indentation" })
   vim.keymap.set("n", ">p", function()
     text_helpers.indent_last_change ">"

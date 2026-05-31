@@ -20,6 +20,20 @@ function M.indent_last_change(direction)
   vim.cmd(string.format("%d,%dnormal! %s", start_mark[1], end_mark[1], command))
 end
 
+function M.rest_of_paragraph()
+  if vim.fn.mode() ~= "V" then
+    vim.cmd.normal { "V", bang = true }
+  end
+
+  vim.cmd.normal { "}", bang = true }
+
+  local cursor_line = vim.api.nvim_win_get_cursor(0)[1]
+  local last_line = vim.api.nvim_buf_line_count(0)
+  if cursor_line ~= last_line then
+    vim.cmd.normal { "k", bang = true }
+  end
+end
+
 function M.delete_surrounding_indentation()
   local cursor_line = vim.api.nvim_win_get_cursor(0)[1]
   local current_indent = line_indent(cursor_line)
