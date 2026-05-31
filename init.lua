@@ -4,6 +4,7 @@ utils.setup_lazy()
 
 require "config.options"
 require "config.basic_remaps"
+require("config.plugin_replacements").setup()
 
 -- Setup lazy.nvim
 require("lazy").setup {

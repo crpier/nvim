@@ -1,62 +1,5 @@
 return {
   {
-    "chrisgrieser/nvim-various-textobjs",
-    event = "VeryLazy",
-    opts = {
-      keymaps = {
-        useDefaults = true,
-      },
-    },
-    keys = {
-      {
-        "dsi",
-        function()
-          -- select outer indentation
-          require("various-textobjs").indentation("outer", "outer")
-
-          -- plugin only switches to visual mode when a textobj has been found
-          local indentationFound = vim.fn.mode():find "V"
-          if not indentationFound then
-            return
-          end
-
-          -- dedent indentation
-          vim.cmd.normal { "<", bang = true }
-
-          -- delete surrounding lines
-          local endBorderLn = vim.api.nvim_buf_get_mark(0, ">")[1]
-          local startBorderLn = vim.api.nvim_buf_get_mark(0, "<")[1]
-          vim.cmd(tostring(endBorderLn) .. " delete") -- delete end first so line index is not shifted
-          vim.cmd(tostring(startBorderLn) .. " delete")
-        end,
-        mode = "n",
-        desc = "Delete Surrounding Indentation",
-      },
-      {
-        ">p",
-        function()
-          require("various-textobjs").lastChange()
-          local changeFound = vim.fn.mode():find "v"
-          if changeFound then
-            vim.cmd.normal { ">", bang = true }
-          end
-        end,
-        desc = "Indent last paste",
-      },
-      {
-        "<p",
-        function()
-          require("various-textobjs").lastChange()
-          local changeFound = vim.fn.mode():find "v"
-          if changeFound then
-            vim.cmd.normal { "<", bang = true }
-          end
-        end,
-        desc = "Unindent last paste",
-      },
-    },
-  },
-  {
     "folke/snacks.nvim",
     dependencies = {
       "nvim-tree/nvim-web-devicons",
@@ -219,15 +162,6 @@ return {
         enable = false,
       },
     },
-  },
-  {
-    "iamcco/markdown-preview.nvim",
-    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-    build = "cd app && npm install",
-    init = function()
-      vim.g.mkdp_filetypes = { "markdown" }
-    end,
-    ft = { "markdown" },
   },
   { "sindrets/diffview.nvim", cmd = { "DiffviewOpen" } },
 }
