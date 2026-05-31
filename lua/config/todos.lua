@@ -31,4 +31,11 @@ function M.open_picker()
   }
 end
 
+function M.setup()
+  local keymaps = require "config.keymaps"
+  keymaps.set("n", "sto", M.open_picker, { desc = "Open TODOs in Snacks picker", group = "todos" })
+  keymaps.set("n", "]t", M.jump_next, { desc = "Next TODO", group = "todos" })
+  keymaps.set("n", "[t", M.jump_prev, { desc = "Previous TODO", group = "todos" })
+end
+
 return M

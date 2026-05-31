@@ -39,7 +39,12 @@ local function set_option(option, value)
 end
 
 function M.setup()
-  local map = vim.keymap.set
+  local keymaps = require "config.keymaps"
+  local function map(mode, lhs, rhs, opts)
+    opts = opts or {}
+    opts.group = opts.group or "unimpaired"
+    keymaps.set(mode, lhs, rhs, opts)
+  end
 
   map("n", "]q", cmd "cnext", { desc = "Next quickfix item" })
   map("n", "[q", cmd "cprevious", { desc = "Previous quickfix item" })

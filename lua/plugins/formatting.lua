@@ -14,16 +14,7 @@ return {
     },
     opts = {
       notify_on_error = true,
-      formatters_by_ft = {
-        lua = { "stylua" },
-        python = { "ruff_fix", "ruff_format", "ruff_organize_imports" },
-        markdown = { "markdownlint" },
-        javascript = { "prettierd" },
-        rust = { "rustfmt" },
-        typescriptreact = { "prettierd" },
-        typescript = { "prettierd" },
-        go = { "gofmt" },
-      },
+      formatters_by_ft = require("config.toolchain").formatters_by_ft(),
     },
   },
 }

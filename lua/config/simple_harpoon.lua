@@ -128,4 +128,29 @@ function M.goto_terminal(index)
   vim.cmd "startinsert"
 end
 
+function M.setup()
+  local keymaps = require "config.keymaps"
+  local function map(lhs, rhs, desc)
+    keymaps.set("n", lhs, rhs, { desc = desc, group = "harpoon" })
+  end
+
+  map("mm", M.add_file, "Mark file")
+  map("mq", M.toggle_quick_menu, "Show marked files")
+  map("ma", function()
+    M.nav_file(1)
+  end, "Go to mark 1")
+  map("ms", function()
+    M.nav_file(2)
+  end, "Go to mark 2")
+  map("md", function()
+    M.nav_file(3)
+  end, "Go to mark 3")
+  map("mf", function()
+    M.nav_file(4)
+  end, "Go to mark 4")
+  map("mg", function()
+    M.goto_terminal(1)
+  end, "Go to terminal 1")
+end
+
 return M

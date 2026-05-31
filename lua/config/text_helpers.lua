@@ -73,4 +73,18 @@ function M.delete_surrounding_indentation()
   vim.api.nvim_buf_set_lines(0, start_border - 1, start_border, false, {})
 end
 
+function M.setup()
+  local keymaps = require "config.keymaps"
+  local group = "text-helpers"
+
+  keymaps.set({ "o", "x" }, "r", M.rest_of_paragraph, { desc = "Rest of paragraph text object", group = group })
+  keymaps.set("n", "dsi", M.delete_surrounding_indentation, { desc = "Delete surrounding indentation", group = group })
+  keymaps.set("n", ">p", function()
+    M.indent_last_change ">"
+  end, { desc = "Indent last change", group = group })
+  keymaps.set("n", "<p", function()
+    M.indent_last_change "<"
+  end, { desc = "Unindent last change", group = group })
+end
+
 return M
