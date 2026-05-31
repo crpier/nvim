@@ -8,6 +8,97 @@ local function line_indent(line)
   return #(text:match "^%s*" or "")
 end
 
+local function line_text(line)
+  return vim.api.nvim_buf_get_lines(0, line - 1, line, false)[1] or ""
+end
+
+local function line_end_col(line)
+  return #line_text(line) + 1
+end
+
+local function line_last_col(line)
+  return math.max(#line_text(line), 1)
+end
+
+local function position_before_or_equal(a, b)
+  return a.line < b.line or (a.line == b.line and a.col <= b.col)
+end
+
+local function position_after_or_equal(a, b)
+  return a.line > b.line or (a.line == b.line and a.col >= b.col)
+end
+
+local function position_before(a, b)
+  return a.line < b.line or (a.line == b.line and a.col < b.col)
+end
+
+local function is_escaped(text, col)
+  local backslashes = 0
+  local index = col - 1
+  while index >= 1 and text:sub(index, index) == "\\" do
+    backslashes = backslashes + 1
+    index = index - 1
+  end
+  return backslashes % 2 == 1
+end
+
+local function triple_quote_positions()
+  local positions = {}
+  local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  for line_number, text in ipairs(lines) do
+    local index = 1
+    while index <= #text - 2 do
+      local token = text:sub(index, index + 2)
+      if (token == [["""]] or token == "'''") and not is_escaped(text, index) then
+        table.insert(positions, { line = line_number, col = index, quote = token })
+        index = index + 3
+      else
+        index = index + 1
+      end
+    end
+  end
+  return positions
+end
+
+local function containing_triple_quote_pair()
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local cursor_pos = { line = cursor[1], col = cursor[2] + 1 }
+  local open = nil
+
+  for _, position in ipairs(triple_quote_positions()) do
+    if open == nil then
+      open = position
+    elseif open.quote == position.quote then
+      local close = position
+      local close_end = { line = close.line, col = close.col + 2 }
+      if position_before_or_equal(open, cursor_pos) and position_after_or_equal(close_end, cursor_pos) then
+        return open, close
+      end
+      open = nil
+    end
+  end
+
+  return nil, nil
+end
+
+local function select_range(start_pos, end_pos, from_visual_mode)
+  if not position_before_or_equal(start_pos, end_pos) then
+    vim.notify("Docstring is empty", vim.log.levels.WARN)
+    return
+  end
+
+  if from_visual_mode then
+    vim.fn.setpos("'<", { 0, start_pos.line, start_pos.col, 0 })
+    vim.fn.setpos("'>", { 0, end_pos.line, end_pos.col, 0 })
+    vim.cmd "normal! gv"
+    return
+  end
+
+  vim.api.nvim_win_set_cursor(0, { start_pos.line, start_pos.col - 1 })
+  vim.cmd "normal! v"
+  vim.api.nvim_win_set_cursor(0, { end_pos.line, end_pos.col - 1 })
+end
+
 function M.indent_last_change(direction)
   local start_mark = vim.api.nvim_buf_get_mark(0, "[")
   local end_mark = vim.api.nvim_buf_get_mark(0, "]")
@@ -32,6 +123,41 @@ function M.rest_of_paragraph()
   if cursor_line ~= last_line then
     vim.cmd.normal { "k", bang = true }
   end
+end
+
+function M.select_python_docstring(include_delimiters, from_visual_mode)
+  local open, close = containing_triple_quote_pair()
+  if open == nil or close == nil then
+    vim.notify("No containing Python docstring", vim.log.levels.WARN)
+    return
+  end
+
+  if include_delimiters then
+    select_range(open, { line = close.line, col = close.col + 2 }, from_visual_mode)
+    return
+  end
+
+  local start_pos = { line = open.line, col = open.col + 3 }
+  local end_pos = { line = close.line, col = close.col - 1 }
+
+  if open.line ~= close.line then
+    local open_suffix = line_text(open.line):sub(start_pos.col)
+    local close_prefix = line_text(close.line):sub(1, close.col - 1)
+    if start_pos.col >= line_end_col(start_pos.line) or open_suffix:match "^%s*$" then
+      start_pos = { line = start_pos.line + 1, col = 1 }
+    end
+    if end_pos.col < 1 or close_prefix:match "^%s*$" then
+      local previous_line = end_pos.line - 1
+      end_pos = { line = previous_line, col = line_last_col(previous_line) }
+    end
+  end
+
+  if position_before(close, start_pos) or position_before(end_pos, open) then
+    vim.notify("Docstring is empty", vim.log.levels.WARN)
+    return
+  end
+
+  select_range(start_pos, end_pos, from_visual_mode)
 end
 
 function M.delete_surrounding_indentation()
@@ -78,6 +204,18 @@ function M.setup()
   local group = "text-helpers"
 
   keymaps.set({ "o", "x" }, "r", M.rest_of_paragraph, { desc = "Rest of paragraph text object", group = group })
+  keymaps.set("o", "ay", function()
+    M.select_python_docstring(true, false)
+  end, { desc = "Around Python docstring", group = group })
+  keymaps.set("o", "iy", function()
+    M.select_python_docstring(false, false)
+  end, { desc = "Inside Python docstring", group = group })
+  keymaps.set("x", "ay", function()
+    M.select_python_docstring(true, true)
+  end, { desc = "Around Python docstring", group = group })
+  keymaps.set("x", "iy", function()
+    M.select_python_docstring(false, true)
+  end, { desc = "Inside Python docstring", group = group })
   keymaps.set("n", "dsi", M.delete_surrounding_indentation, { desc = "Delete surrounding indentation", group = group })
   keymaps.set("n", ">p", function()
     M.indent_last_change ">"
