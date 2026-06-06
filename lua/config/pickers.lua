@@ -68,6 +68,13 @@ function M.projects()
   }
 end
 
+--- Open a git-aware file picker that includes tracked and untracked non-ignored files.
+---@param opts? table
+function M.git_files(opts)
+  opts = vim.tbl_extend("force", { untracked = true }, opts or {})
+  snacks_picker().git_files(opts)
+end
+
 function M.grep_from_input()
   local search = vim.fn.input "Grep > "
   if search == "" then
@@ -90,9 +97,7 @@ function M.keys()
   return {
     {
       "sf",
-      function()
-        snacks_picker().git_files()
-      end,
+      M.git_files,
       desc = "Search git files",
     },
     {
@@ -105,21 +110,21 @@ function M.keys()
     {
       "stp",
       function()
-        snacks_picker().git_files { search = "!tests .py", title = "Python files (no tests)" }
+        M.git_files { search = "!tests .py", title = "Python files (no tests)" }
       end,
       desc = "Search Python files (excluding tests)",
     },
     {
       "stP",
       function()
-        snacks_picker().git_files { search = "tests .py", title = "Python test files" }
+        M.git_files { search = "tests .py", title = "Python test files" }
       end,
       desc = "Search Python test files only",
     },
     {
       "stl",
       function()
-        snacks_picker().git_files { search = ".lua", title = "Lua files" }
+        M.git_files { search = ".lua", title = "Lua files" }
       end,
       desc = "Search Lua files",
     },

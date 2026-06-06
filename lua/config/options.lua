@@ -31,9 +31,9 @@ vim.opt.smartindent = true
 -- Only one statusline
 vim.opt.laststatus = 3
 vim.o.termguicolors = true
--- Allow closing folds using treesitter contexts
-vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+-- Use manual folds only; automatic fold expressions add noticeable undo/redraw latency.
+vim.opt.foldmethod = "manual"
+vim.opt.foldexpr = "0"
 vim.opt.foldlevel = 99
 -- Highlight current line
 vim.opt.cursorline = true
