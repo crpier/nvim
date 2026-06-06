@@ -20,6 +20,10 @@ local function line_last_col(line)
   return math.max(#line_text(line), 1)
 end
 
+local function line_first_non_blank_col(line)
+  return line_text(line):find "%S"
+end
+
 local function position_before_or_equal(a, b)
   return a.line < b.line or (a.line == b.line and a.col <= b.col)
 end
@@ -125,6 +129,33 @@ function M.rest_of_paragraph()
   end
 end
 
+--- Select the current line as a characterwise text object, excluding the newline.
+---
+--- When `include_indentation` is false, selection starts at the first non-space
+--- character. Otherwise, selection starts at column 1.
+---
+---@param include_indentation boolean Include leading whitespace in the selection.
+---@param from_visual_mode boolean Re-select via visual marks instead of starting a new operator-pending selection.
+function M.select_line(include_indentation, from_visual_mode)
+  local line = vim.api.nvim_win_get_cursor(0)[1]
+  local text = line_text(line)
+  if text == "" then
+    vim.notify("Line is empty", vim.log.levels.WARN)
+    return
+  end
+
+  local start_col = 1
+  if not include_indentation then
+    start_col = line_first_non_blank_col(line)
+    if start_col == nil then
+      vim.notify("Line has no non-space characters", vim.log.levels.WARN)
+      return
+    end
+  end
+
+  select_range({ line = line, col = start_col }, { line = line, col = #text }, from_visual_mode)
+end
+
 function M.select_python_docstring(include_delimiters, from_visual_mode)
   local open, close = containing_triple_quote_pair()
   if open == nil or close == nil then
@@ -204,6 +235,18 @@ function M.setup()
   local group = "text-helpers"
 
   keymaps.set({ "o", "x" }, "r", M.rest_of_paragraph, { desc = "Rest of paragraph text object", group = group })
+  keymaps.set("o", "a_", function()
+    M.select_line(true, false)
+  end, { desc = "Around line text object", group = group })
+  keymaps.set("o", "i_", function()
+    M.select_line(false, false)
+  end, { desc = "Inside line text object", group = group })
+  keymaps.set("x", "a_", function()
+    M.select_line(true, true)
+  end, { desc = "Around line text object", group = group })
+  keymaps.set("x", "i_", function()
+    M.select_line(false, true)
+  end, { desc = "Inside line text object", group = group })
   keymaps.set("o", "ay", function()
     M.select_python_docstring(true, false)
   end, { desc = "Around Python docstring", group = group })

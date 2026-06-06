@@ -56,7 +56,7 @@ function M.registers_0_to_9()
     confirm = function(picker, item)
       picker:close()
       vim.fn.setreg('"', vim.fn.getreg(item.register))
-      vim.cmd('normal! ""p')
+      vim.cmd 'normal! ""p'
     end,
   }
 end
@@ -65,6 +65,24 @@ function M.projects()
   snacks_picker().projects {
     dev = project_dirs(),
     max_depth = 2,
+  }
+end
+
+function M.grep_from_input()
+  local search = vim.fn.input "Grep > "
+  if search == "" then
+    return
+  end
+
+  snacks_picker().grep {
+    search = search,
+    live = false,
+    regex = false,
+    title = "Grep: " .. search,
+    transform = function(item)
+      item.text = item.file or item.text
+      return item
+    end,
   }
 end
 
@@ -128,9 +146,7 @@ function M.keys()
     },
     {
       "s/",
-      function()
-        snacks_picker().grep { search = vim.fn.input "Grep > " }
-      end,
+      M.grep_from_input,
       desc = "Search word from user input",
     },
     {
