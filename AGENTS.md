@@ -53,7 +53,7 @@ Uses `lazy.nvim` for plugin management with lazy-loading enabled by default. All
 - `operators.lua` - Text operators and motions (surround, comment, unimpaired)
 - `looks.lua` - UI and appearance
 - `ai.lua` - AI integrations
-- `experimental.lua` - Experimental plugins
+- `experimental.lua` - Experimental plugins (currently diffview)
 - `custom.lua` - Loads local plugins from user configuration
 
 ### Core Configuration Files
@@ -121,6 +121,11 @@ Simple harpoon mappings (from `lua/config/simple_harpoon.lua`):
 - `mq` - Show marked files; inside picker normal mode uses `dd` to remove and `J` / `K` to move marks down/up
 - `ma` / `ms` / `md` / `mf` - Jump to marks 1-4
 - `mg` - Open project terminal 1
+
+Note mappings (from `lua/config/notes.lua`):
+- `<leader>of` - Pick non-daily markdown notes from `~/vault`
+- `<leader>on` - Create a new note in `~/vault`
+- `<leader>ot` - Open or create today's note under `~/vault/daybook/YYYY/YYYY-MM-DD.md`
 
 Snacks.picker mappings (from `lua/plugins/navigation.lua`):
 - `sf` - Git files, including untracked non-ignored files

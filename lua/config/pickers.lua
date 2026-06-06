@@ -96,8 +96,9 @@ end
 function M.non_daily_notes()
   snacks_picker().files {
     cwd = "~/vault",
-    exclude = { "daily" },
-    title = "Notes (excluding daily)",
+    exclude = { "daybook", "templates" },
+    ft = "markdown",
+    title = "Notes",
   }
 end
 

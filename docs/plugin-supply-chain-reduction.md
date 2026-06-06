@@ -15,3 +15,4 @@
 - Added local `config.usage_audit` to track keymap and command usage in `stdpath('state')/usage-audit.json` and expose `:UsageAuditReport` / `:UsageAuditReset`.
 - Removed `unimpaired.nvim`
 - Removed `nvim-treesitter-refactor`; local `<C-n>` / `<C-p>` Treesitter usage navigation replaces the old usage-jump mappings.
+- Removed `obsidian.nvim`; local `config.notes` keeps the used note workflows (`<leader>of`, `<leader>on`, `<leader>ot`).

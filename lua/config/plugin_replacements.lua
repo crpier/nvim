@@ -8,6 +8,7 @@ local features = {
   "config.osc52",
   "config.simple_harpoon",
   "config.simple_bufferline",
+  "config.notes",
   "config.todos",
   "config.text_helpers",
   "config.unimpaired",
