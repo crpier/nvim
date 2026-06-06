@@ -2,10 +2,9 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
-    lazy = false,
+    event = { "BufReadPost", "BufNewFile" },
     dependencies = {
       { "nvim-treesitter/nvim-treesitter-textobjects", branch = "main" },
-      "nvim-treesitter/nvim-treesitter-refactor",
     },
     config = function()
       local config = {
@@ -24,26 +23,6 @@ return {
             node_incremental = "<c-space>",
             scope_incremental = "<c-s>",
             node_decremental = "<c-backspace>",
-          },
-        },
-        refactor = {
-          smart_rename = {
-            enable = false,
-          },
-          highlight_definitions = {
-            enable = false,
-            clear_on_cursor_move = true,
-          },
-          navigation = {
-            enable = true,
-            -- Assign keymaps to false to disable them, e.g. `goto_definition = false`.
-            keymaps = {
-              goto_definition = false,
-              list_definitions = false,
-              list_definitions_toc = false,
-              goto_next_usage = "<C-n>",
-              goto_previous_usage = "<C-p>",
-            },
           },
         },
         textobjects = {
@@ -204,6 +183,10 @@ return {
       keymaps.set({ "x", "o" }, "if", select_textobject "@function.inner", { desc = "Inside function", group = group })
       keymaps.set({ "x", "o" }, "ac", select_textobject "@class.outer", { desc = "Around class", group = group })
       keymaps.set({ "x", "o" }, "ic", select_textobject "@class.inner", { desc = "Inside class", group = group })
+
+      local usage = require "config.treesitter_usage"
+      keymaps.set("n", "<C-n>", usage.goto_next_usage, { desc = "Next usage", group = "treesitter-usage" })
+      keymaps.set("n", "<C-p>", usage.goto_previous_usage, { desc = "Previous usage", group = "treesitter-usage" })
     end,
   },
 }

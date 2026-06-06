@@ -21,6 +21,14 @@ local function set_python_path(command)
   end
 end
 
+local function selected_python_lsp_name()
+  local name = os.getenv "NVIM_PYTHON_LSP"
+  if name == nil or name == "" then
+    return "pyright"
+  end
+  return name:lower()
+end
+
 local function ts_root_dir(bufnr, on_dir)
   local deno_root = vim.fs.root(bufnr, { "deno.json", "deno.jsonc" })
   local deno_lock_root = vim.fs.root(bufnr, { "deno.lock" })
@@ -37,30 +45,23 @@ local function ts_root_dir(bufnr, on_dir)
   on_dir(project_root or vim.fn.getcwd())
 end
 
-local lsp_servers = {
-  lua_ls = {
-    cmd = tool_cmd "lua-language-server",
-    filetypes = { "lua" },
-    root_markers = { ".luarc.json", ".luarc.jsonc", ".stylua.toml", "stylua.toml", ".git" },
-    settings = {
-      Lua = {
-        codeLens = { enable = true },
-        hint = { enable = true, semicolon = "Disable" },
-      },
-    },
-  },
+local python_root_markers = {
+  "pyrightconfig.json",
+  "pyrefly.toml",
+  "ty.toml",
+  "pyproject.toml",
+  "setup.py",
+  "setup.cfg",
+  "requirements.txt",
+  "Pipfile",
+  ".git",
+}
+
+local python_lsp_servers = {
   pyright = {
     cmd = tool_cmd("pyright-langserver", "--stdio"),
     filetypes = { "python" },
-    root_markers = {
-      "pyrightconfig.json",
-      "pyproject.toml",
-      "setup.py",
-      "setup.cfg",
-      "requirements.txt",
-      "Pipfile",
-      ".git",
-    },
+    root_markers = python_root_markers,
     settings = {
       python = {
         analysis = {
@@ -84,6 +85,30 @@ local lsp_servers = {
         complete = "file",
       })
     end,
+  },
+  ty = {
+    cmd = tool_cmd("ty", "server"),
+    filetypes = { "python" },
+    root_markers = python_root_markers,
+  },
+  pyrefly = {
+    cmd = tool_cmd("pyrefly", "lsp"),
+    filetypes = { "python" },
+    root_markers = python_root_markers,
+  },
+}
+
+local lsp_servers = {
+  lua_ls = {
+    cmd = tool_cmd "lua-language-server",
+    filetypes = { "lua" },
+    root_markers = { ".luarc.json", ".luarc.jsonc", ".stylua.toml", "stylua.toml", ".git" },
+    settings = {
+      Lua = {
+        codeLens = { enable = true },
+        hint = { enable = true, semicolon = "Disable" },
+      },
+    },
   },
   ts_ls = {
     cmd = tool_cmd("typescript-language-server", "--stdio"),
@@ -120,7 +145,16 @@ local formatters_by_ft = {
 }
 
 function M.lsp_servers()
-  return vim.deepcopy(lsp_servers)
+  local servers = vim.deepcopy(lsp_servers)
+  local python_lsp_name = selected_python_lsp_name()
+  local python_lsp = python_lsp_servers[python_lsp_name]
+
+  if python_lsp == nil then
+    error(string.format("Unsupported NVIM_PYTHON_LSP=%q. Expected one of: pyright, ty, pyrefly.", python_lsp_name), 0)
+  end
+
+  servers[python_lsp_name] = vim.deepcopy(python_lsp)
+  return servers
 end
 
 function M.formatters_by_ft()

@@ -2,8 +2,6 @@
 
 ## Try later
 
-- Decide which `unimpaired.nvim` mappings are actually used before expanding the local replacement.
-
 ## Done
 
 - Migrated Telescope picker usage to `snacks.nvim` and removed the Telescope plugin stack.
@@ -15,3 +13,5 @@
 - Replaced `conform.nvim` with local `config.formatting` using the same `gq` mapping and external formatter commands.
 - Removed unused DAP plugin stack (`nvim-dap`, `nvim-dap-ui`, `nvim-dap-python`, `nvim-dap-virtual-text`).
 - Added local `config.usage_audit` to track keymap and command usage in `stdpath('state')/usage-audit.json` and expose `:UsageAuditReport` / `:UsageAuditReset`.
+- Removed `unimpaired.nvim`
+- Removed `nvim-treesitter-refactor`; local `<C-n>` / `<C-p>` Treesitter usage navigation replaces the old usage-jump mappings.

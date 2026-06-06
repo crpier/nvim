@@ -166,6 +166,24 @@ local function require_lsp_commands_for_filetype(event)
   )
 end
 
+local function has_lsp_server_for_filetype(filetype)
+  for _, server in pairs(require("config.toolchain").lsp_servers()) do
+    if server_supports_filetype(server, filetype) then
+      return true
+    end
+  end
+  return false
+end
+
+local function enable_servers_for_filetype(event)
+  local filetype = vim.bo[event.buf].filetype
+  if filetype == "" or not has_lsp_server_for_filetype(filetype) then
+    return
+  end
+
+  M.enable_servers()
+end
+
 --- Configure and enable built-in Neovim LSP clients from config.toolchain.
 function M.enable_servers()
   if servers_enabled then
@@ -197,10 +215,9 @@ function M.setup()
     callback = require_lsp_commands_for_filetype,
   })
 
-  vim.api.nvim_create_autocmd("User", {
-    pattern = "LazyDone",
-    once = true,
-    callback = M.enable_servers,
+  vim.api.nvim_create_autocmd("FileType", {
+    group = vim.api.nvim_create_augroup("local-lsp-enable", { clear = true }),
+    callback = enable_servers_for_filetype,
   })
 end
 

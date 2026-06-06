@@ -164,7 +164,7 @@ function M.toggle_quick_menu()
   end
 
   require("snacks").picker {
-    title = "Harpoon marks (<C-x>/dd: remove, <A-j>/<A-k>/J/K: move)",
+    title = "Harpoon marks (dd: remove, J/K: move)",
     finder = function()
       return picker_items(marks)
     end,
@@ -190,9 +190,9 @@ function M.toggle_quick_menu()
     win = {
       input = {
         keys = {
-          ["<c-x>"] = { "harpoon_remove", mode = { "n", "i" }, desc = "Remove mark" },
-          ["<a-k>"] = { "harpoon_move_up", mode = { "n", "i" }, desc = "Move mark up" },
-          ["<a-j>"] = { "harpoon_move_down", mode = { "n", "i" }, desc = "Move mark down" },
+          dd = { "harpoon_remove", mode = "n", desc = "Remove mark" },
+          K = { "harpoon_move_up", mode = "n", desc = "Move mark up" },
+          J = { "harpoon_move_down", mode = "n", desc = "Move mark down" },
         },
       },
       list = {

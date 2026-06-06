@@ -14,7 +14,7 @@ return {
   {
     -- Useful status updates for LSP.
     "j-hui/fidget.nvim",
-    lazy = false,
+    event = "LspAttach",
     opts = {},
   },
   {

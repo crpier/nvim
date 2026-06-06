@@ -1,6 +1,4 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+# AGENTS.md
 
 ## System Requirements
 
@@ -16,7 +14,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 LSP servers configured in `lua/config/toolchain.lua` are expected to be installed externally and available on `PATH`. Run `:checkhealth config` to audit configured LSP, formatter, and linter executables. Opening a filetype with a configured LSP server raises an error if the required executable is missing:
 - `lua_ls`: `lua-language-server`
-- `pyright`: `pyright-langserver` (requires Python 3 / npm-managed install depending on installation method)
+- Python LSP defaults to `pyright`: `pyright-langserver` (requires Python 3 / npm-managed install depending on installation method)
+  - Override before startup with `NVIM_PYTHON_LSP=ty` for `ty server`
+  - Override before startup with `NVIM_PYTHON_LSP=pyrefly` for `pyrefly lsp`
 - `ts_ls`: `typescript-language-server` (requires Node.js and npm)
 - `gopls`: Requires Go to be installed (`go` binary must be in PATH)
 - `rust_analyzer`: Requires Rust (`rustc` and `cargo`)
@@ -45,15 +45,15 @@ Uses `lazy.nvim` for plugin management with lazy-loading enabled by default. All
 - `formatting.lua` - Tombstone for the removed conform.nvim plugin; local formatting lives in `lua/config/formatting.lua`
 - `linting.lua` - Tombstone for the removed nvim-lint plugin; local linting lives in `lua/config/linting.lua`
 - `completion.lua` - blink.cmp completion setup
-- `experimental.lua` - Experimental plugins including snacks.nvim (with snacks.picker for all fuzzy finding/picking)
+- `navigation.lua` - Snacks-based file, buffer, grep, explorer, terminal, and picker integrations
 - `treesitter.lua` - Syntax highlighting and parsing
 - `git.lua` - Git integration
 - `dap.lua` - Tombstone for removed Debug Adapter Protocol plugins
-- `navigation.lua` - File and buffer navigation
+- `navigation.lua` - Snacks-based file and buffer navigation
 - `operators.lua` - Text operators and motions (surround, comment, unimpaired)
 - `looks.lua` - UI and appearance
 - `ai.lua` - AI integrations
-- `experimental.lua` - Experimental plugins (snacks.nvim, overseer, mini.files)
+- `experimental.lua` - Experimental plugins
 - `custom.lua` - Loads local plugins from user configuration
 
 ### Core Configuration Files
@@ -85,6 +85,7 @@ The config detects SSH sessions via `utils.ON_LOCAL = os.getenv("SSH_CLIENT") ==
 ### LSP Setup
 - Uses Neovim's built-in LSP configuration API with externally installed language servers (configured in `lua/config/lsp.lua`)
 - LSP servers are defined in `lua/config/toolchain.lua` and enabled directly with `vim.lsp.config` / `vim.lsp.enable`
+- Python LSP selection is startup-only via `NVIM_PYTHON_LSP`; unset uses `pyright`, supported overrides are `ty` and `pyrefly`
 - LSP keymaps are set in an LspAttach autocmd (`lua/config/lsp.lua`)
 - Key LSP maps: `gd` (definition), `grr` (references), `grn` (rename), `gra` (code action), `K` (hover)
 - Diagnostic navigation: `]d` (next), `[d` (prev), `]D` (last), `[D` (first), `d;` (float)
@@ -117,12 +118,12 @@ Important core mappings from `lua/config/basic_remaps.lua`:
 
 Simple harpoon mappings (from `lua/config/simple_harpoon.lua`):
 - `mm` - Mark current file
-- `mq` - Show marked files; inside picker use `<C-x>` / `dd` to remove and `<A-j>` / `<A-k>` or `J` / `K` to move marks down/up
+- `mq` - Show marked files; inside picker normal mode uses `dd` to remove and `J` / `K` to move marks down/up
 - `ma` / `ms` / `md` / `mf` - Jump to marks 1-4
 - `mg` - Open project terminal 1
 
-Snacks.picker mappings (from `lua/plugins/experimental.lua`):
-- `sf` - Git files
+Snacks.picker mappings (from `lua/plugins/navigation.lua`):
+- `sf` - Git files, including untracked non-ignored files
 - `sF` - All files (including hidden)
 - `stp` - Python files (no tests) - pre-filtered with `!test .py`
 - `stP` - Python test files only - pre-filtered with `test .py`
@@ -157,7 +158,7 @@ When modifying plugins, categorize them appropriately:
 - **Formatting** → `lua/config/formatting.lua`
 - **Linting** → `lua/config/linting.lua`
 - **Completion** → `lua/plugins/completion.lua`
-- **Navigation/Finding** → `lua/plugins/experimental.lua` (snacks.picker) or `lua/plugins/navigation.lua`
+- **Navigation/Finding** → `lua/plugins/navigation.lua` (snacks.picker)
 - **Git** → `lua/plugins/git.lua`
 - **UI/Appearance** → `lua/plugins/looks.lua`
 - **Debugging** → removed for now; reintroduce under `lua/plugins/dap.lua` if needed

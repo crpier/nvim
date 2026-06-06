@@ -11,6 +11,61 @@ local function snacks_picker()
   return require("snacks").picker
 end
 
+local function qf_text(item)
+  return item.line or item.comment or item.label or item.name or item.detail or item.text
+end
+
+local function qf_type(item)
+  return ({ "E", "W", "I", "N" })[item.severity]
+end
+
+local function qf_entry(picker, item)
+  picker:resolve(item)
+
+  local path = snacks_picker().util.path(item)
+  local bufnr = item.buf
+  if (bufnr == nil or not vim.api.nvim_buf_is_valid(bufnr)) and path ~= nil and path ~= "" then
+    bufnr = vim.fn.bufadd(path)
+  end
+
+  return {
+    bufnr = bufnr,
+    filename = bufnr == nil and path or nil,
+    lnum = item.pos and item.pos[1] or 1,
+    col = item.pos and item.pos[2] + 1 or 1,
+    end_lnum = item.end_pos and item.end_pos[1] or nil,
+    end_col = item.end_pos and item.end_pos[2] + 1 or nil,
+    text = qf_text(item),
+    pattern = item.search,
+    type = qf_type(item),
+    valid = true,
+  }
+end
+
+local function selected_or_all_items(picker, all)
+  if all then
+    return picker:items()
+  end
+
+  local selected = picker:selected()
+  return #selected > 0 and selected or picker:items()
+end
+
+local function set_qf_items(picker, items, opts)
+  local qf_items = vim.tbl_map(function(item)
+    return qf_entry(picker, item)
+  end, items)
+
+  picker:close()
+  if opts and opts.win then
+    vim.fn.setloclist(opts.win, {}, "r", { title = picker.opts.title or "Snacks picker", items = qf_items })
+    vim.cmd "botright lopen"
+  else
+    vim.fn.setqflist({}, "r", { title = picker.opts.title or "Snacks picker", items = qf_items })
+    vim.cmd "botright copen"
+  end
+end
+
 local function project_dirs()
   local dirs = vim.deepcopy(default_project_dirs)
   for _, dir in ipairs(require("config.utils").load_local_options().project_base_dirs) do
@@ -66,6 +121,24 @@ function M.projects()
     dev = project_dirs(),
     max_depth = 2,
   }
+end
+
+--- Send selected picker items, or all items when none are selected, to the quickfix list.
+---@param picker snacks.Picker
+function M.qflist(picker)
+  set_qf_items(picker, selected_or_all_items(picker, false))
+end
+
+--- Send all picker items to the quickfix list.
+---@param picker snacks.Picker
+function M.qflist_all(picker)
+  set_qf_items(picker, selected_or_all_items(picker, true))
+end
+
+--- Send selected picker items, or all items when none are selected, to the location list.
+---@param picker snacks.Picker
+function M.loclist(picker)
+  set_qf_items(picker, selected_or_all_items(picker, false), { win = picker.main })
 end
 
 --- Open a git-aware file picker that includes tracked and untracked non-ignored files.
