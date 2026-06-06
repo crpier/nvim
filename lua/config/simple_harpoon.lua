@@ -49,6 +49,32 @@ local function resolve_path(path)
   return project_key() .. "/" .. path
 end
 
+local function find_mark_index(marks, path)
+  for index, mark in ipairs(marks) do
+    if mark == path then
+      return index
+    end
+  end
+  return nil
+end
+
+local function picker_items(marks)
+  return vim.tbl_map(function(mark)
+    local index = find_mark_index(marks, mark)
+    return {
+      text = string.format("%d  %s", index, mark),
+      file = resolve_path(mark),
+      mark = mark,
+      mark_index = index,
+    }
+  end, marks)
+end
+
+local function open_mark(mark)
+  vim.cmd.edit(vim.fn.fnameescape(resolve_path(mark)))
+end
+
+--- Add the current file to this project's harpoon list.
 function M.add_file()
   local current = vim.api.nvim_buf_get_name(0)
   if current == "" then
@@ -72,6 +98,8 @@ function M.add_file()
   vim.notify("Marked: " .. path)
 end
 
+--- Open a file by its 1-based harpoon mark index.
+---@param index integer
 function M.nav_file(index)
   local state = read_state()
   local marks = project_marks(state)
@@ -81,9 +109,52 @@ function M.nav_file(index)
     return
   end
 
-  vim.cmd.edit(vim.fn.fnameescape(resolve_path(path)))
+  open_mark(path)
 end
 
+local function refresh_after_change(picker, marks)
+  if vim.tbl_isempty(marks) then
+    picker:close()
+    vim.notify "No harpoon marks left for this project"
+    return
+  end
+
+  picker:refresh()
+end
+
+local function remove_picker_mark(picker, item, state, marks)
+  if item == nil then
+    return
+  end
+
+  local removed = table.remove(marks, item.mark_index)
+  if removed == nil then
+    return
+  end
+
+  write_state(state)
+  vim.notify("Removed mark " .. item.mark_index .. ": " .. removed)
+  refresh_after_change(picker, marks)
+end
+
+local function move_picker_mark(picker, item, state, marks, delta)
+  if item == nil then
+    return
+  end
+
+  local target = item.mark_index + delta
+  if target < 1 or target > #marks then
+    vim.notify("Mark is already at the edge of the list", vim.log.levels.WARN)
+    return
+  end
+
+  marks[item.mark_index], marks[target] = marks[target], marks[item.mark_index]
+  write_state(state)
+  vim.notify(string.format("Moved mark to %d: %s", target, marks[target]))
+  picker:refresh()
+end
+
+--- Open a picker for this project's harpoon list.
 function M.toggle_quick_menu()
   local state = read_state()
   local marks = project_marks(state)
@@ -92,23 +163,51 @@ function M.toggle_quick_menu()
     return
   end
 
-  vim.ui.select(marks, {
-    prompt = "Harpoon marks",
-    format_item = function(item)
-      for index, mark in ipairs(marks) do
-        if mark == item then
-          return string.format("%d  %s", index, mark)
-        end
-      end
-      return item
+  require("snacks").picker {
+    title = "Harpoon marks (<C-x>/dd: remove, <A-j>/<A-k>/J/K: move)",
+    finder = function()
+      return picker_items(marks)
     end,
-  }, function(choice)
-    if choice then
-      vim.cmd.edit(vim.fn.fnameescape(resolve_path(choice)))
-    end
-  end)
+    format = "text",
+    preview = "file",
+    confirm = function(picker, item)
+      picker:close()
+      if item then
+        open_mark(item.mark)
+      end
+    end,
+    actions = {
+      harpoon_remove = function(picker, item)
+        remove_picker_mark(picker, item, state, marks)
+      end,
+      harpoon_move_up = function(picker, item)
+        move_picker_mark(picker, item, state, marks, -1)
+      end,
+      harpoon_move_down = function(picker, item)
+        move_picker_mark(picker, item, state, marks, 1)
+      end,
+    },
+    win = {
+      input = {
+        keys = {
+          ["<c-x>"] = { "harpoon_remove", mode = { "n", "i" }, desc = "Remove mark" },
+          ["<a-k>"] = { "harpoon_move_up", mode = { "n", "i" }, desc = "Move mark up" },
+          ["<a-j>"] = { "harpoon_move_down", mode = { "n", "i" }, desc = "Move mark down" },
+        },
+      },
+      list = {
+        keys = {
+          dd = { "harpoon_remove", desc = "Remove mark" },
+          K = { "harpoon_move_up", desc = "Move mark up" },
+          J = { "harpoon_move_down", desc = "Move mark down" },
+        },
+      },
+    },
+  }
 end
 
+--- Open or return to a project-local terminal slot.
+---@param index integer
 function M.goto_terminal(index)
   local key = project_key()
   terminals[key] = terminals[key] or {}

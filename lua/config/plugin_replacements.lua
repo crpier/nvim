@@ -1,8 +1,13 @@
 local M = {}
 
 local features = {
+  "config.theme",
+  "config.lsp",
+  "config.formatting",
+  "config.linting",
   "config.osc52",
   "config.simple_harpoon",
+  "config.simple_bufferline",
   "config.todos",
   "config.text_helpers",
   "config.unimpaired",

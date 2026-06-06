@@ -2,10 +2,16 @@
 
 ## Try later
 
-- Migrate remaining Telescope usage to `snacks.nvim` and then remove the Telescope stack if Snacks now covers the needed workflows.
-- Experiment with removing `bufferline.nvim`; keep it only if the UI loss is annoying.
-- Consider vendoring/static-rewriting the Catppuccin colorscheme because it is unlikely to need frequent updates.
-- Rewrite `conform.nvim` and `nvim-lint` as separate units of work.
-- Replace Mason-managed LSP/tool installation with explicit external installation and plain `lspconfig` setup.
 - Decide which `unimpaired.nvim` mappings are actually used before expanding the local replacement.
-- Done: local `config.usage_audit` tracks keymap and command usage in `stdpath('state')/usage-audit.json` and exposes `:UsageAuditReport` / `:UsageAuditReset`.
+
+## Done
+
+- Migrated Telescope picker usage to `snacks.nvim` and removed the Telescope plugin stack.
+- Replaced `bufferline.nvim` with local `config.simple_bufferline` for listed buffer names in the tabline.
+- Vendored Catppuccin Macchiato as a static local colorscheme with upstream MIT attribution in `colors/catppuccin-macchiato.lua`.
+- Replaced Mason-managed LSP/tool installation with direct `vim.lsp.config` setup and explicit external commands that must be available on `PATH`.
+- Replaced `nvim-lspconfig` with local explicit server configs passed to Neovim's built-in LSP API.
+- Replaced `nvim-lint` with local `config.linting` using the same lint triggers and external linter commands.
+- Replaced `conform.nvim` with local `config.formatting` using the same `gq` mapping and external formatter commands.
+- Removed unused DAP plugin stack (`nvim-dap`, `nvim-dap-ui`, `nvim-dap-python`, `nvim-dap-virtual-text`).
+- Added local `config.usage_audit` to track keymap and command usage in `stdpath('state')/usage-audit.json` and expose `:UsageAuditReport` / `:UsageAuditReset`.

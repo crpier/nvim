@@ -32,6 +32,16 @@ local function toggle_option(option)
   end
 end
 
+local function toggle_option_between(option, off_value, on_value)
+  return function()
+    if get_option(option) == on_value then
+      set_option_value(option, off_value)
+    else
+      set_option_value(option, on_value)
+    end
+  end
+end
+
 local function set_option(option, value)
   return function()
     set_option_value(option, value)
@@ -74,6 +84,7 @@ function M.setup()
   map("n", "yol", toggle_option "list", { desc = "Toggle list chars" })
   map("n", "yoh", toggle_option "hlsearch", { desc = "Toggle search highlight" })
   map("n", "yoc", toggle_option "cursorline", { desc = "Toggle cursorline" })
+  map("n", "yoC", toggle_option_between("conceallevel", 0, 2), { desc = "Toggle conceallevel" })
 end
 
 return M

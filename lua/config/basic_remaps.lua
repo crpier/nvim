@@ -49,6 +49,16 @@ map("n", "[<Space>", "O<esc>")
 map("v", "//", [[y/\V<C-R>=escape(@",'/\')<CR><CR>]])
 -- Print full path to current root
 map("n", "y!", "<cmd>lua print(vim.loop.cwd())<cr>")
+-- Copy current file name, matching what <C-g> reports, to the system clipboard
+map("n", "<leader>yf", function()
+  local filename = vim.fn.expand "%"
+  if filename == "" then
+    vim.notify("Current buffer has no file name", vim.log.levels.WARN)
+    return
+  end
+  vim.fn.setreg("+", filename)
+  vim.notify("Copied file name: " .. filename)
+end, { desc = "Copy current file name to clipboard" })
 -- -- Motions for selecting lines
 -- map("o", "al", ":normal val<CR>")
 -- map("o", "il", ":normal vil<CR>")
