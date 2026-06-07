@@ -118,9 +118,9 @@ return {
         vim.api.nvim_win_set_cursor(0, { end_row + 1, end_col - 1 })
       end
 
-      local function is_decorated_function(node)
+      local function decorated_definition_contains(node, child_type)
         for index = 0, node:named_child_count() - 1 do
-          if node:named_child(index):type() == "function_definition" then
+          if node:named_child(index):type() == child_type then
             return true
           end
         end
@@ -128,7 +128,7 @@ return {
         return false
       end
 
-      local function containing_decorated_definition()
+      local function containing_decorated_definition(child_type)
         local cursor = vim.api.nvim_win_get_cursor(0)
         local ok, parser = pcall(vim.treesitter.get_parser, 0)
         if not ok then
@@ -144,7 +144,7 @@ return {
         local col = cursor[2]
         local node = tree:root():named_descendant_for_range(row, col, row, col + 1)
         while node ~= nil do
-          if node:type() == "decorated_definition" and is_decorated_function(node) then
+          if node:type() == "decorated_definition" and decorated_definition_contains(node, child_type) then
             return node
           end
           node = node:parent()
@@ -158,7 +158,7 @@ return {
       --- For Python decorated functions, prefer the enclosing `decorated_definition`
       --- node so decorators are included in the outer-function selection.
       local function select_function_outer()
-        local decorated_definition = containing_decorated_definition()
+        local decorated_definition = containing_decorated_definition "function_definition"
         if decorated_definition ~= nil then
           select_node(decorated_definition)
           return
@@ -179,9 +179,23 @@ return {
         select_textobject "@parameter.inner",
         { desc = "Inside parameter", group = group }
       )
+      --- Select the current class for the `ac` text object.
+      ---
+      --- For Python decorated classes, prefer the enclosing `decorated_definition`
+      --- node so decorators are included in the outer-class selection.
+      local function select_class_outer()
+        local decorated_definition = containing_decorated_definition "class_definition"
+        if decorated_definition ~= nil then
+          select_node(decorated_definition)
+          return
+        end
+
+        select.select_textobject("@class.outer", "textobjects")
+      end
+
       keymaps.set({ "x", "o" }, "af", select_function_outer, { desc = "Around function", group = group })
       keymaps.set({ "x", "o" }, "if", select_textobject "@function.inner", { desc = "Inside function", group = group })
-      keymaps.set({ "x", "o" }, "ac", select_textobject "@class.outer", { desc = "Around class", group = group })
+      keymaps.set({ "x", "o" }, "ac", select_class_outer, { desc = "Around class", group = group })
       keymaps.set({ "x", "o" }, "ic", select_textobject "@class.inner", { desc = "Inside class", group = group })
 
       local usage = require "config.treesitter_usage"

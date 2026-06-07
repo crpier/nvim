@@ -31,6 +31,8 @@ local function node_at_cursor(bufnr)
   return tree:root():named_descendant_for_range(row, col, row, col + 1)
 end
 
+local document_highlight_method = vim.lsp.protocol.Methods.textDocument_documentHighlight
+
 local function node_range(node)
   local start_row, start_col, end_row, end_col = node:range()
   return start_row, start_col, end_row, end_col
@@ -207,14 +209,152 @@ local function goto_node(node)
   vim.api.nvim_win_set_cursor(0, { row + 1, col })
 end
 
---- Jump to the next or previous Treesitter local usage under the cursor.
+local function client_supports_method(client, method, bufnr)
+  if vim.fn.has "nvim-0.11" == 1 then
+    return client:supports_method(method, bufnr)
+  end
+  return client.supports_method(method, { bufnr = bufnr })
+end
+
+local function document_highlight_clients(bufnr)
+  local clients = {}
+  for _, client in ipairs(vim.lsp.get_clients { bufnr = bufnr }) do
+    if client_supports_method(client, document_highlight_method, bufnr) then
+      clients[#clients + 1] = client
+    end
+  end
+  return clients
+end
+
+local function byte_col(line, character, offset_encoding)
+  local ok, col = pcall(vim.str_byteindex, line, offset_encoding or "utf-16", character, false)
+  if ok then
+    return col
+  end
+  return character
+end
+
+local function lsp_range_item(bufnr, range, offset_encoding)
+  local start_line = vim.api.nvim_buf_get_lines(bufnr, range.start.line, range.start.line + 1, true)[1] or ""
+  local end_line = vim.api.nvim_buf_get_lines(bufnr, range["end"].line, range["end"].line + 1, true)[1] or ""
+
+  return {
+    start_row = range.start.line,
+    start_col = byte_col(start_line, range.start.character, offset_encoding),
+    end_row = range["end"].line,
+    end_col = byte_col(end_line, range["end"].character, offset_encoding),
+  }
+end
+
+local function lsp_highlight_key(item)
+  return table.concat({ item.start_row, item.start_col, item.end_row, item.end_col }, ":")
+end
+
+local function lsp_document_highlights(bufnr)
+  local clients = document_highlight_clients(bufnr)
+  if #clients == 0 then
+    return {}
+  end
+
+  local params = vim.lsp.util.make_position_params(0, clients[1].offset_encoding or "utf-16")
+  local responses = vim.lsp.buf_request_sync(bufnr, document_highlight_method, params, 500)
+  if responses == nil then
+    return {}
+  end
+
+  local highlights = {}
+  local seen = {}
+  for client_id, response in pairs(responses) do
+    local client = vim.lsp.get_client_by_id(client_id)
+    local result = response.result or {}
+    for _, highlight in ipairs(result) do
+      if highlight.range ~= nil then
+        local item = lsp_range_item(bufnr, highlight.range, client and client.offset_encoding or "utf-16")
+        local key = lsp_highlight_key(item)
+        if not seen[key] then
+          seen[key] = true
+          highlights[#highlights + 1] = item
+        end
+      end
+    end
+  end
+
+  table.sort(highlights, function(left, right)
+    return left.start_row < right.start_row or (left.start_row == right.start_row and left.start_col < right.start_col)
+  end)
+
+  return highlights
+end
+
+local function cursor_is_in_lsp_highlight(item, cursor_row, cursor_col)
+  local starts_before_or_at_cursor = item.start_row < cursor_row
+    or (item.start_row == cursor_row and item.start_col <= cursor_col)
+  local ends_after_cursor = item.end_row > cursor_row or (item.end_row == cursor_row and item.end_col > cursor_col)
+  return starts_before_or_at_cursor and ends_after_cursor
+end
+
+local function lsp_highlight_starts_before_cursor(item, cursor_row, cursor_col)
+  return item.start_row < cursor_row or (item.start_row == cursor_row and item.start_col < cursor_col)
+end
+
+local function next_lsp_highlight_index(highlights, cursor_row, cursor_col, delta)
+  local current_index
+  for index, item in ipairs(highlights) do
+    if cursor_is_in_lsp_highlight(item, cursor_row, cursor_col) then
+      current_index = index
+      break
+    end
+  end
+
+  if current_index ~= nil then
+    return (current_index + delta + #highlights - 1) % #highlights + 1
+  end
+
+  if delta > 0 then
+    for index, item in ipairs(highlights) do
+      if not lsp_highlight_starts_before_cursor(item, cursor_row, cursor_col) then
+        return index
+      end
+    end
+    return 1
+  end
+
+  for index = #highlights, 1, -1 do
+    if lsp_highlight_starts_before_cursor(highlights[index], cursor_row, cursor_col) then
+      return index
+    end
+  end
+  return #highlights
+end
+
+local function goto_lsp_highlight(item)
+  vim.cmd "normal! m'"
+  vim.api.nvim_win_set_cursor(0, { item.start_row + 1, item.start_col })
+end
+
+local function goto_adjacent_lsp_document_highlight(bufnr, delta)
+  local highlights = lsp_document_highlights(bufnr)
+  if #highlights < 2 then
+    return false
+  end
+
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  goto_lsp_highlight(highlights[next_lsp_highlight_index(highlights, cursor[1] - 1, cursor[2], delta)])
+  return true
+end
+
+--- Jump to the next or previous usage under the cursor.
 ---
---- This uses each parser's `locals.scm` query directly instead of
---- nvim-treesitter-refactor's `nvim-treesitter.locals` helpers, which have been
---- brittle on newer Neovim/Treesitter builds.
+--- Prefer LSP document highlights when available so `<C-n>` / `<C-p>` move
+--- through the same symbols that CursorHold highlights. Fall back to each
+--- parser's `locals.scm` query when LSP highlights are unavailable.
 ---@param delta 1|-1
 function M.goto_adjacent_usage(delta)
   local bufnr = vim.api.nvim_get_current_buf()
+  if goto_adjacent_lsp_document_highlight(bufnr, delta) then
+    return
+  end
+
   local cursor_node = node_at_cursor(bufnr)
   if cursor_node == nil then
     return
