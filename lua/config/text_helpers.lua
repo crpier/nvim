@@ -24,6 +24,10 @@ local function line_first_non_blank_col(line)
   return line_text(line):find "%S"
 end
 
+local function last_non_space_col(text)
+  return text:find "%s*$" - 1
+end
+
 local function position_before_or_equal(a, b)
   return a.line < b.line or (a.line == b.line and a.col <= b.col)
 end
@@ -156,6 +160,32 @@ function M.select_line(include_indentation, from_visual_mode)
   select_range({ line = line, col = start_col }, { line = line, col = #text }, from_visual_mode)
 end
 
+--- Select from the cursor through near-end-of-line.
+---
+--- Trailing spaces are always excluded. The count controls how many additional
+--- non-space characters to exclude from the right; without a count, the final
+--- non-space character is excluded.
+---@param exclude_count integer Number of non-space EOL characters to exclude.
+---@param from_visual_mode boolean Re-select via visual marks instead of starting a new operator-pending selection.
+function M.select_near_eol(exclude_count, from_visual_mode)
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local line = cursor[1]
+  local text = line_text(line)
+  if text == "" then
+    vim.notify("Line is empty", vim.log.levels.WARN)
+    return
+  end
+
+  local start_col = cursor[2] + 1
+  local end_col = last_non_space_col(text) - math.max(exclude_count, 1)
+  if end_col < start_col then
+    vim.notify("Near-EOL text object is empty", vim.log.levels.WARN)
+    return
+  end
+
+  select_range({ line = line, col = start_col }, { line = line, col = end_col }, from_visual_mode)
+end
+
 function M.select_python_docstring(include_delimiters, from_visual_mode)
   local open, close = containing_triple_quote_pair()
   if open == nil or close == nil then
@@ -235,6 +265,12 @@ function M.setup()
   local group = "text-helpers"
 
   keymaps.set({ "o", "x" }, "r", M.rest_of_paragraph, { desc = "Rest of paragraph text object", group = group })
+  keymaps.set("o", "n", function()
+    M.select_near_eol(vim.v.count1, false)
+  end, { desc = "Near end-of-line text object", group = group })
+  keymaps.set("x", "n", function()
+    M.select_near_eol(vim.v.count1, true)
+  end, { desc = "Near end-of-line text object", group = group })
   keymaps.set("o", "a_", function()
     M.select_line(true, false)
   end, { desc = "Around line text object", group = group })

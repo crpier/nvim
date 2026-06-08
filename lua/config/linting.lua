@@ -2,6 +2,7 @@ local M = {}
 
 local namespaces = {}
 local generations = {}
+local warned_missing_linters = {}
 
 local severity = vim.diagnostic.severity
 
@@ -31,6 +32,10 @@ end
 
 local function executable(command)
   return vim.fn.executable(command) == 1
+end
+
+local function notify(message, level)
+  vim.notify(message, level or vim.log.levels.WARN, { title = "linting" })
 end
 
 local function buffer_text(bufnr)
@@ -229,6 +234,12 @@ local function run_linter(bufnr, name)
 
   if not executable(linter.cmd) then
     clear_linter(bufnr, name)
+    local filetype = vim.bo[bufnr].filetype
+    local warning_key = table.concat({ filetype, name, linter.cmd }, ":")
+    if not warned_missing_linters[warning_key] then
+      warned_missing_linters[warning_key] = true
+      notify(string.format("Missing linter executable for filetype `%s`: %s requires `%s`", filetype, name, linter.cmd))
+    end
     return
   end
 

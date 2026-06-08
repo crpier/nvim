@@ -67,8 +67,23 @@ local function same_buffer(bufnr, expected_changedtick)
   return vim.api.nvim_buf_is_valid(bufnr) and changedtick(bufnr) == expected_changedtick
 end
 
+local formatters
+
 local function notify(message, level)
   vim.notify(message, level or vim.log.levels.WARN, { title = "formatting" })
+end
+
+local function missing_formatter_messages(configured)
+  local missing = {}
+  for _, name in ipairs(configured) do
+    local formatter = formatters[name]
+    if formatter == nil then
+      missing[#missing + 1] = string.format("%s is not defined", name)
+    elseif not executable(formatter.cmd) then
+      missing[#missing + 1] = string.format("%s requires `%s`", name, formatter.cmd)
+    end
+  end
+  return missing
 end
 
 local function replace_buffer(bufnr, text)
@@ -137,7 +152,7 @@ local function run_file_formatter(formatter, bufnr, input, callback)
   end)
 end
 
-local formatters = {
+formatters = {
   stylua = {
     cmd = "stylua",
     args = function(bufnr)
@@ -273,6 +288,11 @@ function M.format(opts)
   local bufnr = opts.bufnr or vim.api.nvim_get_current_buf()
   local filetype = vim.bo[bufnr].filetype
   local configured = require("config.toolchain").formatters_by_ft()[filetype] or {}
+
+  local missing = missing_formatter_messages(configured)
+  if #missing > 0 then
+    notify("Missing formatter executable(s): " .. table.concat(missing, ", "))
+  end
 
   local available = vim.tbl_filter(function(name)
     local formatter = formatters[name]

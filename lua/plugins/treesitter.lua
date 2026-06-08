@@ -7,6 +7,37 @@ return {
       { "nvim-treesitter/nvim-treesitter-textobjects", branch = "main" },
     },
     config = function()
+      -- Neovim nightly and nvim-treesitter can briefly disagree about the
+      -- shape of query matches during injected-language parsing in preview
+      -- buffers (for example Snacks picker previews). The upstream
+      -- nvim-treesitter `#downcase!` directive assumes its capture is always a
+      -- single TSNode; when it receives nil/a capture-list instead, it crashes
+      -- from `vim.treesitter.get_node_text()` with `attempt to call method
+      -- 'range' (a nil value)`. Keep the directive behavior, but make it
+      -- defensive so a malformed/stale injection match is ignored instead of
+      -- breaking highlighting.
+      local function install_safe_downcase_directive()
+        local opts = vim.fn.has "nvim-0.10" == 1 and { force = true, all = false } or true
+        vim.treesitter.query.add_directive("downcase!", function(match, _, bufnr, pred, metadata)
+          local id = pred[2]
+          local nodes = match[id]
+          local node = type(nodes) == "table" and nodes[1] or nodes
+          if type(node) ~= "userdata" then
+            return
+          end
+
+          local ok, text = pcall(vim.treesitter.get_node_text, node, bufnr, { metadata = metadata[id] })
+          if not ok then
+            return
+          end
+
+          if not metadata[id] then
+            metadata[id] = {}
+          end
+          metadata[id].text = string.lower(text or "")
+        end, opts)
+      end
+
       local config = {
         ensure_installed = { "markdown", "markdown_inline" },
         highlight = {
@@ -84,6 +115,7 @@ return {
         },
       }
       require("nvim-treesitter.configs").setup(config)
+      install_safe_downcase_directive()
 
       require("nvim-treesitter-textobjects").setup {
         select = {

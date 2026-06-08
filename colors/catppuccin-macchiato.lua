@@ -75,8 +75,11 @@ local highlights = {
     fg = "#24273a",
   },
   ["@comment.todo"] = {
-    bg = "#f0c6c6",
-    fg = "#24273a",
+    cterm = {
+      italic = true,
+    },
+    fg = "#f0c6c6",
+    italic = true,
   },
   ["@comment.warning"] = {
     bg = "#eed49f",

@@ -129,23 +129,31 @@ local function server_supports_filetype(server, filetype)
   return vim.tbl_contains(server.filetypes or {}, filetype)
 end
 
+local warned_missing_lsp_filetypes = {}
+
+local function server_command(server)
+  return server.cmd and server.cmd[1]
+end
+
+local function server_command_available(server)
+  local command = server_command(server)
+  return command ~= nil and vim.fn.executable(command) == 1
+end
+
 local function missing_server_commands(filetype)
   local missing = {}
   local servers = require("config.toolchain").lsp_servers()
 
   for server_name, server in pairs(servers) do
-    if server_supports_filetype(server, filetype) then
-      local command = server.cmd and server.cmd[1]
-      if command == nil or vim.fn.executable(command) == 0 then
-        missing[#missing + 1] = string.format("%s requires `%s`", server_name, command or "<missing cmd>")
-      end
+    if server_supports_filetype(server, filetype) and not server_command_available(server) then
+      missing[#missing + 1] = string.format("%s requires `%s`", server_name, server_command(server) or "<missing cmd>")
     end
   end
 
   return missing
 end
 
-local function require_lsp_commands_for_filetype(event)
+local function warn_missing_lsp_commands_for_filetype(event)
   local filetype = vim.bo[event.buf].filetype
   if filetype == "" then
     return
@@ -156,13 +164,19 @@ local function require_lsp_commands_for_filetype(event)
     return
   end
 
-  error(
+  if warned_missing_lsp_filetypes[filetype] then
+    return
+  end
+  warned_missing_lsp_filetypes[filetype] = true
+
+  vim.notify(
     string.format(
-      "Missing LSP executable(s) for filetype `%s`: %s. Install them on PATH before opening this filetype.",
+      "Missing LSP executable(s) for filetype `%s`: %s. LSP disabled for missing server(s).",
       filetype,
       table.concat(missing, ", ")
     ),
-    0
+    vim.log.levels.WARN,
+    { title = "lsp" }
   )
 end
 
@@ -195,9 +209,11 @@ function M.enable_servers()
   local servers = require("config.toolchain").lsp_servers()
 
   for server_name, server in pairs(servers) do
-    server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-    vim.lsp.config(server_name, server)
-    vim.lsp.enable(server_name)
+    if server_command_available(server) then
+      server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
+      vim.lsp.config(server_name, server)
+      vim.lsp.enable(server_name)
+    end
   end
 end
 
@@ -212,7 +228,7 @@ function M.setup()
 
   vim.api.nvim_create_autocmd("FileType", {
     group = vim.api.nvim_create_augroup("local-lsp-command-check", { clear = true }),
-    callback = require_lsp_commands_for_filetype,
+    callback = warn_missing_lsp_commands_for_filetype,
   })
 
   vim.api.nvim_create_autocmd("FileType", {
