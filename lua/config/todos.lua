@@ -22,10 +22,9 @@ function M.open_picker()
     return
   end
 
-  require("snacks").picker.grep {
+  require("config.pickers").grep {
     title = "TODOs",
     search = rg_pattern,
-    live = false,
     need_search = false,
     hidden = true,
     exclude = { ".git" },

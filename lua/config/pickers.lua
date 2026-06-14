@@ -102,15 +102,57 @@ function M.non_daily_notes()
   }
 end
 
-function M.registers_0_to_9()
+--- Run a list picker over precomputed items, owning the close-then-choose boilerplate.
+---@param opts {title?: string, items: table, format: function, on_choose?: function}
+function M.list(opts)
+  local on_choose = opts.on_choose
   snacks_picker() {
+    title = opts.title,
+    items = opts.items,
+    format = opts.format,
+    confirm = function(picker, item)
+      picker:close()
+      if on_choose then
+        on_choose(item)
+      end
+    end,
+  }
+end
+
+--- Forward an arbitrary picker spec to snacks for advanced cases (custom actions, finders, windows).
+---@param opts table
+function M.picker(opts)
+  return snacks_picker()(opts)
+end
+
+function M.lsp_references()
+  snacks_picker().lsp_references()
+end
+
+function M.lsp_implementations()
+  snacks_picker().lsp_implementations()
+end
+
+function M.lsp_definitions()
+  snacks_picker().lsp_definitions()
+end
+
+function M.lsp_symbols()
+  snacks_picker().lsp_symbols()
+end
+
+function M.lsp_type_definitions()
+  snacks_picker().lsp_type_definitions()
+end
+
+function M.registers_0_to_9()
+  M.list {
     title = "Registers 0-9 (Yank/Delete)",
     items = register_items(),
     format = function(item)
       return { { item.text } }
     end,
-    confirm = function(picker, item)
-      picker:close()
+    on_choose = function(item)
       vim.fn.setreg('"', vim.fn.getreg(item.register))
       vim.cmd 'normal! ""p'
     end,
@@ -149,15 +191,20 @@ function M.git_files(opts)
   snacks_picker().git_files(opts)
 end
 
+--- Run a fixed-search grep picker, owning the non-live default; callers pass the search intent.
+---@param opts table
+function M.grep(opts)
+  snacks_picker().grep(vim.tbl_extend("force", { live = false }, opts))
+end
+
 function M.grep_from_input()
   local search = vim.fn.input "Grep > "
   if search == "" then
     return
   end
 
-  snacks_picker().grep {
+  M.grep {
     search = search,
-    live = false,
     regex = false,
     title = "Grep: " .. search,
     transform = function(item)

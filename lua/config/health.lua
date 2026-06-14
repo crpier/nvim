@@ -13,19 +13,9 @@ local function format_filetypes(filetypes)
   if vim.tbl_isempty(filetypes) then
     return "no configured filetypes"
   end
+  filetypes = vim.deepcopy(filetypes)
   table.sort(filetypes)
   return table.concat(filetypes, ", ")
-end
-
-local function collect_by_tool(tools_by_ft)
-  local by_tool = {}
-  for filetype, tools in pairs(tools_by_ft) do
-    for _, tool in ipairs(tools) do
-      by_tool[tool] = by_tool[tool] or {}
-      by_tool[tool][#by_tool[tool] + 1] = filetype
-    end
-  end
-  return by_tool
 end
 
 local function report_tool(name, command, filetypes)
@@ -61,47 +51,31 @@ local function report_lsp_servers()
   end
 end
 
-local function report_formatters()
-  vim.health.start "Configured formatters"
-  local commands = require("config.formatting").formatter_commands()
-  local by_formatter = collect_by_tool(require("config.toolchain").formatters_by_ft())
+local function report_kind(title, kind, empty_message)
+  vim.health.start(title)
+  local tools = require("config.toolchain").tools(kind)
   local any_missing = false
+  local reported = false
 
-  for formatter, filetypes in pairs(by_formatter) do
-    local ok = report_tool(formatter, commands[formatter], filetypes)
-    any_missing = any_missing or not ok
+  for _, tool in ipairs(tools) do
+    if tool.enabled == nil or tool.enabled() then
+      reported = true
+      any_missing = report_tool(tool.name, tool.cmd, tool.filetypes) == false or any_missing
+    end
   end
 
-  if vim.tbl_isempty(by_formatter) then
-    vim.health.info "No formatters configured"
+  if not reported then
+    vim.health.info(empty_message)
   elseif not any_missing then
-    vim.health.ok "All configured formatter executables are available"
-  end
-end
-
-local function report_linters()
-  vim.health.start "Configured linters"
-  local commands = require("config.linting").linter_commands()
-  local by_linter = collect_by_tool(require("config.toolchain").linters_by_ft())
-  local any_missing = false
-
-  for linter, filetypes in pairs(by_linter) do
-    local ok = report_tool(linter, commands[linter], filetypes)
-    any_missing = any_missing or not ok
-  end
-
-  if vim.tbl_isempty(by_linter) then
-    vim.health.info "No linters configured"
-  elseif not any_missing then
-    vim.health.ok "All configured linter executables are available"
+    vim.health.ok(string.format("All configured %s executables are available", kind))
   end
 end
 
 --- Check configured LSP, formatter, and linter executables.
 function M.check()
   report_lsp_servers()
-  report_formatters()
-  report_linters()
+  report_kind("Configured formatters", "format", "No formatters configured")
+  report_kind("Configured linters", "lint", "No linters configured")
 end
 
 return M

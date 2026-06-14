@@ -24,33 +24,6 @@ local function dirname(path)
   return vim.fn.fnamemodify(path, ":h")
 end
 
-local function nearest_file(start_dir, names)
-  return vim.fs.root(start_dir, function(name)
-    return vim.tbl_contains(names, name)
-  end)
-end
-
-local function rust_edition(start_dir)
-  local root = nearest_file(start_dir, { "Cargo.toml" })
-  if root == nil then
-    return "2021"
-  end
-
-  local cargo_toml = root .. "/Cargo.toml"
-  if vim.fn.filereadable(cargo_toml) ~= 1 then
-    return "2021"
-  end
-
-  for _, line in ipairs(vim.fn.readfile(cargo_toml)) do
-    local edition = line:match '^%s*edition%s*=%s*"([^"]+)"'
-    if edition ~= nil then
-      return edition
-    end
-  end
-
-  return "2021"
-end
-
 local function formatter_cwd(formatter, bufnr)
   if formatter.cwd ~= nil then
     return formatter.cwd(bufnr)
@@ -67,23 +40,8 @@ local function same_buffer(bufnr, expected_changedtick)
   return vim.api.nvim_buf_is_valid(bufnr) and changedtick(bufnr) == expected_changedtick
 end
 
-local formatters
-
 local function notify(message, level)
   vim.notify(message, level or vim.log.levels.WARN, { title = "formatting" })
-end
-
-local function missing_formatter_messages(configured)
-  local missing = {}
-  for _, name in ipairs(configured) do
-    local formatter = formatters[name]
-    if formatter == nil then
-      missing[#missing + 1] = string.format("%s is not defined", name)
-    elseif not executable(formatter.cmd) then
-      missing[#missing + 1] = string.format("%s requires `%s`", name, formatter.cmd)
-    end
-  end
-  return missing
 end
 
 local function replace_buffer(bufnr, text)
@@ -152,99 +110,10 @@ local function run_file_formatter(formatter, bufnr, input, callback)
   end)
 end
 
-formatters = {
-  stylua = {
-    cmd = "stylua",
-    args = function(bufnr)
-      return { "--search-parent-directories", "--respect-ignores", "--stdin-filepath", buffer_path(bufnr), "-" }
-    end,
-    stdin = true,
-    cwd = function(bufnr)
-      return nearest_file(dirname(buffer_path(bufnr)), { ".stylua.toml", "stylua.toml" }) or dirname(buffer_path(bufnr))
-    end,
-  },
-  ruff_fix = {
-    cmd = "ruff",
-    args = function(bufnr)
-      return {
-        "check",
-        "--fix",
-        "--force-exclude",
-        "--exit-zero",
-        "--no-cache",
-        "--stdin-filename",
-        buffer_path(bufnr),
-        "-",
-      }
-    end,
-    stdin = true,
-    cwd = function(bufnr)
-      return nearest_file(dirname(buffer_path(bufnr)), { "pyproject.toml", "ruff.toml", ".ruff.toml" })
-        or dirname(buffer_path(bufnr))
-    end,
-  },
-  ruff_format = {
-    cmd = "ruff",
-    args = function(bufnr)
-      return { "format", "--force-exclude", "--stdin-filename", buffer_path(bufnr), "-" }
-    end,
-    stdin = true,
-    cwd = function(bufnr)
-      return nearest_file(dirname(buffer_path(bufnr)), { "pyproject.toml", "ruff.toml", ".ruff.toml" })
-        or dirname(buffer_path(bufnr))
-    end,
-  },
-  ruff_organize_imports = {
-    cmd = "ruff",
-    args = function(bufnr)
-      return {
-        "check",
-        "--fix",
-        "--force-exclude",
-        "--select=I001",
-        "--exit-zero",
-        "--no-cache",
-        "--stdin-filename",
-        buffer_path(bufnr),
-        "-",
-      }
-    end,
-    stdin = true,
-    cwd = function(bufnr)
-      return nearest_file(dirname(buffer_path(bufnr)), { "pyproject.toml", "ruff.toml", ".ruff.toml" })
-        or dirname(buffer_path(bufnr))
-    end,
-  },
-  markdownlint = {
-    cmd = "markdownlint",
-    args = { "--fix", "$FILENAME" },
-    exit_codes = { 0, 1 },
-    stdin = false,
-  },
-  prettierd = {
-    cmd = "prettierd",
-    args = function(bufnr)
-      return { buffer_path(bufnr) }
-    end,
-    stdin = true,
-  },
-  rustfmt = {
-    cmd = "rustfmt",
-    args = function(bufnr)
-      return { "--emit=stdout", "--edition=" .. rust_edition(dirname(buffer_path(bufnr))) }
-    end,
-    stdin = true,
-  },
-  gofmt = {
-    cmd = "gofmt",
-    stdin = true,
-  },
-}
-
-local function run_formatters(bufnr, configured, index, input, changedtick)
-  if index > #configured then
+local function run_formatters(bufnr, formatters, index, input, expected_changedtick)
+  if index > #formatters then
     vim.schedule(function()
-      if same_buffer(bufnr, changedtick) then
+      if same_buffer(bufnr, expected_changedtick) then
         replace_buffer(bufnr, input)
       else
         notify "Buffer changed while formatting; skipped applying formatter output"
@@ -253,32 +122,17 @@ local function run_formatters(bufnr, configured, index, input, changedtick)
     return
   end
 
-  local name = configured[index]
-  local formatter = formatters[name]
-  if formatter == nil or not executable(formatter.cmd) then
-    run_formatters(bufnr, configured, index + 1, input, changedtick)
-    return
-  end
-
+  local formatter = formatters[index]
   local runner = formatter.stdin == false and run_file_formatter or run_stdin_formatter
   runner(formatter, bufnr, input, function(output, err)
     if err ~= nil then
       vim.schedule(function()
-        notify(name .. " failed: " .. err)
+        notify(formatter.name .. " failed: " .. err)
       end)
       return
     end
-    run_formatters(bufnr, configured, index + 1, output, changedtick)
+    run_formatters(bufnr, formatters, index + 1, output, expected_changedtick)
   end)
-end
-
---- Return formatter executable names keyed by formatter id.
-function M.formatter_commands()
-  local commands = {}
-  for name, formatter in pairs(formatters) do
-    commands[name] = formatter.cmd
-  end
-  return commands
 end
 
 --- Format a buffer with configured external commands, falling back to LSP when none are available.
@@ -287,16 +141,20 @@ function M.format(opts)
   opts = opts or {}
   local bufnr = opts.bufnr or vim.api.nvim_get_current_buf()
   local filetype = vim.bo[bufnr].filetype
-  local configured = require("config.toolchain").formatters_by_ft()[filetype] or {}
+  local configured = require("config.toolchain").formatters_for(filetype)
 
-  local missing = missing_formatter_messages(configured)
+  local missing = {}
+  for _, formatter in ipairs(configured) do
+    if not executable(formatter.cmd) then
+      missing[#missing + 1] = string.format("%s requires `%s`", formatter.name, formatter.cmd)
+    end
+  end
   if #missing > 0 then
     notify("Missing formatter executable(s): " .. table.concat(missing, ", "))
   end
 
-  local available = vim.tbl_filter(function(name)
-    local formatter = formatters[name]
-    return formatter ~= nil and executable(formatter.cmd)
+  local available = vim.tbl_filter(function(formatter)
+    return executable(formatter.cmd)
   end, configured)
 
   if #available == 0 then

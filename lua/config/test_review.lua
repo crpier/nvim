@@ -439,29 +439,8 @@ local function jump_to_test(test)
   render_buffer(vim.api.nvim_get_current_buf(), false)
 end
 
-local function quickfix(items, title)
-  local qf_items = vim.tbl_map(function(test)
-    local status = test.reviewed and "✓" or "○"
-    return {
-      filename = test.file,
-      lnum = test.lnum,
-      col = test.col,
-      text = string.format("%s %s %s", status, test.qualified_name, trim(test.line)),
-    }
-  end, items)
-
-  vim.fn.setqflist({}, " ", { title = title, items = qf_items })
-  vim.cmd.copen()
-end
-
 local function open_test_picker(items, title)
-  local ok, snacks = pcall(require, "snacks")
-  if not ok or snacks.picker == nil then
-    quickfix(items, title)
-    return
-  end
-
-  snacks.picker {
+  require("config.pickers").list {
     title = string.format("%s (%d)", title, #items),
     items = items,
     format = function(item)
@@ -472,10 +451,7 @@ local function open_test_picker(items, title)
         { item.qualified_name, "Function" },
       }
     end,
-    confirm = function(picker, item)
-      picker:close()
-      jump_to_test(item)
-    end,
+    on_choose = jump_to_test,
   }
 end
 

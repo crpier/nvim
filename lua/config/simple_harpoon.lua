@@ -163,7 +163,7 @@ function M.toggle_quick_menu()
     return
   end
 
-  require("snacks").picker {
+  require("config.pickers").picker {
     title = "Harpoon marks (dd: remove, J/K: move)",
     finder = function()
       return picker_items(marks)
