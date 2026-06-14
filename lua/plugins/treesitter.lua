@@ -56,63 +56,6 @@ return {
             node_decremental = "<c-backspace>",
           },
         },
-        textobjects = {
-          select = {
-            enable = true,
-            lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-            keymaps = {
-              -- You can use the capture groups defined in textobjects.scm
-              ["aa"] = "@parameter.outer",
-              ["ia"] = "@parameter.inner",
-              ["af"] = "@function.outer",
-              ["if"] = "@function.inner",
-              ["ac"] = "@class.outer",
-              ["ic"] = "@class.inner",
-            },
-          },
-          move = {
-            enable = true,
-            set_jumps = true, -- whether to set jumps in the jumplist
-            goto_next_start = {
-              ["]m"] = "@function.outer",
-              ["]]"] = "@class.outer",
-            },
-            goto_next_end = {
-              ["]M"] = "@function.outer",
-              ["]["] = "@class.outer",
-            },
-            goto_previous_start = {
-              ["[m"] = "@function.outer",
-              ["[["] = "@class.outer",
-            },
-            goto_previous_end = {
-              ["[M"] = "@function.outer",
-              ["[]"] = "@class.outer",
-            },
-          },
-          swap = {
-            enable = true,
-            swap_next = {
-              ["<leader>tsp"] = "@parameter.inner",
-              ["<leader>tsf"] = "@function.outer",
-              ["<leader>tsc"] = "@class.outer",
-            },
-            swap_previous = {
-              ["<leader>tsP"] = "@parameter.inner",
-              ["<leader>tsF"] = "@function.outer",
-              ["<leader>tsC"] = "@class.outer",
-            },
-          },
-          lsp_interop = {
-            enable = true,
-            border = "none",
-            floating_preview_opts = {},
-            peek_definition_code = {
-              ["<leader>k"] = "@function.outer",
-              ["<leader>K"] = "@class.outer",
-            },
-          },
-        },
       }
       require("nvim-treesitter.configs").setup(config)
       install_safe_downcase_directive()
@@ -129,9 +72,63 @@ return {
       local keymaps = require "config.keymaps"
       local group = "treesitter-textobjects"
       local select = require "nvim-treesitter-textobjects.select"
+      local swap = require "nvim-treesitter-textobjects.swap"
+      local move = require "nvim-treesitter-textobjects.move"
+      local shared = require "nvim-treesitter-textobjects.shared"
+
       local function select_textobject(query)
         return function()
           select.select_textobject(query, "textobjects")
+        end
+      end
+
+      local function swap_textobject(direction, query)
+        return function()
+          swap[direction](query, "textobjects")
+        end
+      end
+
+      local function move_to_textobject(direction, query)
+        return function()
+          move[direction](query, "textobjects")
+        end
+      end
+
+      local function textobject_lines(query, label)
+        local bufnr = vim.api.nvim_get_current_buf()
+        local ok, range = pcall(shared.textobject_at_point, query, "textobjects", bufnr, nil, { lookahead = true })
+        if not ok then
+          vim.notify(range, vim.log.levels.ERROR)
+          return nil, nil
+        end
+        if range == nil then
+          vim.notify("No " .. label .. " textobject found", vim.log.levels.WARN)
+          return nil, nil
+        end
+
+        return vim.api.nvim_buf_get_text(bufnr, range[1], range[2], range[4], range[5], {}), bufnr
+      end
+
+      local function peek_textobject(query, label)
+        return function()
+          local lines, source_bufnr = textobject_lines(query, label)
+          if lines == nil or #lines == 0 then
+            return
+          end
+
+          local preview_bufnr, winid = vim.lsp.util.open_floating_preview(lines, vim.bo[source_bufnr].filetype, {
+            border = "none",
+            focusable = true,
+            max_height = math.max(1, math.floor(vim.o.lines * 0.5)),
+            max_width = math.max(20, math.floor(vim.o.columns * 0.8)),
+          })
+          local close_preview = function()
+            if vim.api.nvim_win_is_valid(winid) then
+              vim.api.nvim_win_close(winid, true)
+            end
+          end
+          vim.keymap.set("n", "q", close_preview, { buffer = preview_bufnr, nowait = true, silent = true })
+          vim.keymap.set("n", "<Esc>", close_preview, { buffer = preview_bufnr, nowait = true, silent = true })
         end
       end
 
@@ -229,6 +226,100 @@ return {
       keymaps.set({ "x", "o" }, "if", select_textobject "@function.inner", { desc = "Inside function", group = group })
       keymaps.set({ "x", "o" }, "ac", select_class_outer, { desc = "Around class", group = group })
       keymaps.set({ "x", "o" }, "ic", select_textobject "@class.inner", { desc = "Inside class", group = group })
+
+      keymaps.set(
+        "n",
+        "<leader>tsp",
+        swap_textobject("swap_next", "@parameter.inner"),
+        { desc = "Swap parameter with next", group = group }
+      )
+      keymaps.set(
+        "n",
+        "<leader>tsf",
+        swap_textobject("swap_next", "@function.outer"),
+        { desc = "Swap function with next", group = group }
+      )
+      keymaps.set(
+        "n",
+        "<leader>tsc",
+        swap_textobject("swap_next", "@class.outer"),
+        { desc = "Swap class with next", group = group }
+      )
+      keymaps.set(
+        "n",
+        "<leader>tsP",
+        swap_textobject("swap_previous", "@parameter.inner"),
+        { desc = "Swap parameter with previous", group = group }
+      )
+      keymaps.set(
+        "n",
+        "<leader>tsF",
+        swap_textobject("swap_previous", "@function.outer"),
+        { desc = "Swap function with previous", group = group }
+      )
+      keymaps.set(
+        "n",
+        "<leader>tsC",
+        swap_textobject("swap_previous", "@class.outer"),
+        { desc = "Swap class with previous", group = group }
+      )
+
+      keymaps.set(
+        { "n", "x", "o" },
+        "]m",
+        move_to_textobject("goto_next_start", "@function.outer"),
+        { desc = "Next function start", group = group }
+      )
+      keymaps.set(
+        { "n", "x", "o" },
+        "]]",
+        move_to_textobject("goto_next_start", "@class.outer"),
+        { desc = "Next class start", group = group }
+      )
+      keymaps.set(
+        { "n", "x", "o" },
+        "]M",
+        move_to_textobject("goto_next_end", "@function.outer"),
+        { desc = "Next function end", group = group }
+      )
+      keymaps.set(
+        { "n", "x", "o" },
+        "][",
+        move_to_textobject("goto_next_end", "@class.outer"),
+        { desc = "Next class end", group = group }
+      )
+      keymaps.set(
+        { "n", "x", "o" },
+        "[m",
+        move_to_textobject("goto_previous_start", "@function.outer"),
+        { desc = "Previous function start", group = group }
+      )
+      keymaps.set(
+        { "n", "x", "o" },
+        "[[",
+        move_to_textobject("goto_previous_start", "@class.outer"),
+        { desc = "Previous class start", group = group }
+      )
+      keymaps.set(
+        { "n", "x", "o" },
+        "[M",
+        move_to_textobject("goto_previous_end", "@function.outer"),
+        { desc = "Previous function end", group = group }
+      )
+      keymaps.set(
+        { "n", "x", "o" },
+        "[]",
+        move_to_textobject("goto_previous_end", "@class.outer"),
+        { desc = "Previous class end", group = group }
+      )
+
+      keymaps.set(
+        "n",
+        "<leader>k",
+        peek_textobject("@function.outer", "function"),
+        { desc = "Peek function", group = group }
+      )
+      keymaps.set("n", "<leader>K", peek_textobject("@class.outer", "class"), { desc = "Peek class", group = group })
 
       local usage = require "config.treesitter_usage"
       keymaps.set("n", "<C-n>", usage.goto_next_usage, { desc = "Next usage", group = "treesitter-usage" })

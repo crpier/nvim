@@ -131,6 +131,11 @@ local lsp_servers = {
     filetypes = { "markdown", "markdown.mdx" },
     root_markers = { ".marksman.toml", ".git" },
   },
+  nil_ls = {
+    cmd = tool_cmd "nil",
+    filetypes = { "nix" },
+    root_markers = { "flake.nix", ".git" },
+  },
 }
 
 local formatters_by_ft = {

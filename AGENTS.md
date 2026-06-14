@@ -21,6 +21,7 @@ LSP servers configured in `lua/config/toolchain.lua` are expected to be installe
 - `gopls`: Requires Go to be installed (`go` binary must be in PATH)
 - `rust_analyzer`: Requires Rust (`rustc` and `cargo`)
 - `marksman`: `marksman`
+- `nil_ls`: `nil` (Nix language server)
 
 **Optional but recommended:**
 - `lazygit` - For the snacks.nvim lazygit integration (`<leader>lg`)
