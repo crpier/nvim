@@ -2,32 +2,51 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
-    event = { "BufReadPost", "BufNewFile" },
+    lazy = false,
     dependencies = {
       { "nvim-treesitter/nvim-treesitter-textobjects", branch = "main" },
     },
     config = function()
       -- Neovim nightly and nvim-treesitter can briefly disagree about the
       -- shape of query matches during injected-language parsing in preview
-      -- buffers (for example Snacks picker previews). The upstream
-      -- nvim-treesitter `#downcase!` directive assumes its capture is always a
-      -- single TSNode; when it receives nil/a capture-list instead, it crashes
-      -- from `vim.treesitter.get_node_text()` with `attempt to call method
-      -- 'range' (a nil value)`. Keep the directive behavior, but make it
-      -- defensive so a malformed/stale injection match is ignored instead of
-      -- breaking highlighting.
-      local function install_safe_downcase_directive()
+      -- buffers (for example Snacks picker previews). Some upstream
+      -- nvim-treesitter directives assume captures are always single TSNodes;
+      -- when they receive nil/a capture-list instead, they crash from
+      -- `vim.treesitter.get_node_text()` with `attempt to call method 'range'
+      -- (a nil value)`. Keep the directive behavior, but make it defensive so a
+      -- malformed/stale injection match is ignored instead of breaking
+      -- highlighting.
+      local function install_safe_treesitter_directives()
         local opts = vim.fn.has "nvim-0.10" == 1 and { force = true, all = false } or true
-        vim.treesitter.query.add_directive("downcase!", function(match, _, bufnr, pred, metadata)
-          local id = pred[2]
+
+        local function capture_node(match, id)
           local nodes = match[id]
           local node = type(nodes) == "table" and nodes[1] or nodes
           if type(node) ~= "userdata" then
+            return nil
+          end
+
+          return node
+        end
+
+        local function node_text(node, bufnr, opts_)
+          local ok, text = pcall(vim.treesitter.get_node_text, node, bufnr, opts_)
+          if not ok then
+            return nil
+          end
+
+          return text
+        end
+
+        vim.treesitter.query.add_directive("downcase!", function(match, _, bufnr, pred, metadata)
+          local id = pred[2]
+          local node = capture_node(match, id)
+          if node == nil then
             return
           end
 
-          local ok, text = pcall(vim.treesitter.get_node_text, node, bufnr, { metadata = metadata[id] })
-          if not ok then
+          local text = node_text(node, bufnr, { metadata = metadata[id] })
+          if text == nil then
             return
           end
 
@@ -35,6 +54,33 @@ return {
             metadata[id] = {}
           end
           metadata[id].text = string.lower(text or "")
+        end, opts)
+
+        local html_script_type_languages = {
+          importmap = "json",
+          module = "javascript",
+          ["application/ecmascript"] = "javascript",
+          ["text/ecmascript"] = "javascript",
+        }
+
+        vim.treesitter.query.add_directive("set-lang-from-mimetype!", function(match, _, bufnr, pred, metadata)
+          local node = capture_node(match, pred[2])
+          if node == nil then
+            return
+          end
+
+          local type_attr_value = node_text(node, bufnr)
+          if type_attr_value == nil or type_attr_value == "" then
+            return
+          end
+
+          local configured = html_script_type_languages[type_attr_value]
+          if configured then
+            metadata["injection.language"] = configured
+          else
+            local parts = vim.split(type_attr_value, "/", {})
+            metadata["injection.language"] = parts[#parts]
+          end
         end, opts)
       end
 
@@ -58,7 +104,7 @@ return {
         },
       }
       require("nvim-treesitter.configs").setup(config)
-      install_safe_downcase_directive()
+      install_safe_treesitter_directives()
 
       require("nvim-treesitter-textobjects").setup {
         select = {

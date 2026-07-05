@@ -19,10 +19,16 @@ filetype association lives on the record, not in a separate by-filetype map.
 _Avoid_: spec, entry, definition.
 
 **Runner**:
-The generic mechanism that executes tool records of one kind — sequential for
+The workflow that applies Tool records of one kind to a buffer — sequential for
 formatters, parallel for linters. Holds no per-tool data. Lives in
 `formatting.lua` and `linting.lua`, exposing `format(bufnr)` / `lint(bufnr)`.
 _Avoid_: engine, executor, driver.
+
+**Tool invocation**:
+The generic mechanism that runs one Tool record and returns its observable
+result. Owns command assembly, stdin/file input mode, working directory, exit
+codes, and process result shape.
+_Avoid_: execution helper, process wrapper, job runner.
 
 **Phase**:
 A formatter's bucket in the pipeline: `fix` runs before `format`. The Registry

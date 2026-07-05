@@ -44,17 +44,47 @@ local function find_lsp_root()
   return nil
 end
 
---- Get the lowest parent dir that contains a .git dir
+local function current_file_dir()
+  local name = vim.api.nvim_buf_get_name(0)
+  if name == "" then
+    return nil
+  end
+  return vim.fn.fnamemodify(name, ":p:h")
+end
+
+local function normalize_dir(path)
+  if not path or path == "" then
+    return nil
+  end
+  return vim.fn.fnamemodify(path, ":p"):gsub("/$", "")
+end
+
+--- Get the git worktree root for the current buffer.
 --- @return string|nil
-local function find_project_root()
-  local search_dir = vim.fn.expand("%:p:h", true)
-  local markers = { ".git", "Makefile", "package.json", "pyproject.toml", ".svn" }
-  while search_dir ~= "/" do
+local function find_git_root()
+  local search_dir = current_file_dir()
+  if not search_dir or vim.fn.executable "git" ~= 1 then
+    return nil
+  end
+
+  local result = vim.fn.systemlist { "git", "-C", search_dir, "rev-parse", "--show-toplevel" }
+  if vim.v.shell_error ~= 0 or not result[1] or result[1] == "" then
+    return nil
+  end
+  return normalize_dir(result[1])
+end
+
+--- Get the nearest parent dir that contains a project marker.
+--- @return string|nil
+local function find_marker_root()
+  local search_dir = current_file_dir()
+  local markers = { ".svn", "Makefile", "package.json", "pyproject.toml" }
+  while search_dir and search_dir ~= "/" do
     for _, marker in ipairs(markers) do
       if
         vim.fn.isdirectory(search_dir .. "/" .. marker) == 1 or vim.fn.filereadable(search_dir .. "/" .. marker) == 1
       then
-        return search_dir
+        return normalize_dir(search_dir)
       end
     end
     search_dir = vim.fn.fnamemodify(search_dir, ":h")
@@ -62,14 +92,11 @@ local function find_project_root()
   return nil
 end
 
---- Find the root dir for the current buffer
+--- Find the root dir for the current buffer.
+--- Priority: git worktree > LSP root > nearest project marker.
 --- @return string|nil
 local function find_root()
-  local lsp_root = find_lsp_root()
-  if lsp_root ~= nil then
-    return lsp_root
-  end
-  return find_project_root()
+  return find_git_root() or normalize_dir(find_lsp_root()) or find_marker_root()
 end
 
 --- Helper variable to store the last root

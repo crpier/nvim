@@ -5,8 +5,10 @@ utils.setup_lazy()
 require "config.options"
 require("config.usage_audit").setup()
 require "config.basic_remaps"
+require("config.variable_part_textobj").setup()
 require("config.test_review").setup()
 require("config.plugin_replacements").setup()
+require("config.pi_bridge").setup()
 
 -- Setup lazy.nvim
 require("lazy").setup {

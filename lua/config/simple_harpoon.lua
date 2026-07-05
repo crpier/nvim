@@ -71,7 +71,12 @@ local function picker_items(marks)
 end
 
 local function open_mark(mark)
-  vim.cmd.edit(vim.fn.fnameescape(resolve_path(mark)))
+  local target = vim.fn.fnamemodify(resolve_path(mark), ":p")
+  local current = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":p")
+  if target == current then
+    return
+  end
+  vim.cmd.edit(vim.fn.fnameescape(target))
 end
 
 --- Add the current file to this project's harpoon list.

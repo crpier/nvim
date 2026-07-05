@@ -323,6 +323,7 @@ local tools = {
       return {
         "check",
         "--fix",
+        "--unsafe-fixes",
         "--force-exclude",
         "--exit-zero",
         "--no-cache",

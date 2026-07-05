@@ -48,12 +48,26 @@ local function diagnostics()
   return table.concat(parts, " ")
 end
 
+local navic_cache = {}
+
 local function navic_location()
   local ok, navic = pcall(require, "nvim-navic")
   if not ok or not navic.is_available() then
     return ""
   end
-  return navic.get_location()
+
+  local bufnr = vim.api.nvim_get_current_buf()
+  local location = navic.get_location()
+
+  -- While typing, navic recomputes context against stale LSP symbols and
+  -- momentarily returns "" until InsertLeave/CursorHold re-requests symbols.
+  -- Reuse the last known location to stop the statusline flickering.
+  if location == "" and vim.startswith(vim.fn.mode(), "i") then
+    return navic_cache[bufnr] or ""
+  end
+
+  navic_cache[bufnr] = location
+  return location
 end
 
 function M.render()
