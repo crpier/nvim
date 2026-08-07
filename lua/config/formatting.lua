@@ -45,8 +45,13 @@ local function notify(message, level)
 end
 
 local function replace_buffer(bufnr, text)
+  local lines = text_to_lines(text)
+  if vim.deep_equal(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), lines) then
+    return
+  end
+
   local view = vim.fn.winsaveview()
-  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, text_to_lines(text))
+  vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
   vim.fn.winrestview(view)
 end
 
