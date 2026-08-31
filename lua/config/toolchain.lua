@@ -24,11 +24,10 @@ local function set_python_path(command)
 end
 
 local function selected_python_lsp_name()
-  local name = os.getenv "NVIM_PYTHON_LSP"
-  if name == nil or name == "" then
-    return "pyright"
+  if vim.fn.executable "ty" == 1 then
+    return "ty"
   end
-  return name:lower()
+  return "pyright"
 end
 
 local function ts_root_dir(bufnr, on_dir)
@@ -49,7 +48,6 @@ end
 
 local python_root_markers = {
   "pyrightconfig.json",
-  "pyrefly.toml",
   "ty.toml",
   "pyproject.toml",
   "setup.py",
@@ -90,11 +88,6 @@ local python_lsp_servers = {
   },
   ty = {
     cmd = tool_cmd("ty", "server"),
-    filetypes = { "python" },
-    root_markers = python_root_markers,
-  },
-  pyrefly = {
-    cmd = tool_cmd("pyrefly", "lsp"),
     filetypes = { "python" },
     root_markers = python_root_markers,
   },
@@ -490,10 +483,6 @@ function M.lsp_servers()
   local servers = vim.deepcopy(lsp_servers)
   local python_lsp_name = selected_python_lsp_name()
   local python_lsp = python_lsp_servers[python_lsp_name]
-
-  if python_lsp == nil then
-    error(string.format("Unsupported NVIM_PYTHON_LSP=%q. Expected one of: pyright, ty, pyrefly.", python_lsp_name), 0)
-  end
 
   servers[python_lsp_name] = vim.deepcopy(python_lsp)
   return servers

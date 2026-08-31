@@ -14,9 +14,7 @@
 
 LSP servers configured in `lua/config/toolchain.lua` are expected to be installed externally and available on `PATH`. Run `:checkhealth config` to audit configured LSP, formatter, and linter executables. Opening a filetype with a configured LSP server raises an error if the required executable is missing:
 - `lua_ls`: `lua-language-server`
-- Python LSP defaults to `pyright`: `pyright-langserver` (requires Python 3 / npm-managed install depending on installation method)
-  - Override before startup with `NVIM_PYTHON_LSP=ty` for `ty server`
-  - Override before startup with `NVIM_PYTHON_LSP=pyrefly` for `pyrefly lsp`
+- Python LSP prefers `ty` (`ty server`) when available, then falls back to `pyright` (`pyright-langserver`)
 - `ts_ls`: `typescript-language-server` (requires Node.js and npm)
 - `gopls`: Requires Go to be installed (`go` binary must be in PATH)
 - `rust_analyzer`: Requires Rust (`rustc` and `cargo`)
@@ -86,7 +84,7 @@ The config detects SSH sessions via `utils.ON_LOCAL = os.getenv("SSH_CLIENT") ==
 ### LSP Setup
 - Uses Neovim's built-in LSP configuration API with externally installed language servers (configured in `lua/config/lsp.lua`)
 - LSP servers are defined in `lua/config/toolchain.lua` and enabled directly with `vim.lsp.config` / `vim.lsp.enable`
-- Python LSP selection is startup-only via `NVIM_PYTHON_LSP`; unset uses `pyright`, supported overrides are `ty` and `pyrefly`
+- Python LSP selection prefers `ty` when available and otherwise uses `pyright`; only one is configured
 - LSP keymaps are set in an LspAttach autocmd (`lua/config/lsp.lua`)
 - Key LSP maps: `gd` (definition), `grr` (references), `grn` (rename), `gra` (code action), `K` (hover)
 - Diagnostic navigation: `]d` (next), `[d` (prev), `]D` (last), `[D` (first), `d;` (float)
