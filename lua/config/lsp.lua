@@ -85,6 +85,14 @@ local function on_lsp_attach(event)
 end
 
 local function setup_diagnostics()
+  local virtual_text = {
+    source = "if_many",
+    spacing = 2,
+    format = function(diagnostic)
+      return diagnostic.message
+    end,
+  }
+
   vim.diagnostic.config {
     severity_sort = true,
     float = { border = "rounded", source = "if_many" },
@@ -97,14 +105,13 @@ local function setup_diagnostics()
         [vim.diagnostic.severity.HINT] = "󰌶 ",
       },
     },
-    virtual_text = {
-      source = "if_many",
-      spacing = 2,
-      format = function(diagnostic)
-        return diagnostic.message
-      end,
-    },
+    virtual_text = virtual_text,
   }
+
+  require("config.keymaps").set("n", "yov", function()
+    local diagnostics = vim.diagnostic.config()
+    vim.diagnostic.config { virtual_text = diagnostics.virtual_text == false and virtual_text or false }
+  end, { desc = "Toggle diagnostic virtual text", group = "diagnostics" })
 
   vim.keymap.set("n", "]d", function()
     vim.diagnostic.jump { count = 1, float = true }
