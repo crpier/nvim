@@ -46,7 +46,7 @@ end
 
 local function current_file_dir()
   local name = vim.api.nvim_buf_get_name(0)
-  if name == "" then
+  if name == "" or vim.bo.buftype ~= "" or name:match "^%a[%w+.-]*://" then
     return nil
   end
   return vim.fn.fnamemodify(name, ":p:h")
@@ -87,7 +87,11 @@ local function find_marker_root()
         return normalize_dir(search_dir)
       end
     end
-    search_dir = vim.fn.fnamemodify(search_dir, ":h")
+    local parent = vim.fn.fnamemodify(search_dir, ":h")
+    if parent == search_dir then
+      break
+    end
+    search_dir = parent
   end
   return nil
 end
@@ -113,6 +117,9 @@ M.enable_set_root_autocmd = function(verbose)
   end
   vim.api.nvim_create_autocmd({ "BufEnter", "LspAttach" }, {
     callback = function()
+      if not current_file_dir() then
+        return
+      end
       local root = find_root()
       if root ~= nil and root ~= M.root then
         vim.api.nvim_set_current_dir(root)
