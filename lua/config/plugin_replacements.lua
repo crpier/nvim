@@ -2,6 +2,7 @@ local M = {}
 
 local features = {
   "config.theme",
+  "config.modicator",
   "config.lsp",
   "config.formatting",
   "config.linting",
@@ -11,6 +12,7 @@ local features = {
   "config.notes",
   "config.todos",
   "config.text_helpers",
+  "config.tabout",
   "config.unimpaired",
   "config.statusline",
 }

@@ -10,6 +10,7 @@ return {
         ["<C-u>"] = { "scroll_documentation_up", "fallback" },
         ["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
         ["<C-e>"] = { "hide", "fallback" },
+        -- fallback resolves the global <Tab> mapping (config.tabout)
         ["<Tab>"] = { "accept", "fallback" },
       },
       appearance = {
