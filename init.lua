@@ -7,6 +7,7 @@ require("config.usage_audit").setup()
 require "config.basic_remaps"
 require("config.variable_part_textobj").setup()
 require("config.test_review").setup()
+require("config.change_review").setup()
 require("config.plugin_replacements").setup()
 
 -- Setup lazy.nvim
