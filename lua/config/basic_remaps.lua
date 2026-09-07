@@ -11,6 +11,7 @@ end
 
 -- Easy exit
 map("n", "Q", "ZQ")
+map("n", "<leader>tq", "<cmd>tabclose<cr>", { desc = "Close current tab" })
 -- Stop search Highlighting
 map("n", "<Esc>", function()
   vim.cmd "nohlsearch"
