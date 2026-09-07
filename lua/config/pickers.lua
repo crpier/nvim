@@ -214,6 +214,93 @@ function M.grep_from_input()
   }
 end
 
+function M.grep_word_from_input()
+  local search = vim.fn.input "Grep word > "
+  if search == "" then
+    return
+  end
+
+  M.grep {
+    search = search,
+    regex = false,
+    args = { "--word-regexp" },
+    title = "Grep word: " .. search,
+    transform = function(item)
+      item.text = item.file or item.text
+      return item
+    end,
+  }
+end
+
+local function remove_qf_item(picker, item)
+  if item == nil then
+    return
+  end
+
+  local qf = vim.fn.getqflist { items = 1, title = 1 }
+  local valid_index = 0
+  for index, qf_item in ipairs(qf.items) do
+    if qf_item.valid == 1 then
+      valid_index = valid_index + 1
+      if valid_index == item.idx then
+        table.remove(qf.items, index)
+        break
+      end
+    end
+  end
+
+  vim.fn.setqflist({}, "r", { title = qf.title, items = qf.items })
+  if vim.tbl_isempty(qf.items) then
+    picker:close()
+    return
+  end
+  picker:refresh()
+end
+
+function M.open_qflist()
+  snacks_picker().qflist {
+    title = "Quickfix list (dd: remove)",
+    actions = {
+      quickfix_remove = remove_qf_item,
+    },
+    win = {
+      input = {
+        keys = {
+          dd = { "quickfix_remove", mode = "n", desc = "Remove quickfix entry" },
+        },
+      },
+      list = {
+        keys = {
+          dd = { "quickfix_remove", desc = "Remove quickfix entry" },
+        },
+      },
+    },
+  }
+end
+
+function M.remove_current_qf_entry()
+  local index = vim.api.nvim_win_get_cursor(0)[1]
+  local qf = vim.fn.getqflist { items = 1, title = 1, context = 1 }
+  if table.remove(qf.items, index) == nil then
+    return
+  end
+
+  if vim.tbl_isempty(qf.items) then
+    vim.fn.setqflist({}, "r", { title = qf.title, context = qf.context, items = {} })
+    vim.cmd.cclose()
+    return
+  end
+
+  local next_index = math.min(index, #qf.items)
+  vim.fn.setqflist({}, "r", {
+    title = qf.title,
+    context = qf.context,
+    items = qf.items,
+  })
+  vim.fn.setqflist({}, "a", { idx = next_index })
+  vim.api.nvim_win_set_cursor(0, { next_index, 0 })
+end
+
 function M.keys()
   return {
     {
@@ -273,7 +360,12 @@ function M.keys()
     {
       "s/",
       M.grep_from_input,
-      desc = "Search word from user input",
+      desc = "Search text from user input",
+    },
+    {
+      "s?",
+      M.grep_word_from_input,
+      desc = "Search whole word from user input",
     },
     {
       "sd",
@@ -281,6 +373,11 @@ function M.keys()
         snacks_picker().diagnostics()
       end,
       desc = "Open all diagnostics",
+    },
+    {
+      "sq",
+      M.open_qflist,
+      desc = "Search quickfix list",
     },
     {
       "sk",
@@ -302,6 +399,13 @@ function M.keys()
         snacks_picker().grep_word()
       end,
       desc = "Search word under cursor",
+    },
+    {
+      "sW",
+      function()
+        snacks_picker().grep { args = { "--word-regexp" } }
+      end,
+      desc = "Search whole words",
     },
     {
       "sm",

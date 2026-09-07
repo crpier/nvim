@@ -48,6 +48,18 @@ local function set_option(option, value)
   end
 end
 
+local function toggle_quickfix()
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    local wininfo = vim.fn.getwininfo(win)[1]
+    if wininfo and wininfo.quickfix == 1 and wininfo.loclist == 0 then
+      vim.cmd.cclose()
+      return
+    end
+  end
+
+  vim.cmd.copen()
+end
+
 function M.setup()
   local keymaps = require "config.keymaps"
   local function map(mode, lhs, rhs, opts)
@@ -60,6 +72,7 @@ function M.setup()
   map("n", "[q", cmd "cprevious", { desc = "Previous quickfix item" })
   map("n", "]Q", cmd "clast", { desc = "Last quickfix item" })
   map("n", "[Q", cmd "cfirst", { desc = "First quickfix item" })
+  map("n", "<C-q>", toggle_quickfix, { desc = "Toggle quickfix list" })
 
   map("n", "]l", cmd "lnext", { desc = "Next location-list item" })
   map("n", "[l", cmd "lprevious", { desc = "Previous location-list item" })

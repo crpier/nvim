@@ -88,6 +88,20 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
   end,
   group = misc_group,
 })
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "qf",
+  callback = function()
+    local wininfo = vim.fn.getwininfo(vim.api.nvim_get_current_win())[1]
+    if wininfo and wininfo.loclist == 0 then
+      vim.keymap.set("n", "dd", require("config.pickers").remove_current_qf_entry, {
+        buffer = true,
+        desc = "Remove quickfix entry",
+        silent = true,
+      })
+    end
+  end,
+  group = misc_group,
+})
 -- Make vim know Jenkinsfiles are groovy code
 vim.api.nvim_create_autocmd({ "BufEnter" }, {
   pattern = { "*Jenkinsfile" },
