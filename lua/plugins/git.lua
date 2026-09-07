@@ -50,7 +50,17 @@ return {
       }
     end,
   },
-  -- amongst your other plugins
+  {
+    "NeogitOrg/neogit",
+    dependencies = { "sindrets/diffview.nvim", "folke/snacks.nvim" },
+    cmd = "Neogit",
+    keys = {
+      { "<leader>gn", "<cmd>Neogit<cr>", desc = "Open Neogit" },
+    },
+    opts = {
+      integrations = { diffview = true, snacks = true },
+    },
+  },
   {
     "tpope/vim-fugitive",
     dependencies = { "tpope/vim-rhubarb" },
