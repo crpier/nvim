@@ -17,17 +17,6 @@ return {
         desc = "Close buffer (like `:bd` but smart)",
       },
       {
-        "yot",
-        function()
-          if require("snacks.dim").enabled then
-            require("snacks.dim").disable()
-          else
-            require("snacks.dim").enable()
-          end
-        end,
-        desc = "Toggle dimming",
-      },
-      {
         "<leader>lg",
         function()
           require("snacks.lazygit").open()
@@ -79,7 +68,6 @@ return {
         refresh = 50, -- refresh at most every 50ms
       },
       bigfile = {},
-      dim = {},
       terminal = {},
       quickfile = {},
       lazygit = {},

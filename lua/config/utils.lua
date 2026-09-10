@@ -135,10 +135,6 @@ end
 M.default_options = {
   --- @type boolean Whether to enable avante.nvim (requires an key).
   avante_enabled = false,
-  --- @type boolean Whether to use supermaven
-  --- supermaven bugs you to to login if you enable it.
-  --- That's the main reason I made local configs lol.
-  supermaven_enabled = false,
   --- @type table List of additional directories to look in,
   --- for project dirs. Same format as the `base_dirs` option.
   project_base_dirs = {},

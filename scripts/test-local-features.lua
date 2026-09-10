@@ -190,5 +190,5 @@ end
 local completion = dofile(root .. "/lua/plugins/completion.lua")[1]
 assert(vim.tbl_contains(completion.dependencies, "local-tabout"))
 vim.fn.delete(tmp, "rf")
-print "local features: 18 virtual specs, deferred setup, first-use keys, command completion, event replay, mapping coverage OK"
+print "local features: 17 virtual specs, deferred setup, first-use keys, command completion, event replay, mapping coverage OK"
 vim.cmd "qa!"

@@ -1,6 +1,6 @@
 # Local features managed by lazy.nvim
 
-`lua/plugins/local_features.lua` registers 18 config modules as virtual plugins. Implementations remain under `lua/config/`; lazy manages setup without downloading repositories or adding directories to the runtimepath.
+`lua/plugins/local_features.lua` registers 17 config modules as virtual plugins. Implementations remain under `lua/config/`; lazy manages setup without downloading repositories or adding directories to the runtimepath.
 
 Find the `local-*` entries in `:Lazy`. Use `:Lazy profile` to inspect setup costs and loading reasons.
 
@@ -8,7 +8,7 @@ Find the `local-*` entries in `:Lazy`. Use `:Lazy profile` to inspect setup cost
 
 | Modules | Trigger |
 | --- | --- |
-| Usage audit, theme, modicator, bufferline, statusline, OSC52 | Startup |
+| Usage audit, theme, bufferline, statusline, OSC52 | Startup |
 | LSP | BufReadPre, BufNewFile, or FileType |
 | Linting | BufReadPost, BufNewFile, BufWritePost, or InsertLeave |
 | Test review | BufReadPost, BufNewFile, or review keys |
@@ -17,7 +17,7 @@ Find the `local-*` entries in `:Lazy`. Use `:Lazy profile` to inspect setup cost
 | Formatting, notes, harpoon, variable-part text objects, text helpers, unimpaired | Feature keys |
 | Tabout | InsertEnter or loading blink.cmp |
 
-Startup features stay eager to avoid UI flashes, missed usage tracking, and unconfigured clipboard access. Theme loads before modicator. Leader and basic mappings still initialize before lazy reads specs.
+Startup features stay eager to avoid UI flashes, missed usage tracking, and unconfigured clipboard access. Leader and basic mappings still initialize before lazy reads specs.
 
 Reviews load on file events so persisted comments and test checkmarks appear without pressing a review key. Their handlers register before the initial BufEnter and BufWinEnter events. LSP setup registers before filetype processing; a FileType trigger also handles unnamed buffers. lazy replays triggering events for newly registered handlers.
 

@@ -58,7 +58,6 @@ return {
   -- These must be ready before interaction or the first UI render.
   feature("usage_audit", { lazy = false, priority = 2000 }),
   feature("theme", { lazy = false, priority = 1000 }),
-  feature("modicator", { lazy = false, dependencies = { "local-theme" } }),
   feature("simple_bufferline", { lazy = false }),
   feature("statusline", { lazy = false }),
   -- Configure the provider before any direct "+ yank/paste, not just <leader>y.
