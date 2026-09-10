@@ -33,7 +33,7 @@ The following formatters and linters are expected to be installed externally and
 - `ruff` - Python linter/formatter
 - `tflint` - Terraform linter
 - `prettierd` - JavaScript/TypeScript formatter
-- `markdownlint` - Markdown formatter
+- `prettier` - Markdown formatter, including table alignment; `gq` preserves paragraph wrapping
 - Optional: `hadolint` for Dockerfiles, `jsonlint` for JSON
 
 ## Configuration Architecture

@@ -1,6 +1,6 @@
 # Usage audit
 
-`:UsageAuditReport` shows keymap and command counts, least-used first. It reads the current in-memory counters, including changes not yet saved. Reopening the report refreshes it.
+`:UsageAuditReport` shows keymap and command counts, least-used first. It reads the current in-memory counters, including changes not yet saved. Reopening the report refreshes it. Press `gq` to align its Markdown tables with Prettier; no renderer is needed.
 
 `:UsageAuditReset` clears saved and in-memory history. There is no undo. Copy `stdpath("state") .. "/usage-audit.json"` first if you want a backup.
 

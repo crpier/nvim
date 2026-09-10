@@ -372,14 +372,24 @@ local tools = {
     stdin = true,
   },
   {
-    name = "markdownlint",
+    name = "prettier",
     kind = "format",
     phase = "format",
-    cmd = "markdownlint",
+    cmd = "prettier",
     filetypes = { "markdown" },
-    args = { "--fix", "$FILENAME" },
-    exit_codes = { 0, 1 },
-    stdin = false,
+    args = function(bufnr)
+      local path = buffer_path(bufnr)
+      if path == "" or vim.bo[bufnr].buftype ~= "" then
+        -- Supply Markdown/config context for unnamed buffers and audit reports.
+        path = vim.fn.getcwd() .. "/.nvim-format.md"
+      end
+      return { "--parser", "markdown", "--prose-wrap", "preserve", "--stdin-filepath", path }
+    end,
+    cwd = function(bufnr)
+      local path = buffer_path(bufnr)
+      return vim.bo[bufnr].buftype == "" and path ~= "" and dirname(path) or vim.fn.getcwd()
+    end,
+    stdin = true,
   },
   {
     name = "prettierd",
