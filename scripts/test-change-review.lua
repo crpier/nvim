@@ -61,12 +61,21 @@ local ok, err = xpcall(function()
   eq(file(session, "deleted.txt").deleted, true)
   local staged_before = git("diff", "--cached", "--binary")
   local status_before = git("status", "--porcelain=v1")
+  eq(review.status(), "") -- Edited files use hunk markers, not a file badge.
   review.toggle_file(session, file(session, "edited.txt"))
+  eq(file(session, "edited.txt").reviewed, true)
+  vim.api.nvim_buf_set_lines(0, 0, 1, false, { "temporary edit" })
+  eq(file(session, "edited.txt").reviewed, true) -- Editing never invalidates approval.
+  vim.cmd "edit!"
   review.refresh(session)
   eq(file(session, "edited.txt").reviewed, true)
   review.toggle_file(session, file(session, "edited.txt"))
   review.refresh(session)
   eq(file(session, "edited.txt").reviewed, false)
+  eq(review.status(), "")
+  local scratch = vim.api.nvim_create_buf(false, true)
+  eq(review.status(scratch), "")
+  vim.api.nvim_buf_delete(scratch, { force = true })
   review.toggle_file(session, file(session, "edited.txt"))
   review.toggle_file(session, file(session, "staged.txt"))
   review.toggle_file(session, file(session, "deleted.txt"))
@@ -104,6 +113,16 @@ local ok, err = xpcall(function()
   eq(vim.api.nvim_get_current_win(), window)
   eq(#vim.api.nvim_list_wins(), windows)
   eq(#session.comments, 1)
+  local select = vim.ui.select
+  local snapshot = session.snapshot
+  vim.ui.select = function(_, _, cb)
+    cb "Cancel"
+  end
+  vim.cmd "ChangeReview refresh"
+  eq(session.snapshot, snapshot)
+  vim.ui.select = function(_, _, cb)
+    cb "Rebuild snapshot"
+  end
   vim.cmd "ChangeReview refresh" -- Works without Diffview loaded.
   local diff_refreshes = 0
   vim.api.nvim_create_user_command("DiffviewRefresh", function()
@@ -111,6 +130,8 @@ local ok, err = xpcall(function()
   end, {})
   vim.cmd "ChangeReview refresh"
   eq(diff_refreshes, 1)
+  vim.ui.select = select
+  review.toggle_file(session, file(session, "staged.txt"))
   eq(#session.comments, 1)
   eq(review.export(session), text)
   assert(text:find("edited.txt", 1, true))
@@ -119,13 +140,13 @@ local ok, err = xpcall(function()
   vim.api.nvim_buf_set_lines(0, 0, 0, false, { "inserted" })
   assert(review.export(session):find("3-3", 1, true))
   assert(not review.export(session):find("Location needs checking", 1, true))
-  eq(pcall(review.toggle_file, session, file(session, "edited.txt")), false)
+  eq(pcall(review.toggle_file, session, file(session, "edited.txt")), true)
   vim.api.nvim_buf_set_lines(0, 2, 3, false, { "rewritten" })
   assert(review.export(session):find("Location needs checking", 1, true))
   assert(review.export(session):find("    changed", 1, true))
   vim.cmd.write()
   review.refresh(session)
-  eq(file(session, "edited.txt").reviewed, false)
+  eq(file(session, "edited.txt").reviewed, true)
   eq(file(session, "staged.txt").reviewed, true)
   eq(#session.comments, 1)
   eq(c.text, "Please simplify this.\nKeep the error handling.")
@@ -220,9 +241,11 @@ local ok, err = xpcall(function()
   assert(not review.export(session):find("Please simplify", 1, true))
   c.resolved = false
 
-  -- Stale picker selections cannot approve a newer version.
+  -- Edits keep the snapshot; a rebuild retires old picker selections.
   local old = file(session, "new file.txt")
   write("new file.txt", { "different" })
+  eq(pcall(review.toggle_file, session, old), true)
+  review.rebuild(session)
   eq(pcall(review.toggle_file, session, old), false)
 
   -- Missing files retain feedback, with original context.

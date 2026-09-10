@@ -71,9 +71,11 @@ local function navic_location()
 end
 
 function M.render()
+  local review = package.loaded["config.change_review"]
+  local review_status = review and review.status() or ""
   local left = vim.tbl_filter(function(item)
     return item ~= nil and item ~= ""
-  end, { branch(), diff(), diagnostics() })
+  end, { review_status, branch(), diff(), diagnostics() })
 
   local location = "%l:%c"
   local navic = navic_location()

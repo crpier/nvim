@@ -3,11 +3,13 @@ local M = {}
 local ns = vim.api.nvim_create_namespace "change-review"
 local sessions = {}
 local store = require "config.change_review_store"
+local hunks = require "config.change_review_hunks"
+local quickfix = require "config.change_review_quickfix"
 
 local function session_for(root)
   if not sessions[root] then
     local comments, token = store.load(root)
-    local session = { root = root, comments = comments, reviewed = {}, files = {}, next_id = 1, store_token = token }
+    local session = { root = root, comments = comments, files = {}, next_id = 1, store_token = token }
     for _, comment in ipairs(comments) do
       comment.root = root
       session.next_id = math.max(session.next_id, comment.id + 1)
@@ -29,6 +31,9 @@ local function schedule_render()
         if vim.api.nvim_buf_is_loaded(buf) and #vim.fn.win_findbuf(buf) > 0 then
           M.attach(buf)
         end
+      end
+      for _, session in pairs(sessions) do
+        quickfix.sync(session.snapshot)
       end
       require("config.change_review_padding").refresh(ns)
     end)
@@ -58,6 +63,10 @@ local function working_file(buf)
 end
 
 local function context()
+  local target = quickfix.target()
+  if target and sessions[target.root] then
+    return sessions[target.root]
+  end
   local buf = vim.api.nvim_get_current_buf()
   local ok, name = pcall(working_file, buf)
   local dir = ok and vim.fs.dirname(name) or vim.t.change_review_root or vim.fn.getcwd()
@@ -72,58 +81,40 @@ local function relative(session, path)
   return path:sub(#prefix + 1)
 end
 
-local function split_paths(output)
-  return vim.split(output, "\0", { plain = true, trimempty = true })
-end
-
--- Explicit refresh only. Approval describes the complete on-disk change against HEAD,
--- independently of which portions happen to be staged.
+-- Build once. Opening a picker or another viewer never resets review progress.
 function M.refresh(session)
   session = session or context()
-  local head = vim.trim(git(session.root, { "rev-parse", "--verify", "HEAD" }))
-  local paths =
-    split_paths(git(session.root, { "diff", "--no-ext-diff", "--no-renames", "--name-only", "-z", head, "--" }))
-  local untracked = {}
-  for _, path in ipairs(split_paths(git(session.root, { "ls-files", "--others", "--exclude-standard", "-z" }))) do
-    untracked[path] = true
-    paths[#paths + 1] = path
-  end
-  table.sort(paths)
-  local files, present = {}, {}
-  for _, path in ipairs(paths) do
-    if not present[path] then
-      present[path] = true
-      local absolute = session.root .. "/" .. path
-      local content
-      if untracked[path] then
-        -- hash-object reads binary files without bringing their contents into Lua.
-        content = "untracked:" .. git(session.root, { "hash-object", "--no-filters", "--", path })
-      else
-        content =
-          git(session.root, { "diff", "--no-ext-diff", "--no-textconv", "--no-renames", "--binary", head, "--", path })
-      end
-      local fingerprint = vim.fn.sha256(head .. "\n" .. content)
-      local buf = vim.fn.bufnr(absolute)
-      local unsaved = buf ~= -1 and vim.bo[buf].modified
-      if unsaved or session.reviewed[path] ~= fingerprint then
-        session.reviewed[path] = nil
-      end
-      files[#files + 1] = {
-        path = path,
-        fingerprint = fingerprint,
-        deleted = vim.uv.fs_stat(absolute) == nil,
-        reviewed = session.reviewed[path] ~= nil,
-        unsaved = unsaved,
-      }
+  assert(sessions[session.root] == session, "Review session was cleared")
+  if not session.snapshot then
+    session.snapshot = hunks.build(session.root)
+    session.files = session.snapshot.files
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+      hunks.attach(session.snapshot, buf)
     end
   end
-  for path in pairs(session.reviewed) do
-    if not present[path] then
-      session.reviewed[path] = nil
-    end
-  end
-  session.files = files
   return session
+end
+
+-- Low-level rebuild; user-facing callers must obtain confirmation first.
+function M.rebuild(session)
+  session = session or context()
+  assert(sessions[session.root] == session, "Review session was cleared")
+  local snapshot = hunks.build(session.root)
+  hunks.clear(session.snapshot)
+  quickfix.replace(session.snapshot, snapshot)
+  session.snapshot, session.files = snapshot, snapshot.files
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    hunks.attach(snapshot, buf)
+  end
+  quickfix.sync(snapshot)
+  schedule_render()
+  return session
+end
+
+local function changed(session)
+  quickfix.sync(session.snapshot)
+  vim.cmd "redrawstatus"
+  schedule_render()
 end
 
 local function current_range(comment)
@@ -242,6 +233,7 @@ function M.attach(buf)
     end
   end
   for _, session in pairs(sessions) do
+    hunks.attach(session.snapshot, buf)
     for _, comment in ipairs(session.comments) do
       if path == comment.root .. "/" .. comment.path then
         decorate(comment, buf)
@@ -377,25 +369,72 @@ local function compose(first, last, file_level)
   end)
 end
 
-function M.toggle_file(session, file)
-  local buf = vim.fn.bufnr(session.root .. "/" .. file.path)
-  assert(buf == -1 or not vim.bo[buf].modified, "Save the file before marking its on-disk changes reviewed")
-  M.refresh(session)
-  for _, current in ipairs(session.files) do
-    if current.path == file.path then
-      assert(
-        not file.fingerprint or file.fingerprint == current.fingerprint,
-        "File changed since the checklist opened; review it again"
-      )
-      if current.reviewed then
-        session.reviewed[file.path] = nil
-      else
-        session.reviewed[file.path] = current.fingerprint
+-- Read cached review state only: statusline redraws must not scan Git or
+-- invalidate approval while the user edits.
+function M.status(buf)
+  local ok, path = pcall(working_file, buf or vim.api.nvim_get_current_buf())
+  if not ok then
+    return ""
+  end
+  for _, session in pairs(sessions) do
+    for _, file in ipairs(session.files) do
+      if file.whole and path == session.root .. "/" .. file.path then
+        return file.reviewed and "[x] Reviewed" or "[ ] Pending review"
       end
-      return
     end
   end
-  error("File no longer has changes", 0)
+  return ""
+end
+
+function M.toggle_file(session, file)
+  M.refresh(session)
+  hunks.toggle_file(session.snapshot, file)
+  changed(session)
+end
+
+local function with_unit(callback)
+  local target = quickfix.target()
+  if target then
+    local session = sessions[target.root]
+    local snapshot = session and session.snapshot
+    if snapshot and snapshot.id == target.snapshot and snapshot.units[target.unit] then
+      callback(session, snapshot.units[target.unit])
+    end
+    return
+  end
+  local buf = vim.api.nvim_get_current_buf()
+  if not pcall(working_file, buf) then
+    return
+  end
+  local session = M.refresh()
+  local snapshot = session.snapshot
+  local matches = hunks.at(snapshot, buf, vim.api.nvim_win_get_cursor(0)[1])
+  if #matches == 1 then
+    callback(session, matches[1])
+  elseif #matches > 1 then
+    vim.ui.select(matches, { prompt = "Overlapping snapshot hunks", format_item = hunks.label }, function(unit)
+      if unit and sessions[session.root] == session and session.snapshot == snapshot then
+        callback(session, unit)
+      end
+    end)
+  end
+end
+
+function M.toggle()
+  with_unit(function(session, unit)
+    hunks.toggle(session.snapshot, unit)
+    changed(session)
+  end)
+end
+
+function M.quickfix()
+  quickfix.open(M.refresh().snapshot)
+end
+
+function M.preview_hunk()
+  with_unit(function(session, unit)
+    quickfix.preview(session.snapshot, unit)
+  end)
 end
 
 local function open_diff(session, path)
@@ -417,10 +456,7 @@ local function files(pending_only)
   vim.ui.select(entries, {
     prompt = "Review files against HEAD",
     format_item = function(file)
-      return (file.reviewed and "[x] " or "[ ] ")
-        .. file.path
-        .. (file.deleted and " (deleted)" or "")
-        .. (file.unsaved and " (unsaved)" or "")
+      return (file.reviewed and "[x] " or "[ ] ") .. file.path .. (file.deleted and " (deleted)" or "")
     end,
   }, function(file)
     if not file then
@@ -599,6 +635,8 @@ function M.clear(session)
     schedule_render()
     error(err, 0)
   end
+  hunks.clear(session.snapshot)
+  quickfix.retire(session.snapshot)
   sessions[session.root] = nil
   schedule_render()
 end
@@ -607,7 +645,7 @@ function M.setup(config)
   store.setup(config)
   local actions = {
     open = function()
-      open_diff(context())
+      open_diff(M.refresh())
     end,
     files = function()
       files(false)
@@ -632,18 +670,34 @@ function M.setup(config)
     copy = function()
       M.copy()
     end,
+    quickfix = M.quickfix,
+    ["preview-hunk"] = M.preview_hunk,
     refresh = function()
-      M.refresh()
-      if vim.fn.exists ":DiffviewRefresh" == 2 then
-        vim.cmd "DiffviewRefresh"
-      end
-      M.attach(vim.api.nvim_get_current_buf())
-      vim.notify "Review and open diff view refreshed; comments retained"
-    end,
-    toggle = function()
       local session = context()
-      M.toggle_file(session, { path = relative(session, working_file(vim.api.nvim_get_current_buf())) })
+      local function rebuild()
+        local ok, err = pcall(function()
+          M.rebuild(session)
+          if vim.fn.exists ":DiffviewRefresh" == 2 then
+            vim.cmd "DiffviewRefresh"
+          end
+        end)
+        if not ok then
+          vim.notify(err, vim.log.levels.ERROR)
+        end
+      end
+      if session.snapshot then
+        vim.ui.select({ "Cancel", "Rebuild snapshot" }, {
+          prompt = "Reset all hunk checkmarks and rescan disk? Comments will be retained.",
+        }, function(choice)
+          if choice == "Rebuild snapshot" then
+            rebuild()
+          end
+        end)
+      else
+        rebuild()
+      end
     end,
+    toggle = M.toggle,
     clear = function()
       local session = context()
       vim.ui.select({ "Cancel", "Clear review" }, { prompt = "Discard comments and approvals?" }, function(choice)
@@ -708,6 +762,7 @@ function M.setup(config)
     group = group,
     callback = function(event)
       for _, session in pairs(sessions) do
+        hunks.detach(session.snapshot, event.buf)
         for _, c in ipairs(session.comments) do
           if c.buf == event.buf then
             if not vim.bo[event.buf].modified then
@@ -728,8 +783,10 @@ function M.setup(config)
     ro = { "open", "Open change review" },
     rf = { "files", "Review file checklist" },
     rn = { "pending", "Unreviewed files" },
-    rr = { "toggle", "Toggle file reviewed" },
-    rR = { "refresh", "Refresh review and Diffview" },
+    rr = { "toggle", "Toggle hunk reviewed" },
+    rq = { "quickfix", "Review hunks in quickfix" },
+    rp = { "preview-hunk", "Preview snapshot hunk" },
+    rR = { "refresh", "Rebuild review snapshot and refresh Diffview" },
     rc = { "comment", "Add review comment" },
     rC = { "file-comment", "Add file review comment" },
     rl = { "comments", "Review comments" },

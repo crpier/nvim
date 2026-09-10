@@ -27,14 +27,18 @@ if root then
     vim.cmd "quit!"
     vim.api.nvim_buf_set_lines(0, 0, 0, false, { "inserted" })
     vim.cmd "write"
+    vim.api.nvim_win_set_cursor(0, { 1, 0 })
     vim.cmd "ChangeReview toggle"
+    assert(review.refresh().snapshot.units[1].reviewed)
   elseif phase == "restore" then
     local ns = vim.api.nvim_create_namespace "change-review"
     local marks = vim.api.nvim_buf_get_extmarks(0, ns, 0, -1, {})
     assert(#marks == 1 and marks[1][2] == 2, "Comments did not restore automatically at saved position")
     local session = review.refresh()
     assert(#session.comments == 2)
-    assert(next(session.reviewed) == nil, "Approvals should not persist")
+    for _, unit in ipairs(session.snapshot.units) do
+      assert(not unit.reviewed, "Approvals should not persist")
+    end
     local text = review.export()
     assert(text:find("Saved feedback", 1, true))
     assert(not text:find("Unsaved draft", 1, true))

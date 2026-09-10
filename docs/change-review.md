@@ -1,16 +1,17 @@
 # Change review trial
 
-Local review alongside Diffview. No Pi connection, automatic commits, staging changes, or Diffview fork.
+Local hunk review in working buffers, Diffview, or quickfix. No Pi connection, automatic commits, staging changes, or Diffview internals.
 
 ## Workflow
 
-1. Save files. `HEAD` is the review baseline; pending changes can span multiple agent turns.
-2. `<leader>ro` runs plain `:DiffviewOpen`, following its normal repository detection, settings, and file list. Staged changes appear in a separate section; untracked-file visibility follows Diffview's defaults.
-3. Edit working-copy files directly, or leave comments for later.
-4. `<leader>rr` toggles the current file's approval. Save it first.
-5. `<leader>rn` picks from unreviewed files; `<leader>rf` shows the full checklist.
-6. `<leader>ry` previews all outstanding feedback. Press `y` in that preview to copy everything, `q` to close. `<leader>rY` or `:ChangeReview copy` copies directly to the `+` register without opening a preview.
-7. Commit manually when ready. `:ChangeReview clear` explicitly discards the review after confirmation.
+1. Save files before creating a snapshot. `HEAD` is the baseline; pending changes can span multiple agent turns.
+2. `<leader>rq` opens a review quickfix list. Alternatively, `<leader>ro` starts review and runs plain `:DiffviewOpen`, preserving Diffview's usual file list and settings. Either uses the same existing snapshot, or creates one if needed.
+3. Enter on a quickfix entry jumps to its working-copy location. Edit source directly, or leave comments for later. Deleted files, binary changes, symlinks, and submodules open read-only snapshot previews instead.
+4. `<leader>rr` toggles the hunk under the working-buffer cursor, the selected review quickfix entry, or the hunk shown in a snapshot preview. `[ ]` / `[x]` virtual text and quickfix entries update together, without notifications. Outside a hunk, toggling is a no-op. If edits collapse several hunks onto one location, a picker asks which to toggle.
+5. `<leader>rp` previews the selected hunk's original snapshot patch, including removed lines. It works from source, review quickfix, and snapshot previews. `q` closes the preview.
+6. `<leader>rn` picks files with unchecked hunks; `<leader>rf` shows the full file checklist. A file is reviewed when all its hunks are checked. The checklist's toggle action checks or unchecks every hunk in that file.
+7. `<leader>ry` previews all outstanding feedback. Press `y` there to copy everything, `q` to close. `<leader>rY` or `:ChangeReview copy` copies feedback directly to the `+` register.
+8. After revisions, keep reviewing the same snapshot or use `<leader>rR` to rebuild it after confirmation. Commit manually when ready. `:ChangeReview clear` discards comments and review progress after confirmation.
 
 Nothing interprets another agent turn as approval. Every export includes this instruction for the agent:
 
@@ -37,21 +38,29 @@ Extmarks follow edits in loaded buffers. Each line comment retains its original 
 
 Historical buffers, including Diffview's old side, are deliberately rejected. For now, use a working-copy file-level comment to discuss deleted code. A completely deleted file can be reviewed through the checklist, but cannot receive a new comment in this version.
 
-## Approval and refresh
+## Hunk snapshots and rebuilding
 
-The viewer and approval baseline differ when changes are staged: Diffview shows working-tree versus index changes and a separate staged section, while approval covers the cumulative diff against `HEAD`. This is necessary because the installed Diffview excludes untracked files from explicit `HEAD` comparisons. With nothing staged, the tracked-file comparisons coincide.
+A snapshot contains cumulative on-disk changes against a resolved `HEAD`, including staged and unstaged changes and non-ignored untracked files. Zero-context Git hunks are separate review entries. New files, entirely deleted files, binary changes, symlinks, submodules, and changes without textual hunks each receive one whole-file entry. Renames are represented as deletion plus creation.
 
-`<leader>rR` or `:ChangeReview refresh` rescans disk changes and runs `:DiffviewRefresh` when available, without discarding comments. It does not load Diffview or open a new view. Opening either file picker also refreshes review bookkeeping. Approval uses the complete per-file Git diff against the resolved `HEAD`, not hunk matching or staging status. Untracked files use their content hash. No lockfiles are excluded beyond normal Git ignore rules for untracked files.
+Edited files show hunk markers in working buffers instead of a file statusline badge. Whole-file entries also retain the file badge. Pure deletions anchor at the nearby surviving line; BOF/EOF positions are clamped to a real line. Snapshot previews retain the removed text. Historical buffers are not annotated or editable review targets.
 
-Unchanged files retain approval. Changed, removed, or no-longer-listed files lose approval; changing `HEAD` invalidates prior approvals. Loaded buffers with unsaved changes cannot be approved. Save changes before using the checklist: unsaved-only changes are not Git working-tree changes and are not listed.
+Extmarks track positions through edits in loaded buffers. Checkmarks survive edits, saves, switching viewers, opening pickers, and changes to `HEAD`. They mean you reviewed that snapshot entry, not that the current source still matches it. New changes do not appear until a rebuild. There is no fuzzy matching or automatic invalidation; reloading externally changed text can require a rebuild to restore useful locations.
 
-The scan is explicit and synchronous, with bounded Git command waits. Very large changesets may make it slow; background scanning is not part of this trial. Repositories need an existing `HEAD` commit.
+`<leader>rR` or `:ChangeReview refresh` asks before resetting all checkmarks and rescanning disk, while retaining comments. Save changed source buffers first; a failed scan leaves the previous snapshot intact. A successful rebuild also updates the review quickfix list and runs `:DiffviewRefresh` when available, without loading Diffview or opening it. Old snapshot previews are labeled retired and cannot toggle new entries.
+
+Diffview still separates staged and unstaged changes, while snapshot hunks are cumulative against `HEAD`. Their boundaries can differ when changes are staged. Markers and source toggling work on the live working-copy side, not the historical/index side. Use quickfix for the complete snapshot, or leave changes unstaged during Diffview review.
+
+The quickfix list uses normal Enter, `:cnext`, and `:cprev` navigation. Review updates address their own list by ID and leave unrelated quickfix and location lists alone. `<leader>rq` reopens the existing review list. `<leader>rr` is a no-op in unrelated lists. Deleted-file previews never create a replacement source file, and cannot receive comments.
+
+Scans are synchronous, with bounded Git command waits. Very large changesets may be slow. Repositories need an existing `HEAD` commit; unsaved-only changes are not included.
 
 ## Commands
 
 `:ChangeReview` accepts:
 
 - `open`
+- `quickfix`
+- `preview-hunk`
 - `files`
 - `pending`
 - `toggle`
@@ -68,17 +77,27 @@ The scan is explicit and synchronous, with bounded Git command waits. Very large
 
 Saved comments persist per repository under `stdpath("state")/change-review/`, normally `~/.local/state/nvim/change-review/`. They restore automatically when a working-copy buffer opens. Comment creation, saves, deletion, resolution, and review clearing write immediately; source-file saves also update stored line positions. There is no dependency on a clean exit.
 
-Unsaved comment-buffer edits are not persisted. Approvals remain session-only. Persistence stores the latest comments, not session history, and commits do not clear them.
+Unsaved comment-buffer edits are not persisted. Hunk snapshots and checkmarks remain session-only. Persistence stores the latest comments, not session history, and commits do not clear them.
 
 State files contain comment text and original code excerpts, are private to the user, and are replaced atomically. A lock and content token reject concurrent stale writes rather than overwriting another editor's feedback. If that happens, export your in-memory feedback before reopening Neovim. A process killed during a write may leave a `.lock` file; remove only that lock after confirming no writer remains. Corrupt state is reported and left untouched rather than silently reset.
 
-Implementation: `lua/config/change_review.lua`. It uses normal buffer events, extmarks, Git, and Diffview's public command. It does not inspect Diffview's internal classes or modify its file panel.
+Implementation:
+
+- `lua/config/change_review.lua`: comments, session orchestration, commands, and mappings.
+- `lua/config/change_review_hunks.lua`: Git snapshots, hunk positions, review state, and virtual markers.
+- `lua/config/change_review_quickfix.lua`: owned quickfix lists and snapshot previews.
+- `lua/config/change_review_store.lua`: comment persistence.
+- `lua/config/change_review_padding.lua`: alignment of comment blocks in two-way diffs.
+
+Diffview integration uses only its public commands, not its internal classes or file panel.
 
 Run checks from the configuration root:
 
 ```sh
 nvim --headless -u NONE -l scripts/test-change-review.lua
 nvim --headless -u NONE -l scripts/test-change-review-persistence.lua
+nvim --headless -u NONE -l scripts/test-change-review-hunks.lua
+nvim --headless -u NONE -l scripts/test-change-review-quickfix.lua
 nvim --headless -u NONE '+lua local ok, err = pcall(dofile, "scripts/test-change-review-padding.lua"); if not ok then print(err); vim.cmd("cquit") end'
 luacheck lua/config/change_review*.lua scripts/test-change-review*.lua
 stylua --check lua/config/change_review*.lua scripts/test-change-review*.lua
