@@ -2,272 +2,251 @@ local M = {}
 
 local state_path = vim.fn.stdpath "state" .. "/usage-audit.json"
 local namespace = vim.api.nvim_create_namespace "config.usage_audit"
-
-local state = nil
-local registered_keymaps = {}
-local candidates_by_mode = {}
-local buffers = {}
-local last_key_at = 0
+local state
+local dirty = false
+local flush_timer
 local setup_done = false
-local current_cmdline = ""
-local current_cmdtype = ""
+local registrations = {}
+local command_lines = {}
+local command_level = 0
+local typed_colon = false
 
-local tracked_modes = {
-  n = true,
-  i = true,
-  v = true,
-  x = true,
-  s = true,
-  o = true,
-  t = true,
-}
+local tracked_modes = { "n", "i", "x", "s", "o", "t" }
 
-local mode_aliases = {
-  no = "n",
-  nov = "n",
-  noV = "n",
-  ["no\22"] = "n",
-  niI = "n",
-  niR = "n",
-  niV = "n",
-  nt = "n",
-  ntT = "n",
-  ic = "i",
-  ix = "i",
-  R = "i",
-  Rc = "i",
-  Rv = "i",
-  Rx = "i",
-  c = "c",
-  cv = "c",
-  ce = "c",
-  r = "n",
-  rm = "n",
-  ["r?"] = "n",
-  v = "x",
-  V = "x",
-  ["\22"] = "x",
-  Vs = "x",
-  S = "s",
-}
+local function mode_key(mode)
+  if mode:sub(1, 2) == "no" then
+    return "o"
+  end
+  local first = mode:sub(1, 1)
+  if first == "v" or first == "V" or first == "\22" then
+    return "x"
+  elseif first == "s" or first == "S" or first == "\19" then
+    return "s"
+  elseif first == "R" then
+    return "i"
+  end
+  return first
+end
+
+local function normalize_lhs(lhs)
+  lhs = lhs
+    :gsub("<[Ll][Ee][Aa][Dd][Ee][Rr]>", function()
+      return vim.g.mapleader or "\\"
+    end)
+    :gsub("<[Ll][Oo][Cc][Aa][Ll][Ll][Ee][Aa][Dd][Ee][Rr]>", function()
+      return vim.g.maplocalleader or "\\"
+    end)
+  return vim.api.nvim_replace_termcodes(lhs, true, true, true)
+end
+
+local function key_id(mode, lhs, scope)
+  return mode .. " " .. vim.fn.keytrans(normalize_lhs(lhs)) .. (scope == "buffer" and " [buffer]" or "")
+end
 
 local function empty_state()
-  return {
-    version = 1,
-    keys = {},
-    commands = {},
-  }
+  return { version = 2, keys = {}, commands = {} }
 end
 
 local function read_state()
   if state then
     return state
   end
-
-  if vim.fn.filereadable(state_path) == 0 then
+  local ok, decoded = pcall(function()
+    return vim.json.decode(table.concat(vim.fn.readfile(state_path), "\n"))
+  end)
+  if ok and type(decoded) == "table" and type(decoded.keys) == "table" and type(decoded.commands) == "table" then
+    state = decoded
+    -- Older records use a mix of <leader>, literal spaces and <Space>. Merge
+    -- aliases without dropping their counts; old mode/origin errors cannot be repaired.
+    if state.version ~= 2 then
+      local keys = {}
+      for _, entry in pairs(state.keys) do
+        entry.lhs = vim.fn.keytrans(normalize_lhs(entry.lhs))
+        local id = key_id(entry.mode, entry.lhs, entry.scope)
+        if keys[id] then
+          keys[id].count = keys[id].count + entry.count
+          if (entry.last_used or "") > (keys[id].last_used or "") then
+            keys[id].last_used = entry.last_used
+          end
+        else
+          keys[id] = entry
+        end
+      end
+      state.keys = keys
+      state.version = 2
+    end
+  else
     state = empty_state()
-    return state
   end
-
-  local ok, decoded = pcall(vim.json.decode, table.concat(vim.fn.readfile(state_path), "\n"))
-  if not ok or type(decoded) ~= "table" then
-    state = empty_state()
-    return state
-  end
-
-  decoded.keys = decoded.keys or {}
-  decoded.commands = decoded.commands or {}
-  state = decoded
   return state
 end
 
-local function write_state()
-  if not state then
+-- Batch writes outside input callbacks. Atomic replacement avoids a partial JSON
+-- file if Neovim exits during a write. This is not a multi-process merge protocol.
+function M.flush()
+  if flush_timer then
+    if not flush_timer:is_closing() then
+      flush_timer:stop()
+      flush_timer:close()
+    end
+    flush_timer = nil
+  end
+  if not dirty then
+    return true
+  end
+  local temporary = state_path .. "." .. vim.fn.getpid() .. ".tmp"
+  local ok, err = pcall(function()
+    vim.fn.mkdir(vim.fn.fnamemodify(state_path, ":h"), "p")
+    assert(vim.fn.writefile({ vim.json.encode(state) }, temporary) == 0, "write failed")
+    assert(vim.uv.fs_rename(temporary, state_path))
+  end)
+  if ok then
+    dirty = false
+  else
+    vim.fn.delete(temporary)
+    vim.notify("Usage audit save failed: " .. tostring(err), vim.log.levels.WARN)
+  end
+  return ok
+end
+
+local function queue_flush()
+  dirty = true
+  if flush_timer then
     return
   end
-  vim.fn.mkdir(vim.fn.fnamemodify(state_path, ":h"), "p")
-  vim.fn.writefile({ vim.json.encode(state) }, state_path)
-end
-
-local function mode_key(mode)
-  return mode_aliases[mode] or mode:sub(1, 1)
-end
-
-local function normalize_lhs(lhs)
-  local ok, normalized = pcall(vim.api.nvim_replace_termcodes, lhs, true, true, true)
-  return ok and normalized or lhs
-end
-
-local function key_id(mode, lhs)
-  return mode .. " " .. lhs
-end
-
-local function command_id(command)
-  return command:match "^%s*([^!%s]+)" or command
+  local timer
+  timer = vim.defer_fn(function()
+    if flush_timer == timer then
+      flush_timer = nil
+      M.flush()
+    end
+  end, 1000)
+  flush_timer = timer
 end
 
 local function increment(bucket, id, metadata)
   local audit_state = read_state()
-  audit_state[bucket][id] = audit_state[bucket][id] or vim.tbl_extend("force", { count = 0 }, metadata or {})
-  local item = audit_state[bucket][id]
-  item.count = (item.count or 0) + 1
+  local item = vim.tbl_extend("force", audit_state[bucket][id] or { count = 0 }, metadata or {})
+  item.count = item.count + 1
   item.last_used = os.date "!%Y-%m-%dT%H:%M:%SZ"
-  write_state()
+  audit_state[bucket][id] = item
+  queue_flush()
 end
 
-local function rebuild_candidates()
-  candidates_by_mode = {}
-  for _, registration in ipairs(registered_keymaps) do
-    for _, mode in ipairs(registration.mode) do
-      mode = mode_key(mode)
-      if tracked_modes[mode] and registration.track_on_key ~= false then
-        local lhs = normalize_lhs(registration.lhs)
-        candidates_by_mode[mode] = candidates_by_mode[mode] or {}
-        table.insert(candidates_by_mode[mode], {
-          lhs = lhs,
-          display_lhs = registration.lhs,
-          desc = registration.desc,
-          group = registration.group,
-        })
-      end
-    end
-  end
-end
-
-local function registered_contains(mode, lhs)
-  for _, registration in ipairs(registered_keymaps) do
-    if registration.lhs == lhs then
-      for _, registered_mode in ipairs(registration.mode) do
-        if mode_key(registered_mode) == mode then
-          return true
-        end
-      end
-    end
-  end
-  return false
-end
-
-local function register_from_nvim_maps()
-  for mode in pairs(tracked_modes) do
-    for _, map in ipairs(vim.api.nvim_get_keymap(mode)) do
-      if not registered_contains(mode, map.lhs) then
-        M.register_keymap(mode, map.lhs, { desc = map.desc, group = "external" })
-      end
-    end
-  end
+local function registration_id(mode, lhs, buffer)
+  return tostring(buffer or 0) .. " " .. mode .. " " .. normalize_lhs(lhs)
 end
 
 function M.register_keymap(mode, lhs, opts)
   opts = opts or {}
-  local modes = type(mode) == "table" and vim.deepcopy(mode) or { mode }
-  table.insert(registered_keymaps, {
-    mode = modes,
-    lhs = lhs,
-    desc = opts.desc,
-    group = opts.group,
-    track_on_key = opts.track_on_key,
-  })
-  rebuild_candidates()
+  local buffer = opts.buffer
+  if buffer == true or buffer == 0 then
+    buffer = vim.api.nvim_get_current_buf()
+  end
+  for _, entry in ipairs(type(mode) == "table" and mode or { mode }) do
+    -- vim.keymap.set("v", ...) applies to both Visual and Select mode.
+    for _, actual in ipairs(entry == "v" and { "x", "s" } or { entry }) do
+      local maps = buffer and vim.api.nvim_buf_get_keymap(buffer, actual) or vim.api.nvim_get_keymap(actual)
+      for _, map in ipairs(maps) do
+        if normalize_lhs(map.lhs) == normalize_lhs(lhs) then
+          registrations[registration_id(actual, lhs, buffer)] = {
+            desc = map.desc,
+            group = opts.group,
+            buffer = buffer,
+            callback = map.callback,
+            rhs = map.rhs,
+          }
+          break
+        end
+      end
+    end
+  end
+end
+
+local function map_metadata(mode, map)
+  local registration = registrations[registration_id(mode, map.lhs, map.buffer ~= 0 and map.buffer or nil)]
+  if
+    registration
+    and (registration.callback ~= map.callback or registration.rhs ~= map.rhs or registration.desc ~= map.desc)
+  then
+    registration = nil -- A plugin replaced a mapping registered through config.keymaps.
+  end
+  return {
+    lhs = vim.fn.keytrans(normalize_lhs(map.lhs)),
+    desc = map.desc or "",
+    group = registration and registration.group or "external",
+    scope = map.buffer ~= 0 and "buffer" or "global",
+  }
 end
 
 function M.record_key(mode, lhs, metadata)
   mode = mode_key(mode)
-  increment("keys", key_id(mode, lhs), vim.tbl_extend("force", {
-    mode = mode,
-    lhs = lhs,
-  }, metadata or {}))
+  metadata = vim.tbl_extend("force", { mode = mode, lhs = lhs }, metadata or {})
+  increment("keys", key_id(mode, lhs, metadata.scope), metadata)
 end
 
 function M.record_command(command)
-  local id = command_id(command)
-  if id == "" then
-    return
+  local ok, parsed = pcall(vim.api.nvim_parse_cmd, command, {})
+  if ok and parsed.cmd ~= "" then
+    increment("commands", parsed.cmd, { command = parsed.cmd })
   end
-  increment("commands", id, { command = id })
 end
 
-local function on_key(char)
+local function on_key(key, typed)
   local mode = mode_key(vim.api.nvim_get_mode().mode)
-  if not tracked_modes[mode] then
+  typed_colon = key == ":" and typed == ":" and mode ~= "c"
+  if mode == "c" then
+    local line = command_lines[command_level]
+    if line and typed ~= "" then
+      line.interactive = true
+    end
+    return
+  end
+  if typed == "" or not vim.tbl_contains(tracked_modes, mode) then
     return
   end
 
-  local now = vim.uv.now()
-  if now - last_key_at > 1000 then
-    buffers = {}
-  end
-  last_key_at = now
-
-  buffers[mode] = (buffers[mode] or "") .. char
-  local buffer = buffers[mode]
-  local still_possible = false
-
-  for _, candidate in ipairs(candidates_by_mode[mode] or {}) do
-    if buffer == candidate.lhs then
-      M.record_key(mode, candidate.display_lhs, {
-        desc = candidate.desc,
-        group = candidate.group,
-      })
-      buffers[mode] = ""
-      return
-    end
-
-    if vim.startswith(candidate.lhs, buffer) then
-      still_possible = true
+  -- `typed` contains the resolved mapping's original LHS, not its RHS. Query
+  -- live maps so late LSP/Gitsigns attachment, replacements and deletions work
+  -- without wrapping plugin callbacks or relying on their event ordering.
+  local maps = vim.api.nvim_buf_get_keymap(0, mode)
+  vim.list_extend(maps, vim.api.nvim_get_keymap(mode))
+  for _, map in ipairs(maps) do
+    if normalize_lhs(map.lhs) == typed then
+      local metadata = map_metadata(mode, map)
+      M.record_key(mode, metadata.lhs, metadata)
+      return -- Buffer-local maps shadow global maps with the same LHS.
     end
   end
-
-  if not still_possible then
-    buffers[mode] = char
-    for _, candidate in ipairs(candidates_by_mode[mode] or {}) do
-      if buffers[mode] == candidate.lhs then
-        M.record_key(mode, candidate.display_lhs, {
-          desc = candidate.desc,
-          group = candidate.group,
-        })
-        buffers[mode] = ""
-        return
-      end
-      if vim.startswith(candidate.lhs, buffers[mode]) then
-        return
-      end
-    end
-    buffers[mode] = ""
-  end
-end
-
-local function usage_for_key(mode, lhs)
-  local entry = read_state().keys[key_id(mode_key(mode), lhs)]
-  return entry and entry.count or 0, entry and entry.last_used or nil
 end
 
 local function keymap_rows()
-  register_from_nvim_maps()
   local rows = {}
-  local seen = {}
-
-  for _, registration in ipairs(registered_keymaps) do
-    for _, mode in ipairs(registration.mode) do
-      mode = mode_key(mode)
-      local id = key_id(mode, registration.lhs)
-      if not seen[id] then
-        seen[id] = true
-        local count, last_used = usage_for_key(mode, registration.lhs)
-        table.insert(rows, {
-          mode = mode,
-          lhs = registration.lhs,
-          desc = registration.desc or "",
-          group = registration.group or "",
-          count = count,
-          last_used = last_used or "never",
-        })
+  -- Keep historical mappings visible even when their buffer/plugin is gone.
+  for id, entry in pairs(read_state().keys) do
+    rows[id] = vim.tbl_extend("force", { scope = "legacy", desc = "", group = "" }, entry)
+  end
+  local function add(mode, map)
+    local metadata = map_metadata(mode, map)
+    local id = key_id(mode, metadata.lhs, metadata.scope)
+    rows[id] = vim.tbl_extend("force", { count = 0, last_used = "never" }, rows[id] or {}, metadata, { mode = mode })
+  end
+  for _, mode in ipairs(tracked_modes) do
+    for _, map in ipairs(vim.api.nvim_get_keymap(mode)) do
+      add(mode, map)
+    end
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+      if vim.api.nvim_buf_is_loaded(buf) then
+        for _, map in ipairs(vim.api.nvim_buf_get_keymap(buf, mode)) do
+          add(mode, map)
+        end
       end
     end
   end
-
+  rows = vim.tbl_values(rows)
   table.sort(rows, function(a, b)
     if a.count == b.count then
-      return a.mode .. a.lhs < b.mode .. b.lhs
+      return key_id(a.mode, a.lhs, a.scope) < key_id(b.mode, b.lhs, b.scope)
     end
     return a.count < b.count
   end)
@@ -277,6 +256,14 @@ end
 local function command_rows()
   local rows = {}
   local commands = vim.api.nvim_get_commands { builtin = false }
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(buf) then
+      commands = vim.tbl_extend("force", commands, vim.api.nvim_buf_get_commands(buf, {}))
+    end
+  end
+  for name in pairs(read_state().commands) do
+    commands[name] = commands[name] or {}
+  end
   for name in pairs(commands) do
     local entry = read_state().commands[name]
     table.insert(rows, {
@@ -294,50 +281,71 @@ local function command_rows()
   return rows
 end
 
+local function cell(text)
+  return tostring(text or ""):gsub("[\r\n]", " "):gsub("|", "&#124;"):gsub("`", "&#96;")
+end
+
 function M.report()
   local lines = {
     "# Usage audit",
     "",
     "State: " .. state_path,
     "",
+    "Historical counts retain the old tracking behavior; zero counts are not proof of disuse.",
+    "Buffer-local key counts aggregate across buffers. Unloaded buffers are not scanned for unused mappings.",
+    "",
     "## Keymaps, least-used first",
     "",
-    "| Count | Last used | Mode | LHS | Group | Description |",
-    "| ---: | --- | --- | --- | --- | --- |",
+    "| Count | Last used | Mode | LHS | Scope | Group | Description |",
+    "| ---: | --- | --- | --- | --- | --- | --- |",
   }
-
   for _, row in ipairs(keymap_rows()) do
     table.insert(
       lines,
-      string.format("| %d | %s | %s | `%s` | %s | %s |", row.count, row.last_used, row.mode, row.lhs, row.group, row.desc)
+      string.format(
+        "| %d | %s | %s | `%s` | %s | %s | %s |",
+        row.count,
+        cell(row.last_used),
+        cell(row.mode),
+        cell(row.lhs),
+        cell(row.scope),
+        cell(row.group),
+        cell(row.desc)
+      )
     )
   end
-
   vim.list_extend(lines, {
     "",
-    "## User commands, least-used first",
+    "## Commands, least-used first",
+    "",
+    "Counts are interactive submissions, not successful executions. Only the first command in a pipeline is counted.",
+    "Fully mapping-generated command lines, API calls and macro playback are excluded from new counts.",
     "",
     "| Count | Last used | Command |",
     "| ---: | --- | --- |",
   })
-
   for _, row in ipairs(command_rows()) do
-    table.insert(lines, string.format("| %d | %s | `:%s` |", row.count, row.last_used, row.command))
+    table.insert(lines, string.format("| %d | %s | `:%s` |", row.count, cell(row.last_used), cell(row.command)))
   end
-
+  local buf = vim.fn.bufnr "usage-audit-report"
+  if buf == -1 then
+    buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_name(buf, "usage-audit-report")
+  end
   vim.cmd.tabnew()
-  local buf = vim.api.nvim_get_current_buf()
+  vim.api.nvim_win_set_buf(0, buf)
   vim.bo[buf].buftype = "nofile"
   vim.bo[buf].bufhidden = "wipe"
   vim.bo[buf].filetype = "markdown"
-  vim.api.nvim_buf_set_name(buf, "usage-audit-report")
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 end
 
 function M.reset()
   state = empty_state()
-  write_state()
-  vim.notify("Usage audit state reset: " .. state_path)
+  dirty = true
+  if M.flush() then
+    vim.notify("Usage audit state reset: " .. state_path)
+  end
 end
 
 function M.setup()
@@ -346,36 +354,39 @@ function M.setup()
   end
   setup_done = true
   read_state()
-
   vim.on_key(on_key, namespace)
-  vim.defer_fn(register_from_nvim_maps, 1000)
-
   local group = vim.api.nvim_create_augroup("usage-audit", { clear = true })
-  vim.api.nvim_create_autocmd("User", {
-    group = group,
-    pattern = "LazyLoad",
-    callback = register_from_nvim_maps,
-  })
-
-  vim.api.nvim_create_autocmd({ "CmdlineEnter", "CmdlineChanged" }, {
+  vim.api.nvim_create_autocmd("CmdlineEnter", {
     group = group,
     callback = function()
-      current_cmdtype = vim.fn.getcmdtype()
-      current_cmdline = vim.fn.getcmdline()
+      command_level = vim.v.event.cmdlevel
+      command_lines[command_level] = { interactive = typed_colon }
+      typed_colon = false
     end,
   })
-
   vim.api.nvim_create_autocmd("CmdlineLeave", {
     group = group,
     callback = function()
-      if current_cmdtype == ":" then
-        M.record_command(current_cmdline)
+      local level = vim.v.event.cmdlevel
+      local line = command_lines[level]
+      if line and line.interactive and vim.fn.getcmdtype() == ":" and not vim.v.event.abort then
+        M.record_command(vim.fn.getcmdline())
       end
-      current_cmdtype = ""
-      current_cmdline = ""
+      command_lines[level] = nil
+      command_level = level - 1
     end,
   })
-
+  vim.api.nvim_create_autocmd("BufWipeout", {
+    group = group,
+    callback = function(event)
+      for id, registration in pairs(registrations) do
+        if registration.buffer == event.buf then
+          registrations[id] = nil
+        end
+      end
+    end,
+  })
+  vim.api.nvim_create_autocmd("VimLeavePre", { group = group, callback = M.flush })
   vim.api.nvim_create_user_command("UsageAuditReport", M.report, { desc = "Open keymap and command usage audit" })
   vim.api.nvim_create_user_command("UsageAuditReset", M.reset, { desc = "Reset keymap and command usage audit data" })
 end

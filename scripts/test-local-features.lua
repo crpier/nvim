@@ -189,6 +189,13 @@ for _, spec in ipairs(specs) do
 end
 local completion = dofile(root .. "/lua/plugins/completion.lua")[1]
 assert(vim.tbl_contains(completion.dependencies, "local-tabout"))
+-- lazy replays the first LHS after setup; the audit must count the user's input
+-- once, not once for the trigger and again for its programmatic replay.
+assert(require("config.usage_audit").flush())
+local usage = vim.json.decode(table.concat(vim.fn.readfile(tmp .. "/state/usage-audit.json"), "\n")).keys
+assert(usage["n gq"].count == 2, "Lazy trigger/replay counted twice")
+assert(usage["o is"].count == 1, "First lazy text object missed or doubled")
+assert(usage["o i_"].count == 1, "First lazy line text object missed or doubled")
 vim.fn.delete(tmp, "rf")
-print "local features: 17 virtual specs, deferred setup, first-use keys, command completion, event replay, mapping coverage OK"
+print "local features: loading, first-use keys, usage counts, command completion, events and mapping coverage OK"
 vim.cmd "qa!"
