@@ -3,12 +3,8 @@ local utils = require "config.utils"
 utils.setup_lazy()
 
 require "config.options"
-require("config.usage_audit").setup()
 require "config.basic_remaps"
-require("config.variable_part_textobj").setup()
-require("config.test_review").setup()
-require("config.change_review").setup()
-require("config.plugin_replacements").setup()
+-- Feature setup is managed by virtual plugins in lua/plugins/local_features.lua.
 
 -- Setup lazy.nvim
 require("lazy").setup {

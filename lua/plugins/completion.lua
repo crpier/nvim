@@ -3,6 +3,7 @@ return {
     "saghen/blink.cmp",
     version = "*",
     event = "InsertEnter",
+    dependencies = { "local-tabout" },
     opts = {
       keymap = {
         preset = "default",
