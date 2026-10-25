@@ -92,7 +92,11 @@ return {
           additional_vim_regex_highlighting = { "markdown" },
         },
         indent = {
-          enable = false,
+          enable = true,
+          -- Trial Tree-sitter indentation only for Lua and Python.
+          disable = function(lang)
+            return lang ~= "lua" and lang ~= "python"
+          end,
         },
         incremental_selection = {
           enable = true,
