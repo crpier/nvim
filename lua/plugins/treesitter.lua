@@ -95,7 +95,7 @@ return {
           enable = true,
           -- Trial Tree-sitter indentation only for Lua and Python.
           disable = function(lang)
-            return lang ~= "lua" and lang ~= "python"
+            return lang ~= "lua"
           end,
         },
         incremental_selection = {
